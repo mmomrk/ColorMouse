@@ -20,7 +20,7 @@ public class World
 	public static void main(String[] args)
 	{
 
-		//WELCOME MESSAGE TODO
+		//WELCOME MESSAGE TODO would suit here. also, gui would be just nice
 		l2Window = new L2Window();
 
 		processIdentifier = new ProcessIdentifier();
