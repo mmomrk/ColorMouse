@@ -1,5 +1,9 @@
 package PixelHunter;
 
+
+import com.sun.jna.platform.win32.WinDef;
+import com.sun.jna.platform.win32.WinDef.*;
+
 /**
  * Created with IntelliJ IDEA.
  * User: mrk
@@ -9,4 +13,25 @@ package PixelHunter;
  */
 public class World
 {
+	private static ProcessIdentifier processIdentifier;
+	private        HWND[]            hwnds;
+	public static  L2Window          l2Window;
+
+	public static void main(String[] args)
+	{
+
+		//WELCOME MESSAGE TODO
+		l2Window = new L2Window();
+
+		processIdentifier = new ProcessIdentifier();
+		WinDef.HWND[] hwnds = new HWND[2];
+		hwnds = processIdentifier.getL2HwndArray();
+
+		System.out.println(hwnds);
+		l2Window.hwnd = hwnds[0];
+		l2Window.moveResize(-8, -16, 508, 800);
+		Pet testPet = new Pet();
+		testPet.setHP();
+
+	}
 }

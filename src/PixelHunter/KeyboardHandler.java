@@ -1,5 +1,6 @@
 package PixelHunter;
 
+
 import java.awt.event.KeyEvent;
 
 /**
@@ -13,17 +14,19 @@ import java.awt.event.KeyEvent;
 public class KeyboardHandler
 {
 
-    private static int a   =  0;
-    public void keyPressed(KeyEvent e)
-    {
-        System.out.println(e.getKeyCode());
+	private static int a = 0;
 
-    }
-    public static void main(String[] args)
-    {
-        while (true){
-            a++;
+	public void keyPressed(KeyEvent e)
+	{
+		System.out.println(e.getKeyCode());
 
-        }
-    }
+	}
+
+	public static void main(String[] args)
+	{
+		while (true) {
+			a++;
+
+		}
+	}
 }

@@ -9,54 +9,50 @@ public class PixelColorGetter
 {
 
 
-    PixelColorGetter()
-    {
-    }
+	PixelColorGetter()
+	{
+	}
 
-    public static Color getPixelColor(int x, int y)
-    {
-        Robot robot;
-        try
-        {
-            robot = new Robot();
-            return robot.getPixelColor(x, y);
-        } catch (AWTException e)
-        {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-        System.out.println("EXCEPTION IN COLOR GETTING");
-        return Color.black;
+	public static Color getPixelColor(int x, int y)
+	{
+		Robot robot;
+		try {
+			robot = new Robot();
+			return robot.getPixelColor(x, y);
+		} catch (AWTException e) {
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		}
+		System.out.println("EXCEPTION IN COLOR GETTING");
+		return Color.black;
 
-    }
+	}
 
-    protected void keyPressedHandler(KeyEvent e)
-    {
+	protected void keyPressedHandler(KeyEvent e)
+	{
 
 
-    }
+	}
 
-    protected void printPixelColor()
-    {
-        int x, y;
-        x = (int) MouseInfo.getPointerInfo().getLocation().getX();
-        y = (int) MouseInfo.getPointerInfo().getLocation().getY();
-        System.out.println(getPixelColor(x, y));
-    }
+	protected static void printPixelColor()
+	{
+		int x, y;
+		x = (int) WinAPIAPI.getMousePos().getX();
+		y = (int) WinAPIAPI.getMousePos().getY();
+		System.out.println(getPixelColor(x, y));
+	}
 
-    public static void main(String[] args)
-    {
+	public static void main(String[] args)
+	{
 
 
-        while (true)
-        {
+		while (true) {
 
-            try
-            {
-                System.in.read();
-            } catch (IOException e)
-            {
+			try {
+				System.in.read();
+			} catch (IOException e) {
 
-            }
-        }
-    }
+			}
+			printPixelColor();
+		}
+	}
 }

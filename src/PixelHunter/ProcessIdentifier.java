@@ -57,56 +57,57 @@ public class ProcessIdentifier
 //}
 //}
 
-    private static class Psapi
-    {
-        static
-        {
-            Native.register("psapi");
-        }
 
-        public static native int GetModuleBaseNameW(Pointer hProcess, Pointer hmodule, char[] lpBaseName, int size);
-    }
+	private static class Psapi
+	{
+		static {
+			Native.register("psapi");
+		}
 
-    private static class Kernel32
-    {
-        static
-        {
-            Native.register("kernel32");
-        }
+		public static native int GetModuleBaseNameW(Pointer hProcess, Pointer hmodule, char[] lpBaseName, int size);
+	}
 
-        public static int PROCESS_QUERY_INFORMATION = 0x0400;
-        public static int PROCESS_VM_READ = 0x0010;
 
-        public static native int GetLastError();
+	private static class Kernel32
+	{
+		static {
+			Native.register("kernel32");
+		}
 
-        public static native Pointer OpenProcess(int dwDesiredAccess, boolean bInheritHandle, Pointer pointer);
-    }
+		public static int PROCESS_QUERY_INFORMATION = 0x0400;
+		public static int PROCESS_VM_READ           = 0x0010;
 
-    private static class User32DLL
-    {
-        static
-        {
+		public static native int GetLastError();
+
+		public static native Pointer OpenProcess(int dwDesiredAccess, boolean bInheritHandle, Pointer pointer);
+	}
+
+
+	private static class User32DLL
+	{
+		static {
 //            Native.register("user32");
-        }
+		}
 
-        public static native int GetWindowThreadProcessId(WinDef.HWND hWnd, PointerByReference pref);
+		public static native int GetWindowThreadProcessId(WinDef.HWND hWnd, PointerByReference pref);
 
-        public static native WinDef.HWND GetForegroundWindow();
+		public static native WinDef.HWND GetForegroundWindow();
 
-        public static native int GetWindowTextW(WinDef.HWND hWnd, char[] lpString, int nMaxCount);
-    }
+		public static native int GetWindowTextW(WinDef.HWND hWnd, char[] lpString, int nMaxCount);
+	}
 
-    private static final int MAX_TITLE_LENGTH = 1024;
 
-    public static void main(String[] args)
-    {
+	private static final int MAX_TITLE_LENGTH = 1024;
 
-        Psapi ps = new Psapi();
-        Kernel32 kr = new Kernel32();
-        User32DLL us = new User32DLL();
+	public static void qmain()//(String[] args)
+	{
 
-        char[] buffer = new char[MAX_TITLE_LENGTH * 2];
-        String nameApp;
+		Psapi ps = new Psapi();
+		Kernel32 kr = new Kernel32();
+		User32DLL us = new User32DLL();
+
+		char[] buffer = new char[MAX_TITLE_LENGTH * 2];
+		String nameApp;
 
 //        us.GetWindowTextW(us.GetForegroundWindow(), buffer, MAX_TITLE_LENGTH);
 //        System.out.println("Active window title: " + Native.toString(buffer));
@@ -117,8 +118,8 @@ public class ProcessIdentifier
 //        Pointer process = kr.OpenProcess(kr.PROCESS_QUERY_INFORMATION | kr.PROCESS_VM_READ, false, pointer.getValue());
 //        ps.GetModuleBaseNameW(process, null, buffer, MAX_TITLE_LENGTH);
 //        System.out.println("Active window process: " + Native.toString(buffer));
-
-
+//
+//
 //        final WinDef.HWND[] windowHandles = new WinDef.HWND[1];
 //        User32.INSTANCE.EnumWindows(new WinUser.WNDENUMPROC()
 //        {
@@ -135,24 +136,59 @@ public class ProcessIdentifier
 //        }, Pointer.NULL);
 //        User32.INSTANCE.EnumWindows;
 //        User32.INSTANCE.SetWindowPos(windowHandles[0], windowHandles[0], 100, 100, 300, 300, 0x0004);
-        final User32 user32 = User32.INSTANCE;
+		final User32 user32 = User32.INSTANCE;
 
-        user32.EnumWindows(new User32.WNDENUMPROC()
-        {
+		user32.EnumWindows(new User32.WNDENUMPROC()
+		{
 
-            int count;
+			int count;
 
-            public boolean callback(WinDef.HWND hWnd, Pointer userData)
-            {
-                char[] windowText = new char[512];
-                user32.GetWindowText(hWnd, windowText, 512);
-                String wText = Native.toString(windowText);
-                wText = (wText.isEmpty()) ? "" : "; text: " + wText;
-                System.out.println("Found window " + hWnd + ", total " + ++count + wText);
-                return true;
-            }
-        }, null);
-    }
+			public boolean callback(WinDef.HWND hWnd, Pointer userData)
+			{
+				char[] windowText = new char[512];
+				user32.GetWindowText(hWnd, windowText, 512);
+				String wText = Native.toString(windowText);
+				wText = (wText.isEmpty()) ? "" : "; text: " + wText;
+				System.out.println("Found window " + hWnd + ", total " + ++count + wText);
+				return true;
+			}
+		}, null);
+	}
 
+	public static WinDef.HWND[] getL2HwndArray()    //return array lenght 2
+	{
+		final WinDef.HWND[] hwnds = new WinDef.HWND[2];
+
+		Psapi ps = new Psapi();
+		Kernel32 kr = new Kernel32();
+		User32DLL us = new User32DLL();
+
+		char[] buffer = new char[MAX_TITLE_LENGTH * 2];
+		String nameApp;
+		final User32 user32 = User32.INSTANCE;
+
+		user32.EnumWindows(new User32.WNDENUMPROC()
+		{
+
+			int count;
+			int i = 0;
+
+			public boolean callback(WinDef.HWND hWnd, Pointer userData)
+			{
+				char[] windowText = new char[512];
+				user32.GetWindowText(hWnd, windowText, 512);
+				String wText = Native.toString(windowText);
+				if (wText.equals("Shot00072.bmp - Windows Photo Viewer")) {
+					hwnds[i++] = hWnd;
+					System.out.println(hWnd);
+				}
+				wText = (wText.isEmpty()) ? "" : "; text: " + wText;
+
+				System.out.println("Found window " + hWnd + ", total " + ++count + wText);
+				return true;
+			}
+		}, null);
+		return hwnds;
+	}
 
 }
