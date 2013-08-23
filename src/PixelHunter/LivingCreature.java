@@ -2,7 +2,7 @@ package PixelHunter;
 
 /** User: mrk
  * Date: 8/23/13 * Time: 3:32 AM */
-//stupid commentary
+
 import java.awt.Point;
 
 public abstract class LivingCreature
