@@ -69,7 +69,7 @@ public class WinAPIAPI
 	}
 
 	public static void showMessage(String s, int t)
-	{//REDO
+	{//REDO todo
 		System.out.println("Timed out message window: " + s);
 		try {
 			TimeUnit.SECONDS.sleep(t);
@@ -80,7 +80,7 @@ public class WinAPIAPI
 	}
 
 	public static void toolTip(String s, int x, int y)
-	{    //REDO
+	{    //REDO	todo
 		System.out.println(s);
 	}
 
