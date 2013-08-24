@@ -1,3 +1,9 @@
+ID_pet  =   100
+ID_target   =   101
+
+
+#INGAME COLORS
+
 PetTargetPartyHpColor_red   =   111
 PetTargetPartyHpColor_green   =   23
 PetTargetPartyHpColor_blue   =   19
@@ -5,3 +11,11 @@ PetTargetPartyHpColor_blue   =   19
 PartyMembersPetHpColor_red  =  141
 PartyMembersPetHpColor_green  = 23
 PartyMembersPetHpColor_blue  =  17
+
+ChatColorParty_red     =   0
+ChatColorParty_green   =   252
+ChatColorParty_blue    =   0
+
+ChatColorPrivate_red     =   253
+ChatColorPrivate_green   =   1
+ChatColorPrivate_blue    =   253

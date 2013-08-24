@@ -4,24 +4,28 @@
     <list default="true" id="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" name="Default" comment="" />
     <ignored path="ColorMouse.iws" />
     <ignored path=".idea/workspace.xml" />
+    <ignored path="../ColorMouse - Copy/" />
+    <ignored path="../../IdeaProjects/" />
     <file path="/PixelColorGetter.java" changelist="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" time="1377261105576" ignored="false" />
-    <file path="/fragment.java" changelist="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" time="1377017775516" ignored="false" />
+    <file path="/fragment.java" changelist="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" time="1377358614702" ignored="false" />
     <file path="/delit.java" changelist="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" time="1377031167600" ignored="false" />
     <file path="/a.java" changelist="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" time="1377349779642" ignored="false" />
     <file path="/sample.java" changelist="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" time="1377348846474" ignored="false" />
     <file path="/KeyboardHandler.java" changelist="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" time="1377030085284" ignored="false" />
     <file path="/ProcessIdentifier.java" changelist="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" time="1377091696012" ignored="false" />
-    <file path="/Dummy.txt" changelist="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" time="1377346874994" ignored="false" />
-    <file path="/L2Window.java" changelist="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" time="1377263331262" ignored="false" />
+    <file path="/Dummy.txt" changelist="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" time="1377362514577" ignored="false" />
+    <file path="/L2Window.java" changelist="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" time="1377360057284" ignored="false" />
     <file path="/WinAPIAPI.java" changelist="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" time="1377350103628" ignored="false" />
-    <file path="/World.java" changelist="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" time="1377293425444" ignored="false" />
+    <file path="/World.java" changelist="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" time="1377360551356" ignored="false" />
     <file path="/LivinCreature.java" changelist="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" time="1377254543913" ignored="false" />
-    <file path="/Pet.java" changelist="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" time="1377290969816" ignored="false" />
+    <file path="/Pet.java" changelist="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" time="1377360511018" ignored="false" />
     <file path="/Delit.java" changelist="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" time="1377278935995" ignored="false" />
-    <file path="/LivingCreature.java" changelist="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" time="1377296122091" ignored="false" />
-    <file path="/inputData" changelist="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" time="1377347780383" ignored="false" />
-    <file path="/GroupVariables.java" changelist="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" time="1377350532111" ignored="false" />
-    <file path="/SecondaryLivingCreature.java" changelist="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" time="1377349297407" ignored="false" />
+    <file path="/LivingCreature.java" changelist="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" time="1377354223993" ignored="false" />
+    <file path="/inputData" changelist="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" time="1377353839643" ignored="false" />
+    <file path="/GroupVariables.java" changelist="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" time="1377356707749" ignored="false" />
+    <file path="/SecondaryLivingCreature.java" changelist="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" time="1377360234817" ignored="false" />
+    <file path="/GroupedVariables.java" changelist="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" time="1377355714449" ignored="false" />
+    <file path="/a.dummy" changelist="6483137a-fe67-4526-bfcd-fb9ff4fe4ac8" time="1377358137892" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,6 +40,8 @@
     <disable_hints />
   </component>
   <component name="DebuggerManager">
+    <breakpoint_rules default_suspend_policy="SuspendAll" default_condition_enabled="true" />
+    <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <breakpoint_any default_suspend_policy="SuspendAll" default_condition_enabled="true">
       <breakpoint>
         <option name="NOTIFY_CAUGHT" value="true" />
@@ -70,8 +76,6 @@
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
     </breakpoint_any>
-    <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
-    <breakpoint_rules default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <breakpoint_rules />
     <ui_properties />
   </component>
@@ -81,37 +85,19 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="World.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/PixelHunter/World.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="23" column="34" selection-start="564" selection-end="564" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="Pet.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/PixelHunter/Pet.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="63" column="79" selection-start="1526" selection-end="1526" vertical-scroll-proportion="0.0">
+            <state line="31" column="4" selection-start="568" selection-end="568" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="L2Window.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="L2Window.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/PixelHunter/L2Window.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="26" column="46" selection-start="450" selection-end="553" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="GroupVariables.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/PixelHunter/GroupVariables.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="20" column="93" selection-start="425" selection-end="425" vertical-scroll-proportion="0.0">
+            <state line="102" column="25" selection-start="3419" selection-end="3419" vertical-scroll-proportion="3.2776349">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -119,60 +105,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SecondaryLivingCreature.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/PixelHunter/SecondaryLivingCreature.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="10" column="24" selection-start="227" selection-end="227" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="inputData" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/resources/inputData">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ProcessIdentifier.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/PixelHunter/ProcessIdentifier.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="188" column="13" selection-start="6334" selection-end="6334" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="LivingCreature.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/PixelHunter/LivingCreature.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="23" column="1" selection-start="440" selection-end="440" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="BOMBA.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="BOMBA.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/resources/BOMBA.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="46" column="24" selection-start="1340" selection-end="1345" vertical-scroll-proportion="0.10526316">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="WinAPIAPI.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/PixelHunter/WinAPIAPI.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="71" column="16" selection-start="1683" selection-end="1683" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state line="49" column="8" selection-start="1464" selection-end="1551" vertical-scroll-proportion="0.0">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -196,22 +133,22 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/PixelHunter/KeyboardHandler.java" />
-        <option value="$PROJECT_DIR$/src/PixelHunter/delit.java" />
         <option value="$PROJECT_DIR$/src/PixelHunter/class_scratches.java" />
         <option value="$PROJECT_DIR$/src/PixelHunter/LivinCreature.java" />
         <option value="$PROJECT_DIR$/src/trash/class_scratches.java" />
         <option value="$PROJECT_DIR$/src/PixelHunter/PixelColorGetter.java" />
         <option value="$PROJECT_DIR$/src/PixelHunter/ProcessIdentifier.java" />
         <option value="$PROJECT_DIR$/src/PixelHunter/Delit.java" />
-        <option value="$PROJECT_DIR$/src/PixelHunter/LivingCreature.java" />
-        <option value="$PROJECT_DIR$/src/PixelHunter/World.java" />
+        <option value="$PROJECT_DIR$/src/PixelHunter/WinAPIAPI.java" />
         <option value="$PROJECT_DIR$/resources/inputData" />
-        <option value="$PROJECT_DIR$/src/PixelHunter/Pet.java" />
+        <option value="$PROJECT_DIR$/src/PixelHunter/GroupVariables.java" />
+        <option value="$PROJECT_DIR$/src/PixelHunter/GroupedVariables.java" />
+        <option value="$PROJECT_DIR$/src/PixelHunter/HpConstants.java" />
+        <option value="$PROJECT_DIR$/src/PixelHunter/LivingCreature.java" />
         <option value="$PROJECT_DIR$/src/PixelHunter/L2Window.java" />
         <option value="$PROJECT_DIR$/src/PixelHunter/SecondaryLivingCreature.java" />
-        <option value="$PROJECT_DIR$/src/PixelHunter/WinAPIAPI.java" />
-        <option value="$PROJECT_DIR$/src/PixelHunter/GroupVariables.java" />
+        <option value="$PROJECT_DIR$/src/PixelHunter/Pet.java" />
+        <option value="$PROJECT_DIR$/src/PixelHunter/World.java" />
       </list>
     </option>
   </component>
@@ -249,7 +186,6 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -269,6 +205,24 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="ColorMouse" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ColorMouse" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ColorMouse" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="slf4j-1.7.5" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -307,6 +261,7 @@
         </subPane>
       </pane>
       <pane id="PackagesPane" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -332,7 +287,144 @@
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\mrk\IdeaProjects\ColorMouse\resources" />
+      <recent name="C:\Users\mrk\IdeaProjects\ColorMouse\src" />
     </key>
+  </component>
+  <component name="RestoreUpdateTree">
+    <UpdateInfo date="Moments ago" ActionInfo="_Update">
+      <UpdatedFiles>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Updated from server" />
+          <option name="myStatusName" value="Changed on server" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="CHANGED_ON_SERVER" />
+          <FILE-GROUP>
+            <option name="myUpdateName" value="Updated" />
+            <option name="myStatusName" value="Changed" />
+            <option name="mySupportsDeletion" value="false" />
+            <option name="myCanBeAbsent" value="false" />
+            <option name="myId" value="UPDATED" />
+          </FILE-GROUP>
+          <FILE-GROUP>
+            <option name="myUpdateName" value="Created" />
+            <option name="myStatusName" value="Created" />
+            <option name="mySupportsDeletion" value="false" />
+            <option name="myCanBeAbsent" value="false" />
+            <option name="myId" value="CREATED" />
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/../.idea/codeStyleSettings.xml</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/../.idea/compiler.xml</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/../.idea/encodings.xml</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/../.idea/libraries/jna_4_0_0.xml</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/../.idea/misc.xml</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/../.idea/modules.xml</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/../.idea/scopes/scope_settings.xml</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/../.idea/vcs.xml</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/../.idea/workspace.xml</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/../ColorMouse.iml</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/../resources/inputData</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/../resources/jna-4.0.0.jar</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/../resources/jna-platform-4.0.0.jar</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/../src/PixelHunter/GroupVariables.java</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/../src/PixelHunter/InfoFrame.java</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/../src/PixelHunter/KeyboardHandler.java</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/../src/PixelHunter/L2Window.java</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/../src/PixelHunter/LivingCreature.java</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/../src/PixelHunter/Pet.java</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/../src/PixelHunter/PixelColorGetter.java</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/../src/PixelHunter/ProcessIdentifier.java</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/../src/PixelHunter/SecondaryLivingCreature.java</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/../src/PixelHunter/ToolTip.java</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/../src/PixelHunter/WinAPIAPI.java</PATH>
+            <PATH vcs="Git" revision="">$PROJECT_DIR$/../src/PixelHunter/World.java</PATH>
+          </FILE-GROUP>
+          <FILE-GROUP>
+            <option name="myUpdateName" value="Deleted" />
+            <option name="myStatusName" value="Deleted" />
+            <option name="mySupportsDeletion" value="false" />
+            <option name="myCanBeAbsent" value="true" />
+            <option name="myId" value="REMOVED_FROM_REPOSITORY" />
+          </FILE-GROUP>
+          <FILE-GROUP>
+            <option name="myUpdateName" value="Restored" />
+            <option name="myStatusName" value="Will be restored" />
+            <option name="mySupportsDeletion" value="false" />
+            <option name="myCanBeAbsent" value="false" />
+            <option name="myId" value="RESTORED" />
+          </FILE-GROUP>
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Modified" />
+          <option name="myStatusName" value="Modified" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="MODIFIED" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Skipped" />
+          <option name="myStatusName" value="Skipped" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="SKIPPED" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Merged with conflicts" />
+          <option name="myStatusName" value="Will be merged with conflicts" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="MERGED_WITH_CONFLICTS" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Merged with tree conflicts" />
+          <option name="myStatusName" value="Merged with tree conflicts" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="MERGED_WITH_TREE_CONFLICT" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Merged with property conflicts" />
+          <option name="myStatusName" value="Will be merged with property conflicts" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="MERGED_WITH_PROPERTY_CONFLICT" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Merged" />
+          <option name="myStatusName" value="Will be merged" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="MERGED" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Not in repository" />
+          <option name="myStatusName" value="Not in repository" />
+          <option name="mySupportsDeletion" value="true" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="UNKNOWN" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Locally added" />
+          <option name="myStatusName" value="Locally added" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="LOCALLY_ADDED" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Locally removed" />
+          <option name="myStatusName" value="Locally removed" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="LOCALLY_REMOVED" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Switched" />
+          <option name="myStatusName" value="Switched" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="SWITCHED" />
+        </FILE-GROUP>
+      </UpdatedFiles>
+    </UpdateInfo>
   </component>
   <component name="RunManager" selected="Application.World">
     <configuration default="false" name="KeyboardHandler" type="Application" factoryName="Application" temporary="true">
@@ -539,21 +631,21 @@
     <frame x="-8" y="-8" width="1296" height="776" extended-state="6" />
     <editor active="false" />
     <layout>
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3063209" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32901135" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32901135" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.13762927" sideWeight="0.6709887" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.13762927" sideWeight="0.6726094" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3987034" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.13762927" sideWeight="0.32576984" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.273906" sideWeight="0.49756888" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.273906" sideWeight="0.49675852" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3279483" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3273906" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.35243055" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3517018" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3063209" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24959481" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -615,112 +707,114 @@
     <breakpoint-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/PixelHunter/KeyboardHandler.java">
+    <entry file="file://$PROJECT_DIR$/resources/inputData">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="18" selection-start="290" selection-end="290" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/PixelHunter/PixelColorGetter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="37" column="53" selection-start="979" selection-end="979" vertical-scroll-proportion="0.0">
+        <state line="20" column="32" selection-start="456" selection-end="456" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/PixelHunter/PixelColorGetter.java">
+    <entry file="file://$PROJECT_DIR$/src/PixelHunter/GroupedVariables.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="1" column="8" selection-start="29" selection-end="29" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/PixelHunter/KeyboardHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="18" selection-start="290" selection-end="290" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ColorMouse.iml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="12" selection-start="411" selection-end="411" vertical-scroll-proportion="0.26842105" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/PixelHunter/PixelColorGetter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="40" column="48" selection-start="712" selection-end="752" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/PixelHunter/World.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="34" selection-start="564" selection-end="564" vertical-scroll-proportion="0.0">
+        <state line="13" column="1" selection-start="240" selection-end="240" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/PixelHunter/LivingCreature.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="1" selection-start="440" selection-end="440" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/PixelHunter/L2Window.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="26" column="46" selection-start="450" selection-end="553" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/PixelHunter/Pet.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="63" column="79" selection-start="1526" selection-end="1526" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/resources/inputData">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/PixelHunter/WinAPIAPI.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="71" column="16" selection-start="1683" selection-end="1683" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/PixelHunter/ProcessIdentifier.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="188" column="13" selection-start="6334" selection-end="6334" vertical-scroll-proportion="0.0">
+        <state line="13" column="0" selection-start="273" selection-end="273" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/PixelHunter/SecondaryLivingCreature.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="10" column="24" selection-start="227" selection-end="227" vertical-scroll-proportion="0.0">
+        <state line="23" column="15" selection-start="443" selection-end="443" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/PixelHunter/GroupVariables.java">
+    <entry file="file://$PROJECT_DIR$/src/PixelHunter/World.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="93" selection-start="425" selection-end="425" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state line="9" column="26" selection-start="174" selection-end="174" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/PixelHunter/HpConstants.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="7" column="13" selection-start="107" selection-end="107" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../untitled/src/Main.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../.idea/codeStyleSettings.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../src/PixelHunter/Pet.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../src/PixelHunter/PixelColorGetter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../src/PixelHunter/World.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../src/PixelHunter/ToolTip.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../src/PixelHunter/L2Window.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="61" column="24" selection-start="1684" selection-end="1684" vertical-scroll-proportion="0.7429306">
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/resources/BOMBA.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="46" column="24" selection-start="1340" selection-end="1345" vertical-scroll-proportion="0.10526316">
+        <state line="49" column="8" selection-start="1464" selection-end="1551" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/PixelHunter/Pet.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="31" column="4" selection-start="568" selection-end="568" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/PixelHunter/L2Window.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="102" column="25" selection-start="3419" selection-end="3419" vertical-scroll-proportion="3.2776349">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
