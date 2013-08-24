@@ -12,21 +12,18 @@ import java.util.Properties;
  */
 public class GroupedVariables
 {
-	public class HpConstants
-	{
-		public Color color;
-		public Point coordinateLeft;
-		public Point coordinateRight;
-	}
 
 	public class ChatConstants
 	{
-		public Color color;
+		//		public final
 		public Point coordinateLeft;
 		public Point coordinateRight;
+//		ChatConstants()	todo: set all coordinates for decyphering caller name in static{}
 	}
 
-	static final class ProjectConstants{
+
+	static final class ProjectConstants
+	{
 
 		static final int ID_PET;
 		static final int ID_TARGET;
@@ -50,26 +47,27 @@ public class GroupedVariables
 			ID_PET = Integer.parseInt(properties.get("ID_pet").toString());
 			ID_TARGET = Integer.parseInt(properties.get("ID_target").toString());
 
-			int red,green,blue;
-			red	=	Integer.parseInt(properties.get("PetTargetPartyHpColor_red").toString());
-			green	=	Integer.parseInt(properties.get("PetTargetPartyHpColor_green").toString());
-			blue	=	Integer.parseInt(properties.get("PetTargetPartyHpColor_blue").toString());
-			SECONDARY_LIVING_CREATURE_HP_COLOR = new Color(red,green,blue);
+			int red, green, blue;
+			red = Integer.parseInt(properties.get("PetTargetPartyHpColor_red").toString());
+			green = Integer.parseInt(properties.get("PetTargetPartyHpColor_green").toString());
+			blue = Integer.parseInt(properties.get("PetTargetPartyHpColor_blue").toString());
+			SECONDARY_LIVING_CREATURE_HP_COLOR = new Color(red, green, blue);
 
-			red	=	Integer.parseInt(properties.get("PartyMembersPetHpColor_red").toString());
-			green	=	Integer.parseInt(properties.get("PartyMembersPetHpColor_green").toString());
-			blue	=	Integer.parseInt(properties.get("PartyMembersPetHpColor_blue").toString());
-			PARTY_MEMBERS_PET_HP_COLOR= new Color(red,green,blue);
+			red = Integer.parseInt(properties.get("PartyMembersPetHpColor_red").toString());
+			green = Integer.parseInt(properties.get("PartyMembersPetHpColor_green").toString());
+			blue = Integer.parseInt(properties.get("PartyMembersPetHpColor_blue").toString());
+			PARTY_MEMBERS_PET_HP_COLOR = new Color(red, green, blue);
 
-			red	=	Integer.parseInt(properties.get("ChatColorParty_red").toString());
-			green	=	Integer.parseInt(properties.get("ChatColorParty_green").toString());
-			blue	=	Integer.parseInt(properties.get("ChatColorParty_blue").toString());
-			CHAT_COLOR_PARTY	=	new Color(red,green,blue);
+			red = Integer.parseInt(properties.get("ChatColorParty_red").toString());
+			green = Integer.parseInt(properties.get("ChatColorParty_green").toString());
+			blue = Integer.parseInt(properties.get("ChatColorParty_blue").toString());
+			CHAT_COLOR_PARTY = new Color(red, green, blue);
 
-			red	=	Integer.parseInt(properties.get("ChatColorParty_red").toString());
-			green	=	Integer.parseInt(properties.get("ChatColorParty_green").toString());
-			blue	=	Integer.parseInt(properties.get("ChatColorParty_blue").toString());
-			CHAT_COLOR_PRIVATE	=	new Color(red,green,blue);
+			red = Integer.parseInt(properties.get("ChatColorParty_red").toString());
+			green = Integer.parseInt(properties.get("ChatColorParty_green").toString());
+			blue = Integer.parseInt(properties.get("ChatColorParty_blue").toString());
+			CHAT_COLOR_PRIVATE = new Color(red, green, blue);
+
 		}
 
 	}

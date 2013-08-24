@@ -2,18 +2,20 @@ package PixelHunter;
 
 
 import com.sun.jna.platform.win32.WinDef;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 
+import static PixelHunter.GroupedVariables.*;
+
 /**
- * Created with IntelliJ IDEA.
  * User: mrk
- * Date: 8/21/13
- * Time: 3:57 AM
- * To change this template use File | Settings | File Templates.
+ * Date: 8/21/13* Time: 3:57 AM
  */
 public class L2Window
 {
+	private static final Logger logger = LoggerFactory.getLogger(L2Window.class);
 
 	public WinDef.HWND hwnd;
 
@@ -23,15 +25,93 @@ public class L2Window
 			frame_yt          = 30,
 			frame_yb          = 8;
 
-	public Color characterHpColorPositive, characterHpColorNegative;
-	public Point characterHp_l, characterHp_r;
-	public final Color petHpColorPositive = new Color(111, 23, 20), petHpColorNegative = new Color(47, 26, 24);
-	public Point petHp_l, petHp_r;
-	public Color targetHpColorPositive, targetHpColorNegative;
-	public Point targetHp_l, targetHp_r;
-	public Color partyHpColorPositive = new Color(111, 23, 20), partyHpColorNegative;//todo test if negative is the same as pet's
-	public Point partyHp_l, partyHp_r;
-	public int partyHp_ydelta, partyHp_pet_xdelta, partyHp_pet_ydelta;     //copy from existing
+
+
+//	public Color characterHpColor;//, characterHpColorNegative;	//    todo delete it when gethp and sethp works for all
+//	public Point characterHp_l, characterHp_r;
+//	public final Color petHpColorPositive = new Color(111, 23, 20), petHpColorNegative = new Color(47, 26, 24);
+//	public Point petHp_l, petHp_r;
+//	public Color targetHpColorPositive, targetHpColorNegative;
+//	public Point targetHp_l, targetHp_r;
+//	public Color partyHpColorPositive = new Color(111, 23, 20), partyHpColorNegative;
+//	public Point partyHp_l, partyHp_r;
+//	public int partyHp_ydelta, partyHp_pet_xdelta, partyHp_pet_ydelta;     //copy from existing
+
+	public void setHP(HpConstants hpConstants)    //warning designed to work only with pet, target and party member (not party pet)
+	{
+		hpConstants.color = ProjectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR;
+
+
+		WinAPIAPI.showMessage("Set HP bar for pet. Place mouse under HP fully healed bar and press OK");
+
+		Point currentCoordinate = WinAPIAPI.getMousePos();
+		int i = 0, yLimit = 100;
+		while (!getRelPixelColor(currentCoordinate).equals(ProjectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR)) {
+			if (i >= yLimit) {   //overflow
+				if (debugMode == 2) {
+					WinAPIAPI.showMessage("Failed to find y");
+				}
+				logger.error("Failed to find y");
+				hpConstants.coordinateRight.setLocation(-1, -1);
+				hpConstants.coordinateLeft.setLocation(-1, -1);
+
+				return ;
+			}
+			currentCoordinate.y--;
+		}
+		logger.debug("Successfully found y" + currentCoordinate.y);
+		if (debugMode == 2) {
+			advancedMouseMove(currentCoordinate);
+			WinAPIAPI.showMessage("Successfully found y");
+		}
+
+		hpConstants.coordinateLeft.y = currentCoordinate.y;
+		hpConstants.coordinateRight.y = currentCoordinate.y;
+		int temporaryX = currentCoordinate.x;
+
+		while (getRelPixelColor(currentCoordinate).equals(ProjectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR)) {
+			currentCoordinate.x--;
+		}
+		logger.debug("Successfully found x left" + currentCoordinate.x);
+		if (debugMode == 2) {
+			advancedMouseMove(currentCoordinate);
+			WinAPIAPI.showMessage("Successfully found x left");
+		}
+		hpConstants.coordinateLeft.x = currentCoordinate.x;
+
+		currentCoordinate.x = temporaryX;
+
+		while (getRelPixelColor(currentCoordinate).equals(ProjectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR)) {
+			currentCoordinate.x++;
+		}
+		logger.debug("Successfully found x right" + currentCoordinate.x);
+		if (debugMode == 2) {
+			advancedMouseMove(currentCoordinate);
+			WinAPIAPI.showMessage("Successfully found x right");
+		}
+		hpConstants.coordinateRight.x = currentCoordinate.x;
+
+		return ;
+	}
+
+	public int getHP(HpConstants hpConstants)    //todo not tested
+	{
+		Color hpColor = hpConstants.color;
+		Point coordinateHp_l = hpConstants.coordinateLeft;
+		Point coordinateHp_r = hpConstants.coordinateRight;
+		double deltaX = coordinateHp_r.x - coordinateHp_l.x;
+		int ticks = 50;
+
+		for (int i = ticks; i >= 0; i--) {
+			Point currentPoint = new Point((int) (coordinateHp_l.x + deltaX * i / ticks), coordinateHp_l.y);
+
+			if (getRelPixelColor(currentPoint).equals(hpColor)) {
+				return (int) ((ticks - i) / ticks);
+			}
+
+		}
+		return 0;
+	}
 
 	public void moveResize(int x, int y, int w, int h)
 	{
@@ -152,22 +232,6 @@ public class L2Window
 		windowPosition = new Point(0, 0);
 		h = 20;
 		w = 20;
-
-		characterHp_l = new Point(0, 0);
-		characterHp_r = new Point(0, 0);
-
-		petHp_l = new Point(0, 0);
-		petHp_r = new Point(0, 0);
-
-		targetHp_l = new Point(0, 0);
-		targetHp_r = new Point(0, 0);
-
-		partyHp_l = new Point(0, 0);
-		partyHp_r = new Point(0, 0);
-
-		partyHp_ydelta = 0;
-		partyHp_pet_xdelta = 0;
-		partyHp_pet_ydelta = 0;
 	}
 
 }

@@ -3,7 +3,6 @@ package PixelHunter;
 /** User: mrk
  * Date: 8/23/13 * Time: 3:32 AM */
 
-import java.awt.Point;
 
 public abstract class LivingCreature
 {
@@ -11,11 +10,8 @@ public abstract class LivingCreature
 
 	public L2Window l2Window;
 
-	public abstract int getHP();
+	public GroupedVariables.ProjectConstants projectConstants;
 
-	public abstract boolean isDead();
-
-	public abstract Point[] setHP();     //point1, point2
 
 	public LivingCreature(int thisid)     //do we need this??
 	{
