@@ -14,7 +14,7 @@ public class Pet extends SecondaryLivingCreature
 
 	public Pet(L2Window l2Window)
 	{
-		super(GroupedVariables.ProjectConstants.ID_PET, l2Window);
+		super(GroupedVariables.projectConstants.ID_PET, l2Window);
 	}
 
 

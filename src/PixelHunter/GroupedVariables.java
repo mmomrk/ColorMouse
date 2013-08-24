@@ -3,6 +3,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -13,7 +14,25 @@ import java.util.Properties;
 public class GroupedVariables
 {
 
-	public class ChatConstants
+	public static GroupedVariables.ProjectConstants projectConstants;
+
+
+	public static class HpConstants
+	{
+		public Color color;
+		public Point coordinateLeft;
+		public Point coordinateRight;
+
+		public HpConstants(Color color, Point left, Point right)
+		{
+			this.color = color;
+			this.coordinateLeft = left;
+			this.coordinateRight = right;
+		}
+	}
+
+
+	public static class ChatConstants
 	{
 		//		public final
 		public Point coordinateLeft;
@@ -21,24 +40,36 @@ public class GroupedVariables
 //		ChatConstants()	todo: set all coordinates for decyphering caller name in static{}
 	}
 
-
-	static final class ProjectConstants
+	public static final class ProjectConstants
 	{
+		//refactor all these were static.note this
+		public static final int ID_PET;
+		public static final int ID_TARGET;
 
-		static final int ID_PET;
-		static final int ID_TARGET;
+		public static final Color SECONDARY_LIVING_CREATURE_HP_COLOR;
+		public static final Color PARTY_MEMBERS_PET_HP_COLOR;
+		public static final Color CHAT_COLOR_PARTY;
+		public static final Color CHAT_COLOR_PRIVATE;
 
-		static final Color SECONDARY_LIVING_CREATURE_HP_COLOR;
-		static final Color PARTY_MEMBERS_PET_HP_COLOR;
-		static final Color CHAT_COLOR_PARTY;
-		static final Color CHAT_COLOR_PRIVATE;
+		public ProjectConstants()
+		{
 
-		private static final Logger logger = LoggerFactory.getLogger(ProjectConstants.class);
+		}
+
+		private static final Logger logger = LoggerFactory.getLogger(GroupedVariables.ProjectConstants.class);
+
+
+		private void main()
+		{
+
+			System.out.println("main of grouped variables" + ID_PET + " " + ID_TARGET);
+		}
 
 		static {
 			Properties properties = new Properties();
 			try {
-				properties.load(ProjectConstants.class.getClassLoader().getResourceAsStream("inputData"));
+				properties.load(new FileInputStream("resources/inputData"));
+//				properties.load(GroupedVariables.ProjectConstants.class.getClassLoader().getResourceAsStream("inputData"));
 			} catch (IOException e) {
 				logger.error("Failed to read input configuration file", e);
 				throw new Error("Failed to read configuration", e);
@@ -70,5 +101,10 @@ public class GroupedVariables
 
 		}
 
+	}
+
+	public GroupedVariables()
+	{
+		projectConstants	=	new GroupedVariables.ProjectConstants();
 	}
 }

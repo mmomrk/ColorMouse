@@ -15,6 +15,8 @@ import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef;
 import com.sun.jna.ptr.PointerByReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 //
@@ -23,6 +25,9 @@ import com.sun.jna.ptr.PointerByReference;
 //
 public class ProcessIdentifier
 {
+
+	private static final Logger logger = LoggerFactory.getLogger(L2Window.class);
+
 //    public static void main(String[] args) throws Exception {
 //        char[] buffer = new char[MAX_TITLE_LENGTH * 2];
 //        GetWindowTextW(GetForegroundWindow(), buffer, MAX_TITLE_LENGTH);
@@ -180,11 +185,11 @@ public class ProcessIdentifier
 				String wText = Native.toString(windowText);
 				if (wText.equals("Shot00072.bmp - Windows Photo Viewer")) {
 					hwnds[i++] = hWnd;
-					System.out.println(hWnd);
+					logger.debug("Process IDer: found proper window, HWND="+hWnd);
 				}
 				wText = (wText.isEmpty()) ? "" : "; text: " + wText;
 
-				System.out.println("Found window " + hWnd + ", total " + ++count + wText);
+//				System.out.println("Found window " + hWnd + ", total " + ++count + wText);
 				return true;
 			}
 		}, null);
@@ -192,3 +197,4 @@ public class ProcessIdentifier
 	}
 
 }
+//todo: make this class a cleaner place
