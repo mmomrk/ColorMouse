@@ -31,9 +31,9 @@ public abstract class SecondaryLivingCreature extends LivingCreature
 	public SecondaryLivingCreature(int thisid, L2Window l2Window)
 	{
 		super(thisid);
-		if (thisid != projectConstants.ID_PET && thisid != projectConstants.ID_TARGET) {
+		if (thisid != GroupedVariables.ProjectConstants.ID_PET && thisid != GroupedVariables.ProjectConstants.ID_TARGET) {
 			logger.error("error in constructor of secondary LC. wrong ID");
-			this.id = projectConstants.ID_PET;
+			this.id = GroupedVariables.ProjectConstants.ID_PET;
 		}
 		hpConstants = new GroupedVariables.HpConstants(Color.black, new Point(0, 0), new Point(0, 0));
 		if (l2Window == null){	//todo delete this if

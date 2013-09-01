@@ -10,7 +10,7 @@ public abstract class LivingCreature
 
 	public L2Window l2Window;
 
-	public GroupedVariables.ProjectConstants projectConstants;
+//	public GroupedVariables.ProjectConstants projectConstants;
 
 	public LivingCreature(int thisid)     //do we need this??
 	{

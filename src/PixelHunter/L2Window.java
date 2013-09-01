@@ -31,31 +31,68 @@ public class L2Window
 
 	private Robot robot;
 
+	private boolean noChatMode = false;    //++getter
 
 
-	@Override
-	public String toString()
+
+	public void findChat()		//add scan for chat status in char after window init
 	{
-		return "L2Window: HWND="+hwnd+"; top-left point is "+windowPosition;
+
+		Point chatStartingPoint	=	new Point(112,-45); //to constructor
+
+		logger.trace("Entered find chat");
+		WinAPIAPI.showMessage("Setting up chat properties. Enter _______ to party chat.");
+		boolean againFlag	=	true;	//used to scan two lines in case of finding a spacebar in the first vertical
+		while (chatStartingPoint.y > -70)
+		{
+			if (colorsAreClose(getRelPixelColor(chatStartingPoint),GroupedVariables.projectConstants.CHAT_COLOR_PARTY))
+			{
+				chatStartingPoint.y	-=	2;	//difference between underline symbol and lowest pixel in ':'
+				logger.debug("Found chat line, "+chatStartingPoint);
+				if (debugMode	==	2)
+				{
+					WinAPIAPI.showMessage("Found chat line, "+chatStartingPoint);
+				}
+				return;
+			}
+
+			chatStartingPoint.y--;
+
+			if (chatStartingPoint.y == -69 && againFlag == true)
+			{
+				chatStartingPoint.y	=	-45;	//maybe it is bad to use hardcoded constant twice todo:discuss
+				chatStartingPoint.x--;
+				againFlag	=	false;
+			}
+
+		}
+		logger.error("Could not find chat line");
+		WinAPIAPI.showMessage("Failed to find chat line!!!");
+		noChatMode	=	true;
+		return;
 	}
+
+
+	public boolean isChatMode()
+	{
+		return !noChatMode;
+	}
+
 
 	public static boolean colorsAreClose(Color color1, Color color2)
 	{
-		final int	threshold	=	4;	//test it, watch it
-		int diffR = color1.getRed()-color2.getRed();
-		int diffG	=	color1.getGreen()-color2.getGreen();
-		int diffB	=	color1.getBlue()-color2.getBlue();
+		final int threshold = 4;    //test it, watch it
+		int diffR = color1.getRed() - color2.getRed();
+		int diffG = color1.getGreen() - color2.getGreen();
+		int diffB = color1.getBlue() - color2.getBlue();
 
 
-		if (Math.abs(diffR) > threshold || Math.abs(diffG) > threshold || Math.abs(diffB) > threshold)
-		{
-			if (Math.abs(diffR) < 2*threshold && Math.abs(diffG) < 2*threshold && Math.abs(diffB) < 2*threshold)
-			{
-				logger.warn("probably two colors are close, but failed comparison. Recommended to increase threshold. "+color1 +" "+color2);
+		if (Math.abs(diffR) > threshold || Math.abs(diffG) > threshold || Math.abs(diffB) > threshold) {
+			if (Math.abs(diffR) < 2 * threshold && Math.abs(diffG) < 2 * threshold && Math.abs(diffB) < 2 * threshold) {
+				logger.warn("probably two colors are close, but failed comparison. Recommended to increase threshold. " + color1 + " " + color2);
 			}
 			return false;
-		}	else
-		{
+		} else {
 			return true;
 		}
 
@@ -72,11 +109,11 @@ public class L2Window
 		Point currentCoordinate = absoluteToRelativeCoordinates(WinAPIAPI.getMousePos());
 
 		int i = 0, yLimit = 100;
-		while (! colorsAreClose(getRelPixelColor(currentCoordinate),projectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR)) {
+		while (!colorsAreClose(getRelPixelColor(currentCoordinate), projectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR)) {
 			if (i >= yLimit) {   //overflow
 				if (debugMode == 2) {            //discuss printing won't work in this
 //					WinAPIAPI.showMessage("Failed to find y"); todo:return after showmessage is fixed
-					logger.info("got "+getRelPixelColor(currentCoordinate)+" expected: projectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR");
+					logger.info("got " + getRelPixelColor(currentCoordinate) + " expected: projectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR");
 					try {
 						System.in.read();
 					} catch (IOException e) {
@@ -87,7 +124,7 @@ public class L2Window
 				hpConstants.coordinateRight.setLocation(-1, -1);
 				hpConstants.coordinateLeft.setLocation(-1, -1);
 
-				return ;
+				return;
 			}
 			currentCoordinate.y--;
 			i++;
@@ -102,7 +139,7 @@ public class L2Window
 		hpConstants.coordinateRight.y = currentCoordinate.y;
 		int temporaryX = currentCoordinate.x;
 
-		while (colorsAreClose(getRelPixelColor(currentCoordinate),projectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR)) {
+		while (colorsAreClose(getRelPixelColor(currentCoordinate), projectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR)) {
 			currentCoordinate.x--;
 		}
 		logger.debug("Successfully found x left" + currentCoordinate.x);
@@ -110,11 +147,11 @@ public class L2Window
 			advancedMouseMove(currentCoordinate);
 			WinAPIAPI.showMessage("Successfully found x left");
 		}
-		hpConstants.coordinateLeft.x = currentCoordinate.x+1;
+		hpConstants.coordinateLeft.x = currentCoordinate.x + 1;
 
 		currentCoordinate.x = temporaryX;
 
-		while (colorsAreClose(getRelPixelColor(currentCoordinate),projectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR)) {
+		while (colorsAreClose(getRelPixelColor(currentCoordinate), projectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR)) {
 			currentCoordinate.x++;
 		}
 		logger.debug("Successfully found x right" + currentCoordinate.x);
@@ -122,9 +159,9 @@ public class L2Window
 			advancedMouseMove(currentCoordinate);
 			WinAPIAPI.showMessage("Successfully found x right");
 		}
-		hpConstants.coordinateRight.x = currentCoordinate.x-1;
+		hpConstants.coordinateRight.x = currentCoordinate.x - 1;
 
-		return ;
+		return;
 	}
 
 	public int getHP(GroupedVariables.HpConstants hpConstants)    //todo not tested
@@ -135,19 +172,17 @@ public class L2Window
 		double deltaX = coordinateHp_r.x - coordinateHp_l.x;
 		int ticks = 50;
 		Point currentPoint = coordinateHp_l;
-		logger.info(""+currentPoint+"deltaX="+deltaX);//todo remove after this code is debugged
-		for (int i = 0; i<=ticks; i++) {
-			System.out.println(i);//todo remove after this code is debugged
-			currentPoint.x = (int) (coordinateHp_r.x -  deltaX * i / ticks);
-			try {	//todo remove this asap
+
+		for (int i = 0; i <= ticks; i++) {
+			currentPoint.x = (int) (coordinateHp_r.x - deltaX * i / ticks);
+			try {    //todo remove this asap
 				System.in.read();
 			} catch (IOException e) {
-				e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+				e.printStackTrace();
 			}
-			if (colorsAreClose(getRelPixelColor(currentPoint),hpColor)) {
+			if (colorsAreClose(getRelPixelColor(currentPoint), hpColor)) {
 				return (int) ((ticks - i) * 100) / ticks;
 			}
-
 
 		}
 		return 0;
@@ -171,21 +206,21 @@ public class L2Window
 	public Point relativeToAbsoluteCoordinates(Point relativePoint)
 	{
 
-		Point absolutePoint	=	new Point();
+		Point absolutePoint = new Point();
 		absolutePoint.x = (int) relativePoint.getX();
 		absolutePoint.y = (int) relativePoint.getY();
 		if ((absolutePoint.x > this.windowPosition.x + this.w) || (absolutePoint.y > this.windowPosition.y + this.h)) {
-			logger.error("RelativeToAbsolute Coordinate out of range, >0; rel point is"+relativePoint);
+			logger.error("RelativeToAbsolute Coordinate out of range, >0; rel point is" + relativePoint);
 			WinAPIAPI.showMessage("RelativeToAbsolute Coordinate out of range, >0", 3);
-			return new Point(-1,-1);
+			return new Point(-1, -1);
 		}
 
 		if (absolutePoint.x < 0) {
 			absolutePoint.x = this.windowPosition.x + this.w - this.frame_x + absolutePoint.x;
 			if (absolutePoint.x < 0) {
-				logger.error("RelativeToAbsolute Coordinate out of range, <0; rel point is"+relativePoint);
+				logger.error("RelativeToAbsolute Coordinate out of range, <0; rel point is" + relativePoint);
 				WinAPIAPI.showMessage("RelativeToAbsolute Coordinate out of range, <0" + absolutePoint.x, 3);
-				return new Point(-1,-1);
+				return new Point(-1, -1);
 			}
 		} else {
 			absolutePoint.x += this.windowPosition.x + this.frame_x;
@@ -195,7 +230,7 @@ public class L2Window
 			absolutePoint.y = this.windowPosition.y + this.h - this.frame_yb + absolutePoint.y;
 			if (absolutePoint.y < 0) {
 				WinAPIAPI.showMessage("Coordinate out of range" + absolutePoint.y, 3);
-				return new Point(-1,-1);
+				return new Point(-1, -1);
 			}
 		} else {
 			absolutePoint.y += this.windowPosition.y + this.frame_yt;
@@ -206,30 +241,30 @@ public class L2Window
 
 	public Point absoluteToRelativeCoordinates(Point absolutePoint)
 	{
-		Point relativePoint	=	new Point();
-		 relativePoint.x = (int) absolutePoint.getX();
-		 relativePoint.y = (int) absolutePoint.getY();
+		Point relativePoint = new Point();
+		relativePoint.x = (int) absolutePoint.getX();
+		relativePoint.y = (int) absolutePoint.getY();
 		if ((absolutePoint.x > this.windowPosition.x + this.w) || (absolutePoint.y > this.windowPosition.y + this.h)) {
 			logger.error("Absolute coordinate to rel is out of range. requested " + absolutePoint);
 			WinAPIAPI.showMessage("Absolute coordinate to rel is out of range. requested " + absolutePoint, 3);//todo: remove after logger is understood
 			return new Point(-1, -1);
 		}
 
-		if (absolutePoint.x < 0 || absolutePoint.y<0) {
+		if (absolutePoint.x < 0 || absolutePoint.y < 0) {
 			logger.error("Absolute coordinate to rel is NEGATIVE!!!. requested " + absolutePoint);
 			WinAPIAPI.showMessage("Absolute coordinate to rel is NEGATIVE!!!. requested " + absolutePoint, 3);//todo: remove after logger is understood
 		}
 
 		relativePoint.x = relativePoint.x - this.windowPosition.x - this.frame_x;
 
-		relativePoint.y = relativePoint.y- this.windowPosition.y - this.frame_yt;
+		relativePoint.y = relativePoint.y - this.windowPosition.y - this.frame_yt;
 
 		return new Point(relativePoint.x, relativePoint.y);
 	}
 
 	public Color getRelPixelColor(Point relativePoint)               //todo hard redo with reltoabs. we had to be drunk while writing it
 	{
-		Point absolutePoint	=	relativeToAbsoluteCoordinates(relativePoint);
+		Point absolutePoint = relativeToAbsoluteCoordinates(relativePoint);
 
 		Color color;
 		color = robot.getPixelColor(absolutePoint.x, absolutePoint.y);
@@ -240,12 +275,19 @@ public class L2Window
 				break;
 			case 2:
 
-				advancedMouseMove(new Point(relativePoint.x,relativePoint.y));
+				advancedMouseMove(new Point(relativePoint.x, relativePoint.y));
 //				robot.mouseMove(x, y);
-				WinAPIAPI.showMessage("getrelPixelColor at relatice point"+relativePoint+" and got color "+color.toString());
+				WinAPIAPI.showMessage("getrelPixelColor at relatice point" + relativePoint + " and got color " + color.toString());
 				break;
 		}
 		return color;
+	}
+
+
+	@Override
+	public String toString()
+	{
+		return "L2Window: HWND=" + hwnd + "; top-left point is " + windowPosition;
 	}
 
 	L2Window()
@@ -255,7 +297,7 @@ public class L2Window
 		h = 20;
 		w = 20;
 		try {
-			robot	=	new Robot();
+			robot = new Robot();
 		} catch (AWTException e) {
 			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 		}
