@@ -12,7 +12,6 @@ public abstract class LivingCreature
 
 	public GroupedVariables.ProjectConstants projectConstants;
 
-
 	public LivingCreature(int thisid)     //do we need this??
 	{
 		id = thisid;

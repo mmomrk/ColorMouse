@@ -16,9 +16,12 @@ public abstract class SecondaryLivingCreature extends LivingCreature
 	public GroupedVariables.HpConstants hpConstants;
 
 
-	public abstract int getHP();
+	public abstract boolean isDead();	//todo: simple
 
-	public abstract boolean isDead();
+	public int getHP()
+	{
+		return this.l2Window.getHP(this.hpConstants);
+	}
 
 	public void setHP()
 	{

@@ -22,28 +22,43 @@ public class L2Window
 
 	public Point windowPosition;
 	public int   h, w;//kinda bad. has to be refactored
+
+	public int debugMode = 2;
+
 	private final int frame_x = 8,
 			frame_yt          = 30,
 			frame_yb          = 8;
 
-	public int debugMode = 2;
+	private Robot robot;
 
 
-
-//	public Color characterHpColor;//, characterHpColorNegative;	//    todo delete it when gethp and sethp works for all
-//	public Point characterHp_l, characterHp_r;
-//	public final Color petHpColorPositive = new Color(111, 23, 20), petHpColorNegative = new Color(47, 26, 24);
-//	public Point petHp_l, petHp_r;
-//	public Color targetHpColorPositive, targetHpColorNegative;
-//	public Point targetHp_l, targetHp_r;
-//	public Color partyHpColorPositive = new Color(111, 23, 20), partyHpColorNegative;
-//	public Point partyHp_l, partyHp_r;
-//	public int partyHp_ydelta, partyHp_pet_xdelta, partyHp_pet_ydelta;     //copy from existing
 
 	@Override
 	public String toString()
 	{
 		return "L2Window: HWND="+hwnd+"; top-left point is "+windowPosition;
+	}
+
+	public static boolean colorsAreClose(Color color1, Color color2)
+	{
+		final int	threshold	=	4;	//test it, watch it
+		int diffR = color1.getRed()-color2.getRed();
+		int diffG	=	color1.getGreen()-color2.getGreen();
+		int diffB	=	color1.getBlue()-color2.getBlue();
+
+
+		if (Math.abs(diffR) > threshold || Math.abs(diffG) > threshold || Math.abs(diffB) > threshold)
+		{
+			if (Math.abs(diffR) < 2*threshold && Math.abs(diffG) < 2*threshold && Math.abs(diffB) < 2*threshold)
+			{
+				logger.warn("probably two colors are close, but failed comparison. Recommended to increase threshold. "+color1 +" "+color2);
+			}
+			return false;
+		}	else
+		{
+			return true;
+		}
+
 	}
 
 	public void setHP(GroupedVariables.HpConstants hpConstants)    //warning designed to work only with pet, target and party member (not party pet)
@@ -53,14 +68,11 @@ public class L2Window
 
 		WinAPIAPI.showMessage("Set HP bar for secondary creature. Place mouse under HP fully healed bar and press OK");
 		logger.info("Setting HP for a secondary LC");
-		try {
-			System.in.read();
-		} catch (IOException e) {
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-		}
-		Point currentCoordinate = WinAPIAPI.getMousePos();
+
+		Point currentCoordinate = absoluteToRelativeCoordinates(WinAPIAPI.getMousePos());
+
 		int i = 0, yLimit = 100;
-		while (!getRelPixelColor(currentCoordinate).equals(projectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR)) {
+		while (! colorsAreClose(getRelPixelColor(currentCoordinate),projectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR)) {
 			if (i >= yLimit) {   //overflow
 				if (debugMode == 2) {            //discuss printing won't work in this
 //					WinAPIAPI.showMessage("Failed to find y"); todo:return after showmessage is fixed
@@ -78,6 +90,7 @@ public class L2Window
 				return ;
 			}
 			currentCoordinate.y--;
+			i++;
 		}
 		logger.debug("Successfully found y" + currentCoordinate.y);
 		if (debugMode == 2) {
@@ -89,7 +102,7 @@ public class L2Window
 		hpConstants.coordinateRight.y = currentCoordinate.y;
 		int temporaryX = currentCoordinate.x;
 
-		while (getRelPixelColor(currentCoordinate).equals(projectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR)) {
+		while (colorsAreClose(getRelPixelColor(currentCoordinate),projectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR)) {
 			currentCoordinate.x--;
 		}
 		logger.debug("Successfully found x left" + currentCoordinate.x);
@@ -97,11 +110,11 @@ public class L2Window
 			advancedMouseMove(currentCoordinate);
 			WinAPIAPI.showMessage("Successfully found x left");
 		}
-		hpConstants.coordinateLeft.x = currentCoordinate.x;
+		hpConstants.coordinateLeft.x = currentCoordinate.x+1;
 
 		currentCoordinate.x = temporaryX;
 
-		while (getRelPixelColor(currentCoordinate).equals(projectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR)) {
+		while (colorsAreClose(getRelPixelColor(currentCoordinate),projectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR)) {
 			currentCoordinate.x++;
 		}
 		logger.debug("Successfully found x right" + currentCoordinate.x);
@@ -109,7 +122,7 @@ public class L2Window
 			advancedMouseMove(currentCoordinate);
 			WinAPIAPI.showMessage("Successfully found x right");
 		}
-		hpConstants.coordinateRight.x = currentCoordinate.x;
+		hpConstants.coordinateRight.x = currentCoordinate.x-1;
 
 		return ;
 	}
@@ -122,17 +135,17 @@ public class L2Window
 		double deltaX = coordinateHp_r.x - coordinateHp_l.x;
 		int ticks = 50;
 		Point currentPoint = coordinateHp_l;
-		logger.info(""+currentPoint);//todo remove after this code is debugged
-		for (int i = ticks; i >= 0; i--) {
+		logger.info(""+currentPoint+"deltaX="+deltaX);//todo remove after this code is debugged
+		for (int i = 0; i<=ticks; i++) {
 			System.out.println(i);//todo remove after this code is debugged
-			currentPoint.x = (int) (coordinateHp_l.x + deltaX * i / ticks);
+			currentPoint.x = (int) (coordinateHp_r.x -  deltaX * i / ticks);
 			try {	//todo remove this asap
 				System.in.read();
 			} catch (IOException e) {
 				e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 			}
-			if (getRelPixelColor(currentPoint).equals(hpColor)) {
-				return (int) ((i * 100) / ticks);
+			if (colorsAreClose(getRelPixelColor(currentPoint),hpColor)) {
+				return (int) ((ticks - i) * 100) / ticks;
 			}
 
 
@@ -151,100 +164,85 @@ public class L2Window
 
 	public void advancedMouseMove(Point point)
 	{
-		point = absoluteToRelativeCoordinates(point);
-		Robot robot;
-		try {
-			robot = new Robot();
-			robot.mouseMove(point.x, point.y);
-		} catch (AWTException e) {
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-		}
+		point = relativeToAbsoluteCoordinates(point);
+		robot.mouseMove(point.x, point.y);
 	}
 
 	public Point relativeToAbsoluteCoordinates(Point relativePoint)
 	{
-		return new Point(this.windowPosition.x + this.frame_x + relativePoint.x, this.windowPosition.y + this.frame_yt + relativePoint.y);
+
+		Point absolutePoint	=	new Point();
+		absolutePoint.x = (int) relativePoint.getX();
+		absolutePoint.y = (int) relativePoint.getY();
+		if ((absolutePoint.x > this.windowPosition.x + this.w) || (absolutePoint.y > this.windowPosition.y + this.h)) {
+			logger.error("RelativeToAbsolute Coordinate out of range, >0; rel point is"+relativePoint);
+			WinAPIAPI.showMessage("RelativeToAbsolute Coordinate out of range, >0", 3);
+			return new Point(-1,-1);
+		}
+
+		if (absolutePoint.x < 0) {
+			absolutePoint.x = this.windowPosition.x + this.w - this.frame_x + absolutePoint.x;
+			if (absolutePoint.x < 0) {
+				logger.error("RelativeToAbsolute Coordinate out of range, <0; rel point is"+relativePoint);
+				WinAPIAPI.showMessage("RelativeToAbsolute Coordinate out of range, <0" + absolutePoint.x, 3);
+				return new Point(-1,-1);
+			}
+		} else {
+			absolutePoint.x += this.windowPosition.x + this.frame_x;
+		}
+
+		if (absolutePoint.y < 0) {
+			absolutePoint.y = this.windowPosition.y + this.h - this.frame_yb + absolutePoint.y;
+			if (absolutePoint.y < 0) {
+				WinAPIAPI.showMessage("Coordinate out of range" + absolutePoint.y, 3);
+				return new Point(-1,-1);
+			}
+		} else {
+			absolutePoint.y += this.windowPosition.y + this.frame_yt;
+		}
+
+		return absolutePoint;
 	}
 
 	public Point absoluteToRelativeCoordinates(Point absolutePoint)
 	{
-		int x = (int) absolutePoint.getX();
-		int y = (int) absolutePoint.getY();
-		if ((x > this.windowPosition.x + this.w) || (y > this.windowPosition.y + this.h)) {
-			WinAPIAPI.showMessage("Coordinate out of range", 3);
+		Point relativePoint	=	new Point();
+		 relativePoint.x = (int) absolutePoint.getX();
+		 relativePoint.y = (int) absolutePoint.getY();
+		if ((absolutePoint.x > this.windowPosition.x + this.w) || (absolutePoint.y > this.windowPosition.y + this.h)) {
+			logger.error("Absolute coordinate to rel is out of range. requested " + absolutePoint);
+			WinAPIAPI.showMessage("Absolute coordinate to rel is out of range. requested " + absolutePoint, 3);//todo: remove after logger is understood
 			return new Point(-1, -1);
 		}
 
-		if (x < 0) {
-			x = this.windowPosition.x + this.w - this.frame_x + x;
-			if (x < 0) {
-				WinAPIAPI.showMessage("Coordinate out of range" + x, 3);
-				return new Point(-1, -1);
-			}
-		} else {
-			x += this.windowPosition.x + this.frame_x;
+		if (absolutePoint.x < 0 || absolutePoint.y<0) {
+			logger.error("Absolute coordinate to rel is NEGATIVE!!!. requested " + absolutePoint);
+			WinAPIAPI.showMessage("Absolute coordinate to rel is NEGATIVE!!!. requested " + absolutePoint, 3);//todo: remove after logger is understood
 		}
 
-		if (y < 0) {
-			y = this.windowPosition.y + this.h - this.frame_yb + y;
-			if (y < 0) {
-				WinAPIAPI.showMessage("Coordinate out of range" + y, 3);
-				return new Point(-1, -1);
-			}
-		} else {
-			y += this.windowPosition.y + this.frame_yt;
-		}
-		return new Point(x, y);
+		relativePoint.x = relativePoint.x - this.windowPosition.x - this.frame_x;
+
+		relativePoint.y = relativePoint.y- this.windowPosition.y - this.frame_yt;
+
+		return new Point(relativePoint.x, relativePoint.y);
 	}
 
-	public Color getRelPixelColor(Point point)
+	public Color getRelPixelColor(Point relativePoint)               //todo hard redo with reltoabs. we had to be drunk while writing it
 	{
-		int x = (int) point.getX();
-		int y = (int) point.getY();
-		if ((x > this.windowPosition.x + this.w) || (y > this.windowPosition.y + this.h)) {
-			WinAPIAPI.showMessage("Coordinate out of range", 3);
-			return Color.CYAN;
-		}
-
-		if (x < 0) {
-			x = this.windowPosition.x + this.w - this.frame_x + x;
-			if (x < 0) {
-				WinAPIAPI.showMessage("Coordinate out of range" + x, 3);
-				return Color.CYAN;
-			}
-		} else {
-			x += this.windowPosition.x + this.frame_x;
-		}
-
-		if (y < 0) {
-			y = this.windowPosition.y + this.h - this.frame_yb + y;
-			if (y < 0) {
-				WinAPIAPI.showMessage("Coordinate out of range" + y, 3);
-				return Color.CYAN;
-			}
-		} else {
-			y += this.windowPosition.y + this.frame_yt;
-		}
+		Point absolutePoint	=	relativeToAbsoluteCoordinates(relativePoint);
 
 		Color color;
-		Robot robot;           //discuss is it ok to make a rbot every time we need a pixel?
-
-		try {
-			robot = new Robot();
-			color = robot.getPixelColor(x, y);
-		} catch (AWTException e) {
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-			WinAPIAPI.showMessage("Robot error", 3);
-			return Color.CYAN;
-		}
+		color = robot.getPixelColor(absolutePoint.x, absolutePoint.y);
 
 		switch (debugMode) {
 			case 1:
-				WinAPIAPI.toolTip(color.toString(), x, y);
+				WinAPIAPI.toolTip(color.toString(), absolutePoint.x, absolutePoint.y);
 				break;
 			case 2:
-				robot.mouseMove(x, y);
-//				WinAPIAPI.showMessage(color.toString());	todo return this asap
+
+				advancedMouseMove(new Point(relativePoint.x,relativePoint.y));
+//				robot.mouseMove(x, y);
+				WinAPIAPI.showMessage("getrelPixelColor at relatice point"+relativePoint+" and got color "+color.toString());
 				break;
 		}
 		return color;
@@ -256,6 +254,11 @@ public class L2Window
 		windowPosition = new Point(0, 0);
 		h = 20;
 		w = 20;
+		try {
+			robot	=	new Robot();
+		} catch (AWTException e) {
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		}
 	}
 
 }
