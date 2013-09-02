@@ -4,6 +4,8 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 
+import static PixelHunter.GroupedVariables.projectConstants;
+
 
 /**
  * User: mrk
@@ -16,7 +18,17 @@ public abstract class SecondaryLivingCreature extends LivingCreature
 	public GroupedVariables.HpConstants hpConstants;
 
 
-	public abstract boolean isDead();	//todo: simple
+	public boolean isDead()	//todo: testmd
+
+	{
+		if (l2Window.colorsAreClose(l2Window.getRelPixelColor(hpConstants.coordinateLeft),hpConstants.color))
+		{
+			return false;
+		}
+		else {
+			return true;
+		}
+	}
 
 	public int getHP()
 	{
@@ -35,7 +47,7 @@ public abstract class SecondaryLivingCreature extends LivingCreature
 			logger.error("error in constructor of secondary LC. wrong ID");
 			this.id = GroupedVariables.ProjectConstants.ID_PET;
 		}
-		hpConstants = new GroupedVariables.HpConstants(Color.black, new Point(0, 0), new Point(0, 0));
+		hpConstants = new GroupedVariables.HpConstants(projectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR, new Point(0, 0), new Point(0, 0)); //primary pet and target hp colors are equal
 		if (l2Window == null){	//todo delete this if
 			System.out.println("window is null!!");
 		}

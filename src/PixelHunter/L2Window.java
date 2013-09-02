@@ -6,9 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
-import java.io.IOException;
-
-import static PixelHunter.GroupedVariables.*;
 
 /**
  * User: mrk
@@ -23,7 +20,7 @@ public class L2Window
 	public Point windowPosition;
 	public int   h, w;//kinda bad. has to be refactored
 
-	public int debugMode = 2;
+	public int debugMode = 0;
 
 	private final int frame_x = 8,
 			frame_yt          = 30,
@@ -100,7 +97,7 @@ public class L2Window
 
 	public void setHP(GroupedVariables.HpConstants hpConstants)    //warning designed to work only with pet, target and party member (not party pet)
 	{
-		hpConstants.color = projectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR;
+
 
 
 		WinAPIAPI.showMessage("Set HP bar for secondary creature. Place mouse under HP fully healed bar and press OK");
@@ -109,16 +106,16 @@ public class L2Window
 		Point currentCoordinate = absoluteToRelativeCoordinates(WinAPIAPI.getMousePos());
 
 		int i = 0, yLimit = 100;
-		while (!colorsAreClose(getRelPixelColor(currentCoordinate), projectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR)) {
+		while (!colorsAreClose(getRelPixelColor(currentCoordinate), hpConstants.color)) {
 			if (i >= yLimit) {   //overflow
 				if (debugMode == 2) {            //discuss printing won't work in this
 //					WinAPIAPI.showMessage("Failed to find y"); todo:return after showmessage is fixed
-					logger.info("got " + getRelPixelColor(currentCoordinate) + " expected: projectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR");
-					try {
-						System.in.read();
-					} catch (IOException e) {
-						e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-					}
+					logger.info("got " + getRelPixelColor(currentCoordinate) + " expected: hpConstants.color");
+//					try {
+//						System.in.read();
+//					} catch (IOException e) {
+//						e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//					}//todo: clean this code
 				}
 				logger.error("Failed to find y");
 				hpConstants.coordinateRight.setLocation(-1, -1);
@@ -139,53 +136,52 @@ public class L2Window
 		hpConstants.coordinateRight.y = currentCoordinate.y;
 		int temporaryX = currentCoordinate.x;
 
-		while (colorsAreClose(getRelPixelColor(currentCoordinate), projectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR)) {
+		while (colorsAreClose(getRelPixelColor(currentCoordinate), hpConstants.color)) {
 			currentCoordinate.x--;
 		}
-		logger.debug("Successfully found x left" + currentCoordinate.x);
+		hpConstants.coordinateLeft.x = ++currentCoordinate.x;		//because it is in while. it stops at the first unequal
+		logger.debug("Successfully found x left " + currentCoordinate.x);
 		if (debugMode == 2) {
 			advancedMouseMove(currentCoordinate);
-			WinAPIAPI.showMessage("Successfully found x left");
+			WinAPIAPI.showMessage("Successfully found x left ");
 		}
-		hpConstants.coordinateLeft.x = currentCoordinate.x + 1;
+
 
 		currentCoordinate.x = temporaryX;
 
-		while (colorsAreClose(getRelPixelColor(currentCoordinate), projectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR)) {
+		while (colorsAreClose(getRelPixelColor(currentCoordinate), hpConstants.color)) {
 			currentCoordinate.x++;
 		}
+		hpConstants.coordinateRight.x = --currentCoordinate.x;
 		logger.debug("Successfully found x right" + currentCoordinate.x);
 		if (debugMode == 2) {
 			advancedMouseMove(currentCoordinate);
 			WinAPIAPI.showMessage("Successfully found x right");
 		}
-		hpConstants.coordinateRight.x = currentCoordinate.x - 1;
+
 
 		return;
 	}
 
 	public int getHP(GroupedVariables.HpConstants hpConstants)    //todo not tested
 	{
+		logger.trace("Inside l2window.getHP");
 		Color hpColor = hpConstants.color;
 		Point coordinateHp_l = hpConstants.coordinateLeft;
 		Point coordinateHp_r = hpConstants.coordinateRight;
 		double deltaX = coordinateHp_r.x - coordinateHp_l.x;
-		int ticks = 50;
-		Point currentPoint = coordinateHp_l;
-
-		for (int i = 0; i <= ticks; i++) {
-			currentPoint.x = (int) (coordinateHp_r.x - deltaX * i / ticks);
-			try {    //todo remove this asap
-				System.in.read();
-			} catch (IOException e) {
-				e.printStackTrace();
+		final int ticks = 50;
+		Point currentPoint	=	new Point(coordinateHp_r);
+		int i = 0;
+		for (; i <= ticks; i++) {
+			currentPoint.x = (int) (hpConstants.coordinateRight.x - (float) deltaX *i / (float)ticks);
+			logger.debug("coordinate hp R "+coordinateHp_r+" current coordinate "+currentPoint);
+			logger.debug("getHP: tick "+i+"of "+ticks+"; deltaX="+deltaX+" and I am subtracting "+deltaX * (float) i / (float)ticks);
+			if (colorsAreClose(getRelPixelColor(currentPoint),hpConstants.color)){
+				return	100*(ticks+1-i)/(ticks+1);
 			}
-			if (colorsAreClose(getRelPixelColor(currentPoint), hpColor)) {
-				return (int) ((ticks - i) * 100) / ticks;
-			}
-
 		}
-		return 0;
+		return	0;
 	}
 
 	public void moveResize(int x, int y, int w, int h)
@@ -262,13 +258,13 @@ public class L2Window
 		return new Point(relativePoint.x, relativePoint.y);
 	}
 
-	public Color getRelPixelColor(Point relativePoint)               //todo hard redo with reltoabs. we had to be drunk while writing it
+	public Color getRelPixelColor(Point relativePoint)
 	{
 		Point absolutePoint = relativeToAbsoluteCoordinates(relativePoint);
 
 		Color color;
 		color = robot.getPixelColor(absolutePoint.x, absolutePoint.y);
-
+		logger.debug("getrelPixelColor at relative point " + relativePoint + " and got color " + color.toString());
 		switch (debugMode) {
 			case 1:
 				WinAPIAPI.toolTip(color.toString(), absolutePoint.x, absolutePoint.y);

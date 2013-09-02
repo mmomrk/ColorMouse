@@ -19,9 +19,9 @@ public class GroupedVariables
 
 	public static class HpConstants
 	{
-		public Color color;
-		public Point coordinateLeft;
-		public Point coordinateRight;
+		public final Color color;
+		public final Point coordinateLeft;
+		public final Point coordinateRight;
 
 		public HpConstants(Color color, Point left, Point right)
 		{
