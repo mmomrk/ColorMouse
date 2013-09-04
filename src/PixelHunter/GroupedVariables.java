@@ -60,6 +60,7 @@ public class GroupedVariables
 		public static final Color CHAT_COLOR_PARTY;
 		public static final Color CHAT_COLOR_PRIVATE;
 
+		public static final int CHAT_TASK_LIST_LENGTH;
 //		public static final Point[] WINDOWS_POSITIONS = {new Point(-8, -25), new Point(508, -25)};	//top-left points of window 1 and 2//todo make sure it is not used
 
 		public ProjectConstants()
@@ -72,7 +73,7 @@ public class GroupedVariables
 
 		private void main()
 		{
-			logger.trace("GroupedVariables.main. congratulations");
+			logger.trace("GroupedVariables.main.. congratulations!! now tell me how did you get there");
 		}
 
 		static {
@@ -96,6 +97,7 @@ public class GroupedVariables
 			ID_Bladedancer = Integer.parseInt(properties.get("ID_Bladedancer").toString());
 			ID_Warlock = Integer.parseInt(properties.get("ID_Warlock").toString());
 
+			CHAT_TASK_LIST_LENGTH	=	Integer.parseInt(properties.get("CHAT_TASK_LIST_LENGTH").toString());
 
 			int red, green, blue;
 			red = Integer.parseInt(properties.get("PetTargetPartyHpColor_red").toString());
