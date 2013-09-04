@@ -164,8 +164,8 @@ public class ProcessIdentifier
 
 	public static ArrayList<WinDef.HWND> getL2HwndArray()    //return array lenght 2
 	{
-		final ArrayList<WinDef.HWND> hwnds;
-		hwnds = new ArrayList<WinDef.HWND>();
+		//does this work?
+		final ArrayList<WinDef.HWND> hwndList = new ArrayList<WinDef.HWND>();
 
 		Psapi ps = new Psapi();
 		Kernel32 kr = new Kernel32();
@@ -187,7 +187,7 @@ public class ProcessIdentifier
 				user32.GetWindowText(hWnd, windowText, 512);
 				String wText = Native.toString(windowText);
 				if (wText.equals("Shot00069.bmp - Paint")) {      //- Windows Photo Viewer	- Paint
-					hwnds.add(hWnd);
+					hwndList.add(hWnd);
 					logger.debug("Process IDer: found proper window, HWND=" + hWnd);
 				}
 				wText = (wText.isEmpty()) ? "" : "; text: " + wText;
@@ -196,7 +196,7 @@ public class ProcessIdentifier
 				return true;
 			}
 		}, null);
-		return hwnds;
+		return hwndList;
 	}
 
 }
