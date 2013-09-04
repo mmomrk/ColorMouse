@@ -1,7 +1,7 @@
 package PixelHunter;
 
 
-import com.sun.jna.platform.win32.WinDef;
+import com.sun.jna.platform.win32.WinDef.HWND;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,12 +15,12 @@ public class L2Window
 {
 	private static final Logger logger = LoggerFactory.getLogger(L2Window.class);
 
-	public WinDef.HWND hwnd;
+	public HWND hwnd;
 
 	public Point windowPosition;
 	public int   h, w;//kinda bad. has to be refactored
 
-	public int debugMode = 0;
+	public int debugMode = 2;
 
 	private final int frame_x = 8,
 			frame_yt          = 30,
@@ -28,44 +28,65 @@ public class L2Window
 
 	private Robot robot;
 
+	private Point chatStartingPoint;
+
 	private boolean noChatMode = false;    //++getter
 
+	public void acceptWindowPosition()	//todo: get current position\scale and saves it to class constants
+	{
+		return;
+	}
 
 
-	public void findChat()		//add scan for chat status in char after window init
+	public static void initiateSize(int windowNumber,HWND hwnd1)		//todo not tested
+	{
+		logger.trace("Inside L2window initiateSize");
+		Dimension screenDimentions	=	Toolkit.getDefaultToolkit().getScreenSize();
+		switch (windowNumber){
+			case 0:
+				WinAPIAPI.setWindowPos(hwnd1, -8, -25, screenDimentions.width + 8, screenDimentions.height - 7);	//8=frame width, 7is fine, having 50px win panel
+				return;
+			case 1:
+				WinAPIAPI.setWindowPos(hwnd1,-8, -25, screenDimentions.width + 12, screenDimentions.height - 7);
+				return;
+			case 2:
+				WinAPIAPI.setWindowPos(hwnd1,screenDimentions.width/2-4, -25, screenDimentions.width+12, screenDimentions.height-7);
+				return;
+		}
+		logger.warn("anomalous behaviour in l2window.initiateSize");
+		return;
+	}
+
+	public void setChat()        //todo debug, test
 	{
 
-		Point chatStartingPoint	=	new Point(112,-45); //to constructor
+		chatStartingPoint = new Point(112, -45);
 
 		logger.trace("Entered find chat");
 		WinAPIAPI.showMessage("Setting up chat properties. Enter _______ to party chat.");
-		boolean againFlag	=	true;	//used to scan two lines in case of finding a spacebar in the first vertical
-		while (chatStartingPoint.y > -70)
-		{
-			if (colorsAreClose(getRelPixelColor(chatStartingPoint),GroupedVariables.projectConstants.CHAT_COLOR_PARTY))
-			{
-				chatStartingPoint.y	-=	2;	//difference between underline symbol and lowest pixel in ':'
-				logger.debug("Found chat line, "+chatStartingPoint);
-				if (debugMode	==	2)
-				{
-					WinAPIAPI.showMessage("Found chat line, "+chatStartingPoint);
+		boolean againFlag = true;    //used to scan two lines in case of finding a spacebar in the first vertical
+		while (chatStartingPoint.y > -70) {
+			if (colorsAreClose(getRelPixelColor(chatStartingPoint), GroupedVariables.projectConstants.CHAT_COLOR_PARTY)) {
+				chatStartingPoint.y -= 2;    //difference between underline symbol and lowest pixel in ':'
+				logger.debug("Found chat line, " + chatStartingPoint);
+				if (debugMode == 2) {
+					WinAPIAPI.showMessage("Found chat line, " + chatStartingPoint);
 				}
 				return;
 			}
 
 			chatStartingPoint.y--;
 
-			if (chatStartingPoint.y == -69 && againFlag == true)
-			{
-				chatStartingPoint.y	=	-45;	//maybe it is bad to use hardcoded constant twice todo:discuss
+			if (chatStartingPoint.y == -69 && againFlag == true) {
+				chatStartingPoint.y = -45;    //maybe it is bad to use hardcoded constant twice todo:discuss
 				chatStartingPoint.x--;
-				againFlag	=	false;
+				againFlag = false;
 			}
 
 		}
 		logger.error("Could not find chat line");
 		WinAPIAPI.showMessage("Failed to find chat line!!!");
-		noChatMode	=	true;
+		noChatMode = true;
 		return;
 	}
 
@@ -95,13 +116,17 @@ public class L2Window
 
 	}
 
-	public void setHP(GroupedVariables.HpConstants hpConstants)    //warning designed to work only with pet, target and party member (not party pet)
+	public void setHP(GroupedVariables.HpConstants hpConstants, int id)    //warning designed to work only with pet, target and party member (not party pet or character)
 	{
-
-
-
-		WinAPIAPI.showMessage("Set HP bar for secondary creature. Place mouse under HP fully healed bar and press OK");
-		logger.info("Setting HP for a secondary LC");
+		logger.trace("Setting HP for a secondary LC, id: " + id);
+		if (id == GroupedVariables.projectConstants.ID_PET) {
+			WinAPIAPI.showMessage("Set HP bar for the pet. Place mouse under fully healed HP bar and press OK");
+		} else if (id == GroupedVariables.projectConstants.ID_TARGET) {
+			WinAPIAPI.showMessage("Set HP bar for the target. Place mouse under fully healed HP bar and press OK");
+		} else {
+			logger.error("wrong id passed to setHP: " + id);
+			return;
+		}
 
 		Point currentCoordinate = absoluteToRelativeCoordinates(WinAPIAPI.getMousePos());
 
@@ -139,7 +164,7 @@ public class L2Window
 		while (colorsAreClose(getRelPixelColor(currentCoordinate), hpConstants.color)) {
 			currentCoordinate.x--;
 		}
-		hpConstants.coordinateLeft.x = ++currentCoordinate.x;		//because it is in while. it stops at the first unequal
+		hpConstants.coordinateLeft.x = ++currentCoordinate.x;        //because it is in while. it stops at the first unequal
 		logger.debug("Successfully found x left " + currentCoordinate.x);
 		if (debugMode == 2) {
 			advancedMouseMove(currentCoordinate);
@@ -163,7 +188,7 @@ public class L2Window
 		return;
 	}
 
-	public int getHP(GroupedVariables.HpConstants hpConstants)    //todo not tested
+	public int getHP(GroupedVariables.HpConstants hpConstants)
 	{
 		logger.trace("Inside l2window.getHP");
 		Color hpColor = hpConstants.color;
@@ -171,18 +196,19 @@ public class L2Window
 		Point coordinateHp_r = hpConstants.coordinateRight;
 		double deltaX = coordinateHp_r.x - coordinateHp_l.x;
 		final int ticks = 50;
-		Point currentPoint	=	new Point(coordinateHp_r);
+		Point currentPoint = new Point(coordinateHp_r);
 		int i = 0;
 		for (; i <= ticks; i++) {
-			currentPoint.x = (int) (hpConstants.coordinateRight.x - (float) deltaX *i / (float)ticks);
-			logger.debug("coordinate hp R "+coordinateHp_r+" current coordinate "+currentPoint);
-			logger.debug("getHP: tick "+i+"of "+ticks+"; deltaX="+deltaX+" and I am subtracting "+deltaX * (float) i / (float)ticks);
-			if (colorsAreClose(getRelPixelColor(currentPoint),hpConstants.color)){
-				return	100*(ticks+1-i)/(ticks+1);
+			currentPoint.x = (int) (hpConstants.coordinateRight.x - (float) deltaX * i / (float) ticks);
+			logger.debug("coordinate hp R " + coordinateHp_r + " current coordinate " + currentPoint);
+			logger.debug("getHP: tick " + i + "of " + ticks + "; deltaX=" + deltaX + " and I am subtracting " + deltaX * (float) i / (float) ticks);
+			if (colorsAreClose(getRelPixelColor(currentPoint), hpConstants.color)) {
+				return 100 * (ticks + 1 - i) / (ticks + 1);
 			}
 		}
-		return	0;
+		return 0;
 	}
+
 
 	public void moveResize(int x, int y, int w, int h)
 	{
@@ -273,7 +299,7 @@ public class L2Window
 
 				advancedMouseMove(new Point(relativePoint.x, relativePoint.y));
 //				robot.mouseMove(x, y);
-				WinAPIAPI.showMessage("getrelPixelColor at relatice point" + relativePoint + " and got color " + color.toString());
+				WinAPIAPI.showMessage("getrelPixelColor at relative point " + relativePoint + " and got color " + color.toString());
 				break;
 		}
 		return color;
@@ -288,7 +314,7 @@ public class L2Window
 
 	L2Window()
 	{
-		hwnd = new WinDef.HWND(null);
+		hwnd = new HWND(null);
 		windowPosition = new Point(0, 0);
 		h = 20;
 		w = 20;
