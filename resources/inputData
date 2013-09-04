@@ -1,3 +1,18 @@
+#ID's
+
+ID_DefaultCharacter =   0
+ID_Warcryer  =   1
+ID_Spoiler  =   2
+ID_Prophet  =   3
+ID_Warlord  =   4
+ID_Swordsinger  =   5
+ID_Bladedancer  =   6
+ID_Warlock  =   7
+
+
+
+
+
 ID_pet  =   100
 ID_target   =   101
 
