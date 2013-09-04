@@ -1,11 +1,13 @@
 package PixelHunter;
 
-
+import com.sun.jna.platform.win32.WinDef;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
+
+import static java.lang.Math.abs;
 
 /**
  * User: mrk
@@ -13,6 +15,7 @@ import java.awt.*;
  */
 public class L2Window
 {
+
 	private static final Logger logger = LoggerFactory.getLogger(L2Window.class);
 
 	public HWND hwnd;
@@ -20,7 +23,7 @@ public class L2Window
 	public Point windowPosition;
 	public int   h, w;//kinda bad. has to be refactored
 
-	public int debugMode = 2;
+	public int debugMode = 0;
 
 	private final int frame_x = 8,
 			frame_yt          = 30,
@@ -32,8 +35,13 @@ public class L2Window
 
 	private boolean noChatMode = false;    //++getter
 
-	public void acceptWindowPosition()    //todo: get current position\scale and saves it to class constants
+	public void acceptWindowPosition()
 	{
+		logger.trace("Inside acceptWindowPosition");
+		WinDef.RECT rect = WinAPIAPI.getWindowRect(this.hwnd);
+		this.windowPosition = new Point(rect.left, rect.top);
+		this.h = abs(rect.top - rect.bottom);
+		this.w = abs(rect.right - rect.left);
 		return;
 	}
 
@@ -44,20 +52,20 @@ public class L2Window
 		Dimension screenDimentions = Toolkit.getDefaultToolkit().getScreenSize();
 		switch (windowNumber) {
 			case 0:
-				WinAPIAPI.setWindowPos(hwnd1, -8, -25, screenDimentions.width + 8, screenDimentions.height - 7);    //8=frame width, 7is fine, having 50px win panel
+				WinAPIAPI.setWindowPos(hwnd1, -8, -25, screenDimentions.width + 16, screenDimentions.height - 7);    //8=frame width, 7is fine, having 50px win panel
 				return;
 			case 1:
-				WinAPIAPI.setWindowPos(hwnd1, -8, -25, screenDimentions.width + 12, screenDimentions.height - 7);
+				WinAPIAPI.setWindowPos(hwnd1, -8, -25, screenDimentions.width/2 + 12, screenDimentions.height - 7);
 				return;
 			case 2:
-				WinAPIAPI.setWindowPos(hwnd1, screenDimentions.width / 2 - 4, -25, screenDimentions.width + 12, screenDimentions.height - 7);
+				WinAPIAPI.setWindowPos(hwnd1, screenDimentions.width / 2 - 4, -25, screenDimentions.width/2 + 12, screenDimentions.height - 7);
 				return;
 		}
 		logger.warn("anomalous behaviour in l2window.initiateSize");
 		return;
 	}
 
-	public void setChat()        //todo debug, test
+	public void setChat()
 	{
 
 		chatStartingPoint = new Point(112, -45);
@@ -105,8 +113,8 @@ public class L2Window
 		int diffB = color1.getBlue() - color2.getBlue();
 
 
-		if (Math.abs(diffR) > threshold || Math.abs(diffG) > threshold || Math.abs(diffB) > threshold) {
-			if (Math.abs(diffR) < 2 * threshold && Math.abs(diffG) < 2 * threshold && Math.abs(diffB) < 2 * threshold) {
+		if (abs(diffR) > threshold || abs(diffG) > threshold || abs(diffB) > threshold) {
+			if (abs(diffR) < 2 * threshold && abs(diffG) < 2 * threshold && abs(diffB) < 2 * threshold) {
 				logger.warn("probably two colors are close, but failed comparison. Recommended to increase threshold. " + color1 + " " + color2);
 			}
 			return false;
@@ -118,7 +126,8 @@ public class L2Window
 
 	public void setHP(GroupedVariables.HpConstants hpConstants, int id)    //warning designed to work only with pet, target and party member (not party pet or character)
 	{
-		logger.trace("Setting HP for a secondary LC, id: " + id);
+		logger.trace("l2Window.setHP, entered with id=" + id + ", pet id expected=" + GroupedVariables.projectConstants.ID_PET + ", targ id=" + GroupedVariables.projectConstants.ID_TARGET);
+		logger.debug("id-ID_PET="+(id-GroupedVariables.projectConstants.ID_PET));
 		if (id == GroupedVariables.projectConstants.ID_PET) {
 			WinAPIAPI.showMessage("Set HP bar for the pet. Place mouse under fully healed HP bar and press OK");
 		} else if (id == GroupedVariables.projectConstants.ID_TARGET) {
@@ -129,23 +138,13 @@ public class L2Window
 		}
 
 		Point currentCoordinate = absoluteToRelativeCoordinates(WinAPIAPI.getMousePos());
-
+		logger.debug("got mouse position " + currentCoordinate);
 		int i = 0, yLimit = 100;
 		while (!colorsAreClose(getRelPixelColor(currentCoordinate), hpConstants.color)) {
 			if (i >= yLimit) {   //overflow
-				if (debugMode == 2) {            //discuss printing won't work in this
-//					WinAPIAPI.showMessage("Failed to find y"); todo:return after showmessage is fixed
-					logger.info("got " + getRelPixelColor(currentCoordinate) + " expected: hpConstants.color");
-//					try {
-//						System.in.read();
-//					} catch (IOException e) {
-//						e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-//					}//todo: clean this code
-				}
 				logger.error("Failed to find y");
 				hpConstants.coordinateRight.setLocation(-1, -1);
 				hpConstants.coordinateLeft.setLocation(-1, -1);
-
 				return;
 			}
 			currentCoordinate.y--;
