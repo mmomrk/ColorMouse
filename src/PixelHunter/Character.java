@@ -11,12 +11,12 @@ public abstract class Character extends LivingCreature
 {
 
 
-	public L2Window l2window;
-//	public timer    buffTimer, homerunTimer;
+	public  L2Window l2window;
+	//	public timer    buffTimer, homerunTimer;
 //	private int buffTime;
 //	public  int farmMode, buffMode, homerunMode;
-	private Pet     pet;
-	private Target  target;
+	private Pet      pet;
+	private Target   target;
 //	public boolean followFlag;
 
 
@@ -32,7 +32,8 @@ public abstract class Character extends LivingCreature
 		l2Window.setChat();
 	}
 
-	public int getHP(){	//todo when time comes don't forget to do this
+	public int getHP()
+	{    //todo when time comes don't forget to do this
 		return 0;
 	}
 
@@ -71,25 +72,24 @@ public abstract class Character extends LivingCreature
 //	public void toggleFarmMode();    //#11
 //
 
-	public Character(int thisid, WinDef.HWND hwnd)		//windownumber can only be 1 or 0
+	public Character(int thisid, WinDef.HWND hwnd)        //windownumber can only be 1 or 0
 	{
 		super(thisid);
-		this.l2Window =	new L2Window();
-		this.l2Window.hwnd	=	hwnd;
+		this.l2Window = new L2Window();
+		this.l2Window.hwnd = hwnd;
 
 
 
 //		WinAPIAPI.showMessage("you can move/resize window now");	//todo test world class approach before deleting this
 //		l2window.x  ,y  ,h  ,w
 
-		pet	=	new Pet(l2Window);
+		pet = new Pet(l2Window);
 		pet.setHP();
 
-		target	=	new Target(l2Window);
+		target = new Target(l2Window);
 		target.setHP();
 
 		l2window.setChat();
-
 
 	}
 }

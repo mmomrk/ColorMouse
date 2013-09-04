@@ -1,7 +1,9 @@
 package PixelHunter;
 
-/** User: mrk
- * Date: 8/23/13 * Time: 3:32 AM */
+/**
+ * User: mrk
+ * Date: 8/23/13 * Time: 3:32 AM
+ */
 
 
 public abstract class LivingCreature

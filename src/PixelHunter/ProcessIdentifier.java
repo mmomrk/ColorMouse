@@ -18,6 +18,8 @@ import com.sun.jna.ptr.PointerByReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+
 
 //
 //public class EnumerateWindows {
@@ -160,9 +162,10 @@ public class ProcessIdentifier
 		}, null);
 	}
 
-	public static WinDef.HWND[] getL2HwndArray()    //return array lenght 2
+	public static ArrayList<WinDef.HWND> getL2HwndArray()    //return array lenght 2
 	{
-		final WinDef.HWND[] hwnds = new WinDef.HWND[2];
+		final ArrayList<WinDef.HWND> hwnds;
+		hwnds = new ArrayList<WinDef.HWND>();
 
 		Psapi ps = new Psapi();
 		Kernel32 kr = new Kernel32();
@@ -183,9 +186,9 @@ public class ProcessIdentifier
 				char[] windowText = new char[512];
 				user32.GetWindowText(hWnd, windowText, 512);
 				String wText = Native.toString(windowText);
-				if (wText.equals("Shot00072.bmp - Windows Photo Viewer")) {
-					hwnds[i++] = hWnd;
-					logger.debug("Process IDer: found proper window, HWND="+hWnd);
+				if (wText.equals("Shot00069.bmp - Paint")) {      //- Windows Photo Viewer	- Paint
+					hwnds.add(hWnd);
+					logger.debug("Process IDer: found proper window, HWND=" + hWnd);
 				}
 				wText = (wText.isEmpty()) ? "" : "; text: " + wText;
 

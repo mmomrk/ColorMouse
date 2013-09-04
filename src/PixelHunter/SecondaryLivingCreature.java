@@ -21,11 +21,9 @@ public abstract class SecondaryLivingCreature extends LivingCreature
 	public boolean isDead()
 
 	{
-		if (l2Window.colorsAreClose(l2Window.getRelPixelColor(hpConstants.coordinateLeft),hpConstants.color))
-		{
+		if (l2Window.colorsAreClose(l2Window.getRelPixelColor(hpConstants.coordinateLeft), hpConstants.color)) {
 			return false;
-		}
-		else {
+		} else {
 			return true;
 		}
 	}
@@ -38,7 +36,7 @@ public abstract class SecondaryLivingCreature extends LivingCreature
 
 	public void setHP()
 	{
-		this.l2Window.setHP(this.hpConstants,this.id);
+		this.l2Window.setHP(this.hpConstants, this.id);
 	}
 
 	public SecondaryLivingCreature(int thisid, L2Window l2Window)
@@ -49,7 +47,7 @@ public abstract class SecondaryLivingCreature extends LivingCreature
 			this.id = thisid;
 		}
 		hpConstants = new GroupedVariables.HpConstants(projectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR, new Point(0, 0), new Point(0, 0)); //primary pet and target hp colors are equal
-		if (l2Window == null){	//todo delete this if?
+		if (l2Window == null) {    //todo delete this if?
 			WinAPIAPI.showMessage("window is null!!");
 		}
 		this.l2Window = l2Window;

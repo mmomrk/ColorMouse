@@ -40,6 +40,7 @@ public class GroupedVariables
 //		ChatConstants()	todo: set all coordinates for decyphering caller name in static{}
 	}
 
+
 	public static final class ProjectConstants
 	{
 		//refactor all these were static.note this
@@ -87,13 +88,13 @@ public class GroupedVariables
 			ID_TARGET = Integer.parseInt(properties.get("ID_target").toString());
 
 			ID_DefaultCharacter = Integer.parseInt(properties.get("ID_DefaultCharacter").toString());
-			ID_Warcryer  = Integer.parseInt(properties.get("ID_Warcryer").toString());
-			ID_Spoiler   = Integer.parseInt(properties.get("ID_Spoiler").toString());
-			ID_Prophet   = Integer.parseInt(properties.get("ID_Prophet").toString());
-			ID_Warlord   = Integer.parseInt(properties.get("ID_Warlord").toString());
+			ID_Warcryer = Integer.parseInt(properties.get("ID_Warcryer").toString());
+			ID_Spoiler = Integer.parseInt(properties.get("ID_Spoiler").toString());
+			ID_Prophet = Integer.parseInt(properties.get("ID_Prophet").toString());
+			ID_Warlord = Integer.parseInt(properties.get("ID_Warlord").toString());
 			ID_Swordsinger = Integer.parseInt(properties.get("ID_Swordsinger").toString());
-			ID_Bladedancer   = Integer.parseInt(properties.get("ID_Bladedancer").toString());
-			ID_Warlock   = Integer.parseInt(properties.get("ID_Warlock").toString());
+			ID_Bladedancer = Integer.parseInt(properties.get("ID_Bladedancer").toString());
+			ID_Warlock = Integer.parseInt(properties.get("ID_Warlock").toString());
 
 
 			int red, green, blue;
@@ -123,6 +124,6 @@ public class GroupedVariables
 
 	public GroupedVariables()
 	{
-		projectConstants	=	new GroupedVariables.ProjectConstants();
+		projectConstants = new GroupedVariables.ProjectConstants();
 	}
 }

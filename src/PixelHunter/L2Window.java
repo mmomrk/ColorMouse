@@ -32,25 +32,25 @@ public class L2Window
 
 	private boolean noChatMode = false;    //++getter
 
-	public void acceptWindowPosition()	//todo: get current position\scale and saves it to class constants
+	public void acceptWindowPosition()    //todo: get current position\scale and saves it to class constants
 	{
 		return;
 	}
 
 
-	public static void initiateSize(int windowNumber,HWND hwnd1)		//todo not tested
+	public static void initiateSize(int windowNumber, HWND hwnd1)        //todo not tested
 	{
 		logger.trace("Inside L2window initiateSize");
-		Dimension screenDimentions	=	Toolkit.getDefaultToolkit().getScreenSize();
-		switch (windowNumber){
+		Dimension screenDimentions = Toolkit.getDefaultToolkit().getScreenSize();
+		switch (windowNumber) {
 			case 0:
-				WinAPIAPI.setWindowPos(hwnd1, -8, -25, screenDimentions.width + 8, screenDimentions.height - 7);	//8=frame width, 7is fine, having 50px win panel
+				WinAPIAPI.setWindowPos(hwnd1, -8, -25, screenDimentions.width + 8, screenDimentions.height - 7);    //8=frame width, 7is fine, having 50px win panel
 				return;
 			case 1:
-				WinAPIAPI.setWindowPos(hwnd1,-8, -25, screenDimentions.width + 12, screenDimentions.height - 7);
+				WinAPIAPI.setWindowPos(hwnd1, -8, -25, screenDimentions.width + 12, screenDimentions.height - 7);
 				return;
 			case 2:
-				WinAPIAPI.setWindowPos(hwnd1,screenDimentions.width/2-4, -25, screenDimentions.width+12, screenDimentions.height-7);
+				WinAPIAPI.setWindowPos(hwnd1, screenDimentions.width / 2 - 4, -25, screenDimentions.width + 12, screenDimentions.height - 7);
 				return;
 		}
 		logger.warn("anomalous behaviour in l2window.initiateSize");
