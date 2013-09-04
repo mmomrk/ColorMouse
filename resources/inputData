@@ -9,13 +9,11 @@ ID_Swordsinger  =   5
 ID_Bladedancer  =   6
 ID_Warlock  =   7
 
-
-
-
-
 ID_pet  =   100
 ID_target   =   101
 
+#MISC CONSTANTS
+CHAT_TASK_LIST_LENGTH   =   10
 
 #INGAME COLORS
 
