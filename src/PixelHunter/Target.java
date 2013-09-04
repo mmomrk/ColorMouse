@@ -18,9 +18,4 @@ public class Target extends SecondaryLivingCreature
 
 	}
 
-	@Override
-	public int getHP()
-	{
-		return super.getHP();
-	}
 }
