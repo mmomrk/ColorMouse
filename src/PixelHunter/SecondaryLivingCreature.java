@@ -34,6 +34,7 @@ public abstract class SecondaryLivingCreature extends LivingCreature
 		return this.l2Window.getHP(this.hpConstants);
 	}
 
+	@Override
 	public void setHP()
 	{
 		this.l2Window.setHP(this.hpConstants, this.id);
@@ -42,14 +43,19 @@ public abstract class SecondaryLivingCreature extends LivingCreature
 	public SecondaryLivingCreature(int thisid, L2Window l2Window)
 	{
 		super(thisid);
+		logger.trace("SecondaryLC constructor");
 		if (thisid != GroupedVariables.ProjectConstants.ID_PET && thisid != GroupedVariables.ProjectConstants.ID_TARGET) {
 			logger.error("error in constructor of secondary LC. wrong ID");
 			this.id = thisid;
 		}
-		hpConstants = new GroupedVariables.HpConstants(projectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR, new Point(0, 0), new Point(0, 0)); //primary pet and target hp colors are equal
+
 		if (l2Window == null) {    //todo delete this if?
 			WinAPIAPI.showMessage("window is null!!");
 		}
 		this.l2Window = l2Window;
+
+		hpConstants = new GroupedVariables.HpConstants(projectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR, new Point(0, 0), new Point(0, 0)); //primary pet and target hp colors are equal
+		setHP();
+
 	}
 }

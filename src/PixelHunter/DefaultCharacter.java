@@ -15,6 +15,12 @@ public class DefaultCharacter extends Character
 		return super.getHP();
 	}
 
+	@Override
+	public void setHP()
+	{
+		super.setHP();
+	}
+
 	public DefaultCharacter(WinDef.HWND hwnd)
 	{
 		super(0, hwnd);

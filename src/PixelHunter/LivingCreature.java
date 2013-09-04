@@ -16,8 +16,11 @@ public abstract class LivingCreature
 
 	public abstract int getHP();
 
+	public abstract void setHP();
+
 	public LivingCreature(int thisid)     //do we need this??
 	{
 		id = thisid;
+
 	}
 }
