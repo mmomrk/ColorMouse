@@ -16,6 +16,12 @@ public class DefaultCharacter extends Character
 	}
 
 	@Override
+	void buffRebuff()	//todo implement
+	{
+		return;
+	}
+
+	@Override
 	public void setHP()
 	{
 		super.setHP();

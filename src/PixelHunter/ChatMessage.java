@@ -5,10 +5,11 @@ package PixelHunter;
  */
 public class ChatMessage
 {
+	private int senderID	=	0;
+	private int priority	=	0;
 	private int	command;
-	private int senderID;
-	private int modeColor;
-	private int priority;
+	private int modeColor;	//0=party, 1=private
+
 
 	public int getPriority()
 	{
@@ -30,16 +31,20 @@ public class ChatMessage
 		return modeColor;
 	}
 
-	ChatMessage(int command, int senderID, int modeColor)
+	ChatMessage(int command, int senderSignature, int modeColor)
 	{
 		this.command	=	command;
-		this.senderID	=	senderID;
 		this.modeColor	=	modeColor;
-		switch (command){
-			case 0:		//todo after commands are understood, documented and specified
-				this.priority	=	0;
-			case 1:
-				this.priority	=	0;
+		switch (senderSignature){
+			case	0:	//todo after can get these values first-hand
+				this.senderID	=	554;
+				break;
 		}
+		switch (command){
+			case 0:		//todo after commands are understood, documented and specified. default is 0
+				this.priority	=	0;
+				break;
+		}
+
 	}
 }

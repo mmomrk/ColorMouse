@@ -5,10 +5,13 @@ import com.sun.jna.platform.win32.WinDef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static java.lang.Math.pow;
 
 /**
  * User: mrk
@@ -21,8 +24,12 @@ public abstract class Character extends LivingCreature
 	//	public timer    buffTimer, homerunTimer;
 //	private int buffTime;
 //	public  int farmMode, buffMode, homerunMode;
-	private Pet    pet;
+	Point chatStartingPoint;
+
+	public Pet    pet;	//todo think of privacy
 	private Target target;
+
+	private int INT;
 
 	private Comparator<ChatMessage>    chatMessageComparator = new MessageComparator();
 	private PriorityQueue<ChatMessage> toDoList              = new PriorityQueue<ChatMessage>(GroupedVariables.projectConstants.CHAT_TASK_LIST_LENGTH, chatMessageComparator);
@@ -30,7 +37,7 @@ public abstract class Character extends LivingCreature
 	private boolean isMacroFree = true,
 			rebuff              = false;
 
-	Timer macroLockTimer;
+	private Timer macroLockTimer;
 
 
 	abstract void buffRebuff(); //should set rebuff to 0
@@ -87,19 +94,60 @@ public abstract class Character extends LivingCreature
 		macroLockTimer.schedule(new SetMacroFree(), milliseconds);
 	}
 
+	private boolean chatPatternMatches(int i,boolean equalsExpectedColor){
+		if (i % 5 <4 && equalsExpectedColor){	//is it magic? not yet. look int your chat
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
 	private ChatMessage readChat()
 	{    //todo implement
 		logger.trace(".readChat");
+		Color messageColor	=	Color.CYAN;	//compiler doesn't know this is not necessary
+		int senderSignature, receivedCode	=	0,modeColor	=	0;
+		int i;
+		Point currentPoint	=	new Point(0,this.chatStartingPoint.y+3);//lower command pixel is 3 px under ':'
 
-		//scan for dots
-		return null;
-		//read the message
-
-		//spamSelf
-
-		//construct retVal
-
-
+		for (i=50; i<80; i++){
+			currentPoint.x	=	i;
+			if (l2Window.colorsAreClose(l2Window.getRelPixelColor(currentPoint),GroupedVariables.projectConstants.CHAT_COLOR_PARTY )){
+				messageColor	=	GroupedVariables.projectConstants.CHAT_COLOR_PARTY;
+				modeColor	=	0;
+				break;
+			}
+			if (l2Window.colorsAreClose(l2Window.getRelPixelColor(currentPoint),GroupedVariables.projectConstants.CHAT_COLOR_PRIVATE )){
+				messageColor	=	GroupedVariables.projectConstants.CHAT_COLOR_PRIVATE;
+				modeColor	=	1;
+				break;
+			}
+		}
+		if (i==80){
+			logger.info("Chat is empty");
+			return null;
+		}
+		//found first pixel
+		senderSignature	=	i;
+		//now check the pattern
+		for (i=0;i<17;i++){
+			currentPoint.x+=i;
+			if (!chatPatternMatches(i,l2Window.colorsAreClose(l2Window.getRelPixelColor(currentPoint),messageColor))){
+				return null;
+			}
+		}
+		//now we totally have in incoming
+		currentPoint.y--;	//to be in the information zone
+		// decoding
+		for (i=0;i<=6;i++){//command binary capacity sits in this hardcoded 6
+			currentPoint.x	=	senderSignature+i*5;
+			if (!l2Window.colorsAreClose(l2Window.getRelPixelColor(currentPoint),messageColor)){//found bit true
+				receivedCode+=pow(2,i);
+			}
+		}
+		logger.info("Received chat commad number "+receivedCode+" from sig "+senderSignature);
+		return new ChatMessage(receivedCode,senderSignature,modeColor);
 	}
 
 	public void chatReact()                   //todo not tested
@@ -122,6 +170,7 @@ public abstract class Character extends LivingCreature
 
 		if (commandExecuted) {
 			logger.debug("Command executed");
+			toDoList.poll();
 		} else {
 			logger.debug("Command was not executed");
 		}
@@ -131,7 +180,7 @@ public abstract class Character extends LivingCreature
 
 	public void setChat()
 	{
-		l2Window.setChat();
+		this.chatStartingPoint = l2Window.setChat();
 	}
 
 	public void setHP()
@@ -150,6 +199,7 @@ public abstract class Character extends LivingCreature
 
 		return "Character. ID=" + this.id + ". Window " + l2Window.toString();
 	}
+
 
 	public Character(int thisid, WinDef.HWND hwnd)        //windownumber can only be 1 or 0
 	{
