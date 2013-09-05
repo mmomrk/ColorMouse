@@ -17,21 +17,6 @@ public class GroupedVariables
 	public static GroupedVariables.ProjectConstants projectConstants;
 
 
-	public static class HpConstants
-	{
-		public final Color color;
-		public final Point coordinateLeft;
-		public final Point coordinateRight;
-
-		public HpConstants(Color color, Point left, Point right)
-		{
-			this.color = color;
-			this.coordinateLeft = left;
-			this.coordinateRight = right;
-		}
-	}
-
-
 	public static class ChatConstants
 	{
 		//		public final

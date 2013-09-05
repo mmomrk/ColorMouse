@@ -20,7 +20,7 @@ public abstract class LivingCreature
 
 	public LivingCreature(int thisid)     //do we need this??
 	{
-		id = thisid;
+		this.id = thisid;
 
 	}
 }

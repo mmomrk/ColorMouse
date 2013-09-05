@@ -15,7 +15,7 @@ public abstract class SecondaryLivingCreature extends LivingCreature
 {
 	private static final Logger logger = LoggerFactory.getLogger(LivingCreature.class);
 
-	public GroupedVariables.HpConstants hpConstants;
+	public HpConstants hpConstants;
 
 
 	public boolean isDead()
@@ -54,7 +54,10 @@ public abstract class SecondaryLivingCreature extends LivingCreature
 		}
 		this.l2Window = l2Window;
 
-		hpConstants = new GroupedVariables.HpConstants(projectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR, new Point(0, 0), new Point(0, 0)); //primary pet and target hp colors are equal
+		hpConstants = new HpConstants(projectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR, new Point(0, 0), new Point(0, 0), thisid); //primary pet and target hp colors are equal
+
+
+
 		setHP();
 
 	}
