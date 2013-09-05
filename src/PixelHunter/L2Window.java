@@ -6,7 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
+import java.awt.event.InputEvent;
 
+import static PixelHunter.WinAPIAPI.getMousePos;
 import static java.lang.Math.abs;
 
 /**
@@ -23,13 +25,13 @@ public class L2Window
 	public Point windowPosition;
 	public int   h, w;//kinda bad. has to be refactored
 
-	public int debugMode = 0;
+	public static int debugMode = 2;
 
 	private final int frame_x = 8,
 			frame_yt          = 30,
-			frame_yb          = 8;
+			frame_yb = 8;
 
-	private Robot robot;
+	private static Robot robot;
 
 	private Point chatStartingPoint;
 
@@ -65,7 +67,7 @@ public class L2Window
 		return;
 	}
 
-	public void setChat()
+	public Point setChat()
 	{
 
 		chatStartingPoint = new Point(112, -45);
@@ -80,7 +82,7 @@ public class L2Window
 				if (debugMode == 2) {
 					WinAPIAPI.showMessage("Found chat line, " + chatStartingPoint);
 				}
-				return;
+				return new Point(-1,-1);
 			}
 
 			chatStartingPoint.y--;
@@ -95,7 +97,7 @@ public class L2Window
 		logger.error("Could not find chat line");
 		WinAPIAPI.showMessage("Failed to find chat line!!!");
 		noChatMode = true;
-		return;
+		return chatStartingPoint;
 	}
 
 
@@ -124,12 +126,12 @@ public class L2Window
 
 	}
 
-	public void setHP(GroupedVariables.HpConstants hpConstants, int id)    //warning designed to work only with pet, target and party member (not party pet or character)
+	public void setHP(HpConstants hpConstants, int id)    //warning designed to work only with pet, target and party member (not party pet or character)
 	{
-		logger.trace("l2Window.setHP, entered with id=" + id + ", pet id expected=" + GroupedVariables.projectConstants.ID_PET + ", targ id=" + GroupedVariables.projectConstants.ID_TARGET);
-		logger.debug("id-ID_PET="+(id-GroupedVariables.projectConstants.ID_PET));
+		logger.trace(".setHP");
 		if (id == GroupedVariables.projectConstants.ID_PET) {
 			WinAPIAPI.showMessage("Set HP bar for the pet. Place mouse under fully healed HP bar and press OK");
+
 		} else if (id == GroupedVariables.projectConstants.ID_TARGET) {
 			WinAPIAPI.showMessage("Set HP bar for the target. Place mouse under fully healed HP bar and press OK");
 		} else {
@@ -137,7 +139,7 @@ public class L2Window
 			return;
 		}
 
-		Point currentCoordinate = absoluteToRelativeCoordinates(WinAPIAPI.getMousePos());
+		Point currentCoordinate = absoluteToRelativeCoordinates(getMousePos());
 		logger.debug("got mouse position " + currentCoordinate);
 		int i = 0, yLimit = 100;
 		while (!colorsAreClose(getRelPixelColor(currentCoordinate), hpConstants.color)) {
@@ -182,12 +184,36 @@ public class L2Window
 			advancedMouseMove(currentCoordinate);
 			WinAPIAPI.showMessage("Successfully found x right");
 		}
-
+		logger.info("successfully found HP");
 
 		return;
 	}
 
-	public int getHP(GroupedVariables.HpConstants hpConstants)
+	public static void mouseClick_Absolute(Point absolutePoint){	//tested
+		logger.trace(".mouseClick Absolute to "+absolutePoint);
+
+		Point currentMousePosition	=	getMousePos();
+		robot.mouseMove(absolutePoint.x, absolutePoint.y);
+		robot.mousePress(InputEvent.BUTTON1_MASK);
+		robot.mouseRelease(InputEvent.BUTTON1_MASK);
+		if (debugMode == 0){
+			robot.mouseMove(currentMousePosition.x, currentMousePosition.y);
+		}
+	}
+
+	public void mouseClick_Relative(Point relativePoint){	//not tested
+		logger.trace(".mouseClick Relative");
+
+		Point currentMousePosition	=	getMousePos();
+		advancedMouseMove(relativePoint);
+		robot.mousePress(InputEvent.BUTTON1_MASK);
+		robot.mouseRelease(InputEvent.BUTTON1_MASK);
+		if (debugMode == 0){
+			robot.mouseMove(currentMousePosition.x,currentMousePosition.y);
+		}
+	}
+
+	public int getHP(HpConstants hpConstants)
 	{
 		logger.trace("Inside l2window.getHP");
 		Color hpColor = hpConstants.color;
@@ -196,11 +222,15 @@ public class L2Window
 		double deltaX = coordinateHp_r.x - coordinateHp_l.x;
 		final int ticks = 50;
 		Point currentPoint = new Point(coordinateHp_r);
+
+		if (hpConstants.isPet){
+			mouseClick_Relative(new Point(hpConstants.coordinateLeft.x - 10, hpConstants.coordinateLeft.y));
+		}
+		//todo: test it
+
 		int i = 0;
 		for (; i <= ticks; i++) {
 			currentPoint.x = (int) (hpConstants.coordinateRight.x - (float) deltaX * i / (float) ticks);
-			logger.debug("coordinate hp R " + coordinateHp_r + " current coordinate " + currentPoint);
-			logger.debug("getHP: tick " + i + "of " + ticks + "; deltaX=" + deltaX + " and I am subtracting " + deltaX * (float) i / (float) ticks);
 			if (colorsAreClose(getRelPixelColor(currentPoint), hpConstants.color)) {
 				return 100 * (ticks + 1 - i) / (ticks + 1);
 			}
@@ -289,7 +319,7 @@ public class L2Window
 
 		Color color;
 		color = robot.getPixelColor(absolutePoint.x, absolutePoint.y);
-		logger.debug("getrelPixelColor at relative point " + relativePoint + " and got color " + color.toString());
+//		logger.debug("getrelPixelColor at relative point " + relativePoint + " and got color " + color.toString());
 		switch (debugMode) {
 			case 1:
 				WinAPIAPI.toolTip(color.toString(), absolutePoint.x, absolutePoint.y);
