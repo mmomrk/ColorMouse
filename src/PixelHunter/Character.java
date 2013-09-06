@@ -26,12 +26,12 @@ public abstract class Character extends LivingCreature
 //	public  int farmMode, buffMode, homerunMode;
 	Point chatStartingPoint;
 
-	public Pet    pet;	//todo think of privacy
+	public  Pet    pet;    //todo think of privacy
 	private Target target;
 
 	private int INT;
 
-	private Comparator<ChatMessage>    chatMessageComparator = new MessageComparator();
+	private Comparator<ChatMessage>    chatMessageComparator = new MessagePriorityComparator();
 	private PriorityQueue<ChatMessage> toDoList              = new PriorityQueue<ChatMessage>(GroupedVariables.projectConstants.CHAT_TASK_LIST_LENGTH, chatMessageComparator);
 
 	private boolean isMacroFree = true,
@@ -227,7 +227,7 @@ public abstract class Character extends LivingCreature
 //CLASSES
 
 
-	private class MessageComparator implements Comparator<ChatMessage>    //todo not tested
+	private class MessagePriorityComparator implements Comparator<ChatMessage>    //todo not tested
 	{
 
 		@Override

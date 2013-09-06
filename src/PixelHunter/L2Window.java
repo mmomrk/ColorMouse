@@ -10,6 +10,7 @@ import java.awt.event.InputEvent;
 
 import static PixelHunter.WinAPIAPI.getMousePos;
 import static java.lang.Math.abs;
+import static java.lang.Thread.sleep;
 
 /**
  * User: mrk
@@ -36,6 +37,22 @@ public class L2Window
 	private Point chatStartingPoint;
 
 	private boolean noChatMode = false;    //++getter
+
+	public static void easySleep(int milliseconds){	//maybe it was a design mistake
+		try {
+			sleep(milliseconds);
+		} catch (InterruptedException e) {
+			logger.error("Error in easy sleep. Interrupted");
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		}
+	}
+
+	public static void keyClick(int key){
+		logger.trace(".keyClick "+key);
+		robot.keyPress(key);
+		robot.keyRelease(key);
+		return;
+	}
 
 	public void acceptWindowPosition()
 	{
@@ -110,6 +127,25 @@ public class L2Window
 	public static boolean colorsAreClose(Color color1, Color color2)
 	{
 		final int threshold = 4;    //test it, watch it
+		int diffR = color1.getRed() - color2.getRed();
+		int diffG = color1.getGreen() - color2.getGreen();
+		int diffB = color1.getBlue() - color2.getBlue();
+
+
+		if (abs(diffR) > threshold || abs(diffG) > threshold || abs(diffB) > threshold) {
+			if (abs(diffR) < 2 * threshold && abs(diffG) < 2 * threshold && abs(diffB) < 2 * threshold) {
+				logger.warn("probably two colors are close, but failed comparison. Recommended to increase threshold. " + color1 + " " + color2);
+			}
+			return false;
+		} else {
+			return true;
+		}
+
+	}
+
+	public static boolean colorsAreClose(Color color1, Color color2, int thresholdIn)
+	{
+		final int threshold = thresholdIn;    //test it, watch it
 		int diffR = color1.getRed() - color2.getRed();
 		int diffG = color1.getGreen() - color2.getGreen();
 		int diffB = color1.getBlue() - color2.getBlue();
@@ -313,21 +349,36 @@ public class L2Window
 		return new Point(relativePoint.x, relativePoint.y);
 	}
 
+	public static Color getAbsPixelColor(Point absolutePoint)
+	{
+
+
+		Color color;
+		color = robot.getPixelColor(absolutePoint.x, absolutePoint.y);
+		switch (debugMode) {
+			case 1:
+				WinAPIAPI.toolTip(color.toString(), absolutePoint.x, absolutePoint.y);
+				break;
+			case 2:
+				robot.mouseMove(absolutePoint.x, absolutePoint.y);
+				WinAPIAPI.showMessage("getrelPixelColor at relative point " + absolutePoint + " and got color " + color.toString());
+				break;
+		}
+		return color;
+	}
+
 	public Color getRelPixelColor(Point relativePoint)
 	{
 		Point absolutePoint = relativeToAbsoluteCoordinates(relativePoint);
 
 		Color color;
 		color = robot.getPixelColor(absolutePoint.x, absolutePoint.y);
-//		logger.debug("getrelPixelColor at relative point " + relativePoint + " and got color " + color.toString());
 		switch (debugMode) {
 			case 1:
 				WinAPIAPI.toolTip(color.toString(), absolutePoint.x, absolutePoint.y);
 				break;
 			case 2:
-
 				advancedMouseMove(new Point(relativePoint.x, relativePoint.y));
-//				robot.mouseMove(x, y);
 				WinAPIAPI.showMessage("getrelPixelColor at relative point " + relativePoint + " and got color " + color.toString());
 				break;
 		}
@@ -343,13 +394,29 @@ public class L2Window
 
 	L2Window()
 	{
-		hwnd = new HWND(null);
-		windowPosition = new Point(0, 0);
-		h = 20;
-		w = 20;
+		this.hwnd = new HWND(null);
+		this.windowPosition = new Point(0, 0);
+		this.h = 20;
+		this.w = 20;
 		try {
 			robot = new Robot();
 		} catch (AWTException e) {
+			logger.error("Failed to create robot in l2window. we're doomed");
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+
+		}
+	}
+
+	L2Window(HWND hwnd)
+	{
+		this.hwnd = hwnd;
+		this.windowPosition = new Point(0, 0);
+		this.h = 20;
+		this.w = 20;
+		try {
+			robot = new Robot();
+		} catch (AWTException e) {
+			logger.error("Failed to create robot in l2window. we're doomed");
 			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 		}
 	}
