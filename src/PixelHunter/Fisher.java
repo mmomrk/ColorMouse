@@ -56,7 +56,7 @@ public class Fisher    //todo finished making this class super cool
 		logger.info("finished fishing");
 	}
 
-	private boolean isForNightTime()    //todo test it when nighttime support is added
+	private boolean isNightTime()    //todo test it when nighttime support is added
 	{
 		DateTime currentDateTime = DateTime.now();
 		int currentHour = currentDateTime.getHourOfDay();
