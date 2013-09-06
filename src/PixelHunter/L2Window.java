@@ -26,11 +26,12 @@ public class L2Window
 	public Point windowPosition;
 	public int   h, w;//kinda bad. has to be refactored
 
-	public static int debugMode = 2;
+	public static int debugMode = GroupedVariables.projectConstants.INITIAL_DEBUG_MODE;
 
-	private final int frame_x = 8,
-	frame_yt                  = 30,
-	frame_yb                  = 8;
+	private final int
+	frame_x  = 8,
+	frame_yt = 30,
+	frame_yb = 8;
 
 	private static Robot robot;
 
@@ -52,7 +53,17 @@ public class L2Window
 	{
 		logger.trace(".keyClick " + key);
 		robot.keyPress(key);
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		}
 		robot.keyRelease(key);
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		}
 		return;
 	}
 
@@ -156,6 +167,7 @@ public class L2Window
 		if (abs(diffR) > threshold || abs(diffG) > threshold || abs(diffB) > threshold) {
 			if (abs(diffR) < 2 * threshold && abs(diffG) < 2 * threshold && abs(diffB) < 2 * threshold) {
 				logger.warn("probably two colors are close, but failed comparison. Recommended to increase threshold. " + color1 + " " + color2);
+
 			}
 			return false;
 		} else {
@@ -361,7 +373,8 @@ public class L2Window
 		color = robot.getPixelColor(absolutePoint.x, absolutePoint.y);
 		switch (debugMode) {
 			case 1:
-				WinAPIAPI.toolTip(color.toString(), absolutePoint.x, absolutePoint.y);
+//				WinAPIAPI.toolTip(color.toString(), absolutePoint.x, absolutePoint.y);
+				robot.mouseMove(absolutePoint.x, absolutePoint.y);
 				break;
 			case 2:
 				robot.mouseMove(absolutePoint.x, absolutePoint.y);
@@ -379,10 +392,11 @@ public class L2Window
 		color = robot.getPixelColor(absolutePoint.x, absolutePoint.y);
 		switch (debugMode) {
 			case 1:
-				WinAPIAPI.toolTip(color.toString(), absolutePoint.x, absolutePoint.y);
+				advancedMouseMove(relativePoint);
+//				WinAPIAPI.toolTip(color.toString(), absolutePoint.x, absolutePoint.y);
 				break;
 			case 2:
-				advancedMouseMove(new Point(relativePoint.x, relativePoint.y));
+				advancedMouseMove(relativePoint);
 				WinAPIAPI.showMessage("getrelPixelColor at relative point " + relativePoint + " and got color " + color.toString());
 				break;
 		}

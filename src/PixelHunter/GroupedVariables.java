@@ -46,6 +46,7 @@ public class GroupedVariables
 		public static final Color CHAT_COLOR_PRIVATE;
 
 		public static final int CHAT_TASK_LIST_LENGTH;
+		public static final int INITIAL_DEBUG_MODE;
 //		public static final Point[] WINDOWS_POSITIONS = {new Point(-8, -25), new Point(508, -25)};	//top-left points of window 1 and 2//todo make sure it is not used
 
 		public ProjectConstants()
@@ -83,6 +84,7 @@ public class GroupedVariables
 			ID_Warlock = Integer.parseInt(properties.get("ID_Warlock").toString());
 
 			CHAT_TASK_LIST_LENGTH = Integer.parseInt(properties.get("CHAT_TASK_LIST_LENGTH").toString());
+			INITIAL_DEBUG_MODE	=	Integer.parseInt(properties.get("INITIAL_DEBUG_MODE").toString());
 
 			int red, green, blue;
 			red = Integer.parseInt(properties.get("PetTargetPartyHpColor_red").toString());
