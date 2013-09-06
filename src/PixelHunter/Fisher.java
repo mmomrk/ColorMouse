@@ -67,7 +67,7 @@ public class Fisher    //todo finished making this class super cool
 		}
 
 
-		//todo implement
+
 	}
 
 	private void waitForBlink()
