@@ -35,7 +35,7 @@ public abstract class Character extends LivingCreature
 	private PriorityQueue<ChatMessage> toDoList              = new PriorityQueue<ChatMessage>(GroupedVariables.projectConstants.CHAT_TASK_LIST_LENGTH, chatMessageComparator);
 
 	private boolean isMacroFree = true,
-			rebuff              = false;
+	rebuff                      = false;
 
 	private Timer macroLockTimer;
 
@@ -94,11 +94,11 @@ public abstract class Character extends LivingCreature
 		macroLockTimer.schedule(new SetMacroFree(), milliseconds);
 	}
 
-	private boolean chatPatternMatches(int i,boolean equalsExpectedColor){
-		if (i % 5 <4 && equalsExpectedColor){	//is it magic? not yet. look int your chat
+	private boolean chatPatternMatches(int i, boolean equalsExpectedColor)
+	{
+		if (i % 5 < 4 && equalsExpectedColor) {    //is it magic? not yet. look int your chat
 			return true;
-		}
-		else {
+		} else {
 			return false;
 		}
 	}
@@ -106,48 +106,48 @@ public abstract class Character extends LivingCreature
 	private ChatMessage readChat()
 	{    //todo implement
 		logger.trace(".readChat");
-		Color messageColor	=	Color.CYAN;	//compiler doesn't know this is not necessary
-		int senderSignature, receivedCode	=	0,modeColor	=	0;
+		Color messageColor = Color.CYAN;    //compiler doesn't know this is not necessary
+		int senderSignature, receivedCode = 0, modeColor = 0;
 		int i;
-		Point currentPoint	=	new Point(0,this.chatStartingPoint.y+3);//lower command pixel is 3 px under ':'
+		Point currentPoint = new Point(0, this.chatStartingPoint.y + 3);//lower command pixel is 3 px under ':'
 
-		for (i=50; i<80; i++){
-			currentPoint.x	=	i;
-			if (l2Window.colorsAreClose(l2Window.getRelPixelColor(currentPoint),GroupedVariables.projectConstants.CHAT_COLOR_PARTY )){
-				messageColor	=	GroupedVariables.projectConstants.CHAT_COLOR_PARTY;
-				modeColor	=	0;
+		for (i = 50; i < 80; i++) {
+			currentPoint.x = i;
+			if (l2Window.colorsAreClose(l2Window.getRelPixelColor(currentPoint), GroupedVariables.projectConstants.CHAT_COLOR_PARTY)) {
+				messageColor = GroupedVariables.projectConstants.CHAT_COLOR_PARTY;
+				modeColor = 0;
 				break;
 			}
-			if (l2Window.colorsAreClose(l2Window.getRelPixelColor(currentPoint),GroupedVariables.projectConstants.CHAT_COLOR_PRIVATE )){
-				messageColor	=	GroupedVariables.projectConstants.CHAT_COLOR_PRIVATE;
-				modeColor	=	1;
+			if (l2Window.colorsAreClose(l2Window.getRelPixelColor(currentPoint), GroupedVariables.projectConstants.CHAT_COLOR_PRIVATE)) {
+				messageColor = GroupedVariables.projectConstants.CHAT_COLOR_PRIVATE;
+				modeColor = 1;
 				break;
 			}
 		}
-		if (i==80){
+		if (i == 80) {
 			logger.info("Chat is empty");
 			return null;
 		}
 		//found first pixel
-		senderSignature	=	i;
+		senderSignature = i;
 		//now check the pattern
-		for (i=0;i<17;i++){
-			currentPoint.x+=i;
-			if (!chatPatternMatches(i,l2Window.colorsAreClose(l2Window.getRelPixelColor(currentPoint),messageColor))){
+		for (i = 0; i < 17; i++) {
+			currentPoint.x += i;
+			if (!chatPatternMatches(i, l2Window.colorsAreClose(l2Window.getRelPixelColor(currentPoint), messageColor))) {
 				return null;
 			}
 		}
 		//now we totally have in incoming
-		currentPoint.y--;	//to be in the information zone
+		currentPoint.y--;    //to be in the information zone
 		// decoding
-		for (i=0;i<=6;i++){//command binary capacity sits in this hardcoded 6
-			currentPoint.x	=	senderSignature+i*5;
-			if (!l2Window.colorsAreClose(l2Window.getRelPixelColor(currentPoint),messageColor)){//found bit true
-				receivedCode+=pow(2,i);
+		for (i = 0; i <= 6; i++) {//command binary capacity sits in this hardcoded 6
+			currentPoint.x = senderSignature + i * 5;
+			if (!l2Window.colorsAreClose(l2Window.getRelPixelColor(currentPoint), messageColor)) {//found bit true
+				receivedCode += pow(2, i);
 			}
 		}
-		logger.info("Received chat commad number "+receivedCode+" from sig "+senderSignature);
-		return new ChatMessage(receivedCode,senderSignature,modeColor);
+		logger.info("Received chat commad number " + receivedCode + " from sig " + senderSignature);
+		return new ChatMessage(receivedCode, senderSignature, modeColor);
 	}
 
 	public void chatReact()                   //todo not tested

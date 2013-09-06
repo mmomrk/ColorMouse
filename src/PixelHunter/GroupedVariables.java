@@ -82,7 +82,7 @@ public class GroupedVariables
 			ID_Bladedancer = Integer.parseInt(properties.get("ID_Bladedancer").toString());
 			ID_Warlock = Integer.parseInt(properties.get("ID_Warlock").toString());
 
-			CHAT_TASK_LIST_LENGTH	=	Integer.parseInt(properties.get("CHAT_TASK_LIST_LENGTH").toString());
+			CHAT_TASK_LIST_LENGTH = Integer.parseInt(properties.get("CHAT_TASK_LIST_LENGTH").toString());
 
 			int red, green, blue;
 			red = Integer.parseInt(properties.get("PetTargetPartyHpColor_red").toString());

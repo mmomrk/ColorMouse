@@ -16,7 +16,7 @@ public class DefaultCharacter extends Character
 	}
 
 	@Override
-	void buffRebuff()	//todo implement
+	void buffRebuff()    //todo implement
 	{
 		return;
 	}

@@ -186,7 +186,7 @@ public class ProcessIdentifier
 				char[] windowText = new char[512];
 				user32.GetWindowText(hWnd, windowText, 512);
 				String wText = Native.toString(windowText);
-				if (wText.equals("Shot00069.bmp - Paint")) {      //- Windows Photo Viewer	- Paint
+				if (wText.equals("Asterios ")) {      //- Windows Photo Viewer	- Paint
 					hwndList.add(hWnd);
 					logger.debug("Process IDer: found proper window, HWND=" + hWnd);
 				}

@@ -1,4 +1,5 @@
 package PixelHunter;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,27 +13,32 @@ import static java.lang.Thread.sleep;
  * User: mrk
  * Date: 9/6/13; Time: 2:11 AM
  */
-public class Fisher	//todo finished making this class super cool
+public class Fisher    //todo finished making this class super cool
 {
 	private static final Logger logger = LoggerFactory.getLogger(Fisher.class);
 
 	private L2Window l2Window;
 	private static final Color
-			colorHpBlueNegative   = new Color(53, 33, 26),
-			colorHpOrangeNegative = new Color(36, 14, 12),
-			colorHpBlue           = new Color(0, 103, 159),//(12, 104, 156),
-			colorHpOrange         = new Color(144, 36, 7),
-			colorControlFrame     = new Color(178, 163, 141);
-	private static       boolean nightMode        = false;
+	colorHpBlueNegative   = new Color(53, 33, 26),
+	colorHpOrangeNegative = new Color(36, 14, 12),
+	colorHpBlue           = new Color(0, 103, 159),//(12, 104, 156),
+	colorHpOrange         = new Color(144, 36, 7),
+	colorControlFrame     = new Color(178, 163, 141);
+	private static boolean nightMode = false;
+	private Point workingPoint;
+	private boolean firstAnalysis = true;
+
+
 	private static final int
-								 timeToWaitMillis = 1000,//how much time  to wait before act
-			timeToSleepMillis                     = 50;//passed to sleep method
+	timeToWaitMillis  = 1000,//how much time  to wait before act
+	timeToSleepMillis = 50;//passed to sleep method
 
 	private final Point
-			leftmostBluePixelCoordinate,
-			controlFrameCoordinate;
+	leftmostBluePixelCoordinate,
+	controlFrameCoordinate;
 
 	private final int threshold = 10;    //default is 4
+
 
 	public void fish()
 	{
@@ -42,7 +48,7 @@ public class Fisher	//todo finished making this class super cool
 		if (!isFishingFrameExist()) {    //we killed the frame. correcting the mistake
 			keyClick(KeyEvent.VK_NUMPAD1);
 		}
-
+		waitForFishHp();
 		while (isFishingFrameExist()) {
 			waitForBlink();
 			act(analyze());
@@ -50,22 +56,32 @@ public class Fisher	//todo finished making this class super cool
 		logger.info("finished fishing");
 	}
 
-	private void checkForNightTime()
+	private boolean isForNightTime()    //todo test it when nighttime support is added
 	{
+		DateTime currentDateTime = DateTime.now();
+		int currentHour = currentDateTime.getHourOfDay();
+		if (currentHour % 4 == 1) {
+			return true;
+		} else {
+			return false;
+		}
+
+
 		//todo implement
 	}
 
 	private void waitForBlink()
 	{
 		while (!
-				(colorsAreClose(getAbsPixelColor(this.leftmostBluePixelCoordinate), this.colorHpBlue, threshold)
-						||
-						colorsAreClose(getAbsPixelColor(this.leftmostBluePixelCoordinate), this.colorHpOrange, threshold)
-						||
-						colorsAreClose(getAbsPixelColor(this.leftmostBluePixelCoordinate), this.colorHpOrangeNegative, threshold)
-						||
-						colorsAreClose(getAbsPixelColor(this.leftmostBluePixelCoordinate), this.colorHpBlueNegative, threshold))
-				) {
+			   (colorsAreClose(getAbsPixelColor(this.leftmostBluePixelCoordinate), this.colorHpBlue, threshold)
+				||
+				colorsAreClose(getAbsPixelColor(this.leftmostBluePixelCoordinate), this.colorHpOrange, threshold)
+				||
+				colorsAreClose(getAbsPixelColor(this.leftmostBluePixelCoordinate), this.colorHpOrangeNegative, threshold)
+				||
+				colorsAreClose(getAbsPixelColor(this.leftmostBluePixelCoordinate), this.colorHpBlueNegative, threshold))
+		)
+		{
 			try {        //one can refactor all these trey sleep to use easy sleep from window
 				sleep(timeToSleepMillis);
 			} catch (InterruptedException e) {
@@ -89,9 +105,9 @@ public class Fisher	//todo finished making this class super cool
 			}
 		}
 		while (!(colorsAreClose(getAbsPixelColor(this.leftmostBluePixelCoordinate), this.colorHpBlue, threshold)
-				||
-				colorsAreClose(getAbsPixelColor(this.leftmostBluePixelCoordinate), this.colorHpOrange, threshold))
-				);
+				 ||
+				 colorsAreClose(getAbsPixelColor(this.leftmostBluePixelCoordinate), this.colorHpOrange, threshold))
+		);
 		logger.info("Fish HP bar finally appeared");
 	}
 
@@ -115,21 +131,52 @@ public class Fisher	//todo finished making this class super cool
 
 	}
 
-	private Point workingPoint;
 
 	private boolean analyze()
 	{
 		logger.trace(".analyze");
-		workingPoint = this.leftmostBluePixelCoordinate;
-		while (colorsAreClose(getAbsPixelColor(workingPoint), this.colorHpBlue, threshold)
-				||
-				colorsAreClose(getAbsPixelColor(workingPoint), this.colorHpOrange, threshold)) {
-			workingPoint.x++;
+		if (firstAnalysis) {
+			workingPoint = new Point(this.leftmostBluePixelCoordinate);
+		}
+
+
+		boolean stayingOnPositive;
+		if (colorsAreClose(getAbsPixelColor(workingPoint), this.colorHpBlue, threshold)
+			||
+			colorsAreClose(getAbsPixelColor(workingPoint), this.colorHpOrange, threshold))
+		{
+			stayingOnPositive = true;
+		} else if (colorsAreClose(getAbsPixelColor(workingPoint), this.colorHpBlueNegative, threshold)
+				   ||
+				   colorsAreClose(getAbsPixelColor(workingPoint), this.colorHpOrangeNegative, threshold))
+		{
+			stayingOnPositive = false;
+		} else {
+			logger.error("Found invalid color in analyze");
+			return false;
+		}
+
+		if (stayingOnPositive) {
+			while (colorsAreClose(getAbsPixelColor(workingPoint), this.colorHpBlue, threshold)
+				   ||
+				   colorsAreClose(getAbsPixelColor(workingPoint), this.colorHpOrange, threshold))
+			{
+				workingPoint.x++;
+			}
+		} else {
+			while (colorsAreClose(getAbsPixelColor(workingPoint), this.colorHpBlueNegative, threshold)
+				   ||
+				   colorsAreClose(getAbsPixelColor(workingPoint), this.colorHpOrangeNegative, threshold))
+			{
+				workingPoint.x--;
+			}
+
 		}
 		int timePassed = 0;
 		while (timePassed < this.timeToWaitMillis) {
 			if (colorsAreClose(getAbsPixelColor(workingPoint), this.colorHpBlue, threshold) ||
-					colorsAreClose(getAbsPixelColor(workingPoint), this.colorHpOrange, threshold)) {
+				colorsAreClose(getAbsPixelColor(workingPoint), this.colorHpOrange, threshold))
+			{
 				return true;    //do the reeling
 			}
 			timePassed += this.timeToSleepMillis;

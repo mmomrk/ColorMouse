@@ -29,8 +29,8 @@ public class L2Window
 	public static int debugMode = 2;
 
 	private final int frame_x = 8,
-			frame_yt          = 30,
-			frame_yb = 8;
+	frame_yt                  = 30,
+	frame_yb                  = 8;
 
 	private static Robot robot;
 
@@ -38,7 +38,8 @@ public class L2Window
 
 	private boolean noChatMode = false;    //++getter
 
-	public static void easySleep(int milliseconds){	//maybe it was a design mistake
+	public static void easySleep(int milliseconds)
+	{    //maybe it was a design mistake
 		try {
 			sleep(milliseconds);
 		} catch (InterruptedException e) {
@@ -47,8 +48,9 @@ public class L2Window
 		}
 	}
 
-	public static void keyClick(int key){
-		logger.trace(".keyClick "+key);
+	public static void keyClick(int key)
+	{
+		logger.trace(".keyClick " + key);
 		robot.keyPress(key);
 		robot.keyRelease(key);
 		return;
@@ -74,10 +76,10 @@ public class L2Window
 				WinAPIAPI.setWindowPos(hwnd1, -8, -25, screenDimentions.width + 16, screenDimentions.height - 7);    //8=frame width, 7is fine, having 50px win panel
 				return;
 			case 1:
-				WinAPIAPI.setWindowPos(hwnd1, -8, -25, screenDimentions.width/2 + 12, screenDimentions.height - 7);
+				WinAPIAPI.setWindowPos(hwnd1, -8, -25, screenDimentions.width / 2 + 12, screenDimentions.height - 7);
 				return;
 			case 2:
-				WinAPIAPI.setWindowPos(hwnd1, screenDimentions.width / 2 - 4, -25, screenDimentions.width/2 + 12, screenDimentions.height - 7);
+				WinAPIAPI.setWindowPos(hwnd1, screenDimentions.width / 2 - 4, -25, screenDimentions.width / 2 + 12, screenDimentions.height - 7);
 				return;
 		}
 		logger.warn("anomalous behaviour in l2window.initiateSize");
@@ -99,7 +101,7 @@ public class L2Window
 				if (debugMode == 2) {
 					WinAPIAPI.showMessage("Found chat line, " + chatStartingPoint);
 				}
-				return new Point(-1,-1);
+				return new Point(-1, -1);
 			}
 
 			chatStartingPoint.y--;
@@ -225,27 +227,29 @@ public class L2Window
 		return;
 	}
 
-	public static void mouseClick_Absolute(Point absolutePoint){	//tested
-		logger.trace(".mouseClick Absolute to "+absolutePoint);
+	public static void mouseClick_Absolute(Point absolutePoint)
+	{    //tested
+		logger.trace(".mouseClick Absolute to " + absolutePoint);
 
-		Point currentMousePosition	=	getMousePos();
+		Point currentMousePosition = getMousePos();
 		robot.mouseMove(absolutePoint.x, absolutePoint.y);
 		robot.mousePress(InputEvent.BUTTON1_MASK);
 		robot.mouseRelease(InputEvent.BUTTON1_MASK);
-		if (debugMode == 0){
+		if (debugMode == 0) {
 			robot.mouseMove(currentMousePosition.x, currentMousePosition.y);
 		}
 	}
 
-	public void mouseClick_Relative(Point relativePoint){	//not tested
+	public void mouseClick_Relative(Point relativePoint)
+	{    //not tested
 		logger.trace(".mouseClick Relative");
 
-		Point currentMousePosition	=	getMousePos();
+		Point currentMousePosition = getMousePos();
 		advancedMouseMove(relativePoint);
 		robot.mousePress(InputEvent.BUTTON1_MASK);
 		robot.mouseRelease(InputEvent.BUTTON1_MASK);
-		if (debugMode == 0){
-			robot.mouseMove(currentMousePosition.x,currentMousePosition.y);
+		if (debugMode == 0) {
+			robot.mouseMove(currentMousePosition.x, currentMousePosition.y);
 		}
 	}
 
@@ -259,7 +263,7 @@ public class L2Window
 		final int ticks = 50;
 		Point currentPoint = new Point(coordinateHp_r);
 
-		if (hpConstants.isPet){
+		if (hpConstants.isPet) {
 			mouseClick_Relative(new Point(hpConstants.coordinateLeft.x - 10, hpConstants.coordinateLeft.y));
 		}
 		//todo: test it
