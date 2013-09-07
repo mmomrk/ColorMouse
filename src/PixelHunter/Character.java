@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Timer;
@@ -20,32 +21,32 @@ import static java.lang.Math.pow;
 public abstract class Character extends LivingCreature
 {
 
-	private static final Logger logger = LoggerFactory.getLogger(Character.class);
+	private static final Logger logger                  = LoggerFactory.getLogger(Character.class);
 	//	public timer    buffTimer, homerunTimer;
 //	private int buffTime;
 //	public  int farmMode, buffMode, homerunMode;
-	Point chatStartingPoint;
+	private static final int    maxChatStartExpectation = 100;
 
-	public  Pet    pet;    //todo think of privacy
+	private Point chatStartingPoint;
+
+	public  Pet    pet;    //remove public after tests are done
 	private Target target;
-
-	private int INT;
 
 	private Comparator<ChatMessage>    chatMessageComparator = new MessagePriorityComparator();
 	private PriorityQueue<ChatMessage> toDoList              = new PriorityQueue<ChatMessage>(GroupedVariables.projectConstants.CHAT_TASK_LIST_LENGTH, chatMessageComparator);
 
-	private boolean isMacroFree = true,
-	rebuff                      = false;
+	private boolean
+	isMacroFree = true,
+	rebuff      = false;
 
 	private Timer macroLockTimer;
 
-
 	abstract void buffRebuff(); //should set rebuff to 0
-//	public boolean followFlag;
+
+	//	public boolean followFlag;
 //	public void classSpecificDeed();//think of it twice
 //	public void pvE();
 //	public void runHome();
-//	public void spamSelf();
 //	public void target(int id);
 //	public void setMp();
 //	public void setPetHp();
@@ -70,7 +71,10 @@ public abstract class Character extends LivingCreature
 //
 //	public void toggleFarmMode();    //#11
 //
-
+	public void spamSelf()
+	{
+		l2Window.keyClick(KeyEvent.VK_0);
+	}
 
 	private boolean chatCommandExecute(ChatMessage doIt)    //todo
 	{
@@ -96,9 +100,12 @@ public abstract class Character extends LivingCreature
 
 	private boolean chatPatternMatches(int i, boolean equalsExpectedColor)
 	{
-		if (i % 5 < 4 && equalsExpectedColor) {    //is it magic? not yet. look int your chat
+		logger.trace(".chatPatternMatches with pixel number " + i + " and matching green color of " + equalsExpectedColor);
+		logger.debug("first condition is " + (i % 5 < 3 && equalsExpectedColor) + " and second is " + (i % 5 >= 3 && !equalsExpectedColor));
+		if ((i % 5 < 3 && equalsExpectedColor) || (i % 5 >= 3 && !equalsExpectedColor)) {    //is it magic? not yet. look int your chat
 			return true;
 		} else {
+			logger.warn("Chat pattern match has failed. Generally this should not happen");
 			return false;
 		}
 	}
@@ -111,7 +118,8 @@ public abstract class Character extends LivingCreature
 		int i;
 		Point currentPoint = new Point(0, this.chatStartingPoint.y + 3);//lower command pixel is 3 px under ':'
 
-		for (i = 50; i < 80; i++) {
+		logger.debug("now searching first pixel in signature");
+		for (i = 50; i < this.maxChatStartExpectation; i++) {    //todo test the length
 			currentPoint.x = i;
 			if (l2Window.colorsAreClose(l2Window.getRelPixelColor(currentPoint), GroupedVariables.projectConstants.CHAT_COLOR_PARTY)) {
 				messageColor = GroupedVariables.projectConstants.CHAT_COLOR_PARTY;
@@ -124,15 +132,16 @@ public abstract class Character extends LivingCreature
 				break;
 			}
 		}
-		if (i == 80) {
+		if (i == this.maxChatStartExpectation) {
 			logger.info("Chat is empty");
 			return null;
 		}
 		//found first pixel
 		senderSignature = i;
+		logger.debug("found signature " + i);
 		//now check the pattern
 		for (i = 0; i < 17; i++) {
-			currentPoint.x += i;
+			currentPoint.x = senderSignature + i;
 			if (!chatPatternMatches(i, l2Window.colorsAreClose(l2Window.getRelPixelColor(currentPoint), messageColor))) {
 				return null;
 			}
@@ -140,13 +149,20 @@ public abstract class Character extends LivingCreature
 		//now we totally have in incoming
 		currentPoint.y--;    //to be in the information zone
 		// decoding
-		for (i = 0; i <= 6; i++) {//command binary capacity sits in this hardcoded 6
+		l2Window.debugMode = 2;    //remove after debugged
+		for (i = 0; i <= 5; i++) {//command binary capacity sits in this hardcoded 5
 			currentPoint.x = senderSignature + i * 5;
 			if (!l2Window.colorsAreClose(l2Window.getRelPixelColor(currentPoint), messageColor)) {//found bit true
-				receivedCode += pow(2, i);
+				if (l2Window.colorsAreClose(l2Window.getRelPixelColor(new Point(currentPoint.x + 2, currentPoint.y)), messageColor)) {
+					receivedCode += pow(2, i);
+				}else {
+					logger.warn(".ReadChat: Warning while decoding message: both left and right pivot points are empty");
+					break;
+				}
 			}
+			logger.debug(".readChat: decode. current val is " + receivedCode);
 		}
-		logger.info("Received chat commad number " + receivedCode + " from sig " + senderSignature);
+		logger.info(".readChat: Received chat command number " + receivedCode + " from sig " + senderSignature);
 		return new ChatMessage(receivedCode, senderSignature, modeColor);
 	}
 
@@ -160,6 +176,7 @@ public abstract class Character extends LivingCreature
 
 		ChatMessage incomingMessage = readChat();
 		if (incomingMessage != null) {
+			spamSelf();
 			toDoList.add(incomingMessage);
 		}
 
@@ -169,10 +186,10 @@ public abstract class Character extends LivingCreature
 		}
 
 		if (commandExecuted) {
-			logger.debug("Command executed");
+			logger.debug(".chatReact: Command executed");
 			toDoList.poll();
 		} else {
-			logger.debug("Command was not executed");
+			logger.debug(".chatReact: Command was not executed");
 		}
 
 		return;
@@ -181,6 +198,7 @@ public abstract class Character extends LivingCreature
 	public void setChat()
 	{
 		this.chatStartingPoint = l2Window.setChat();
+		logger.info("Finished setChat. Now chatStartingPoint is " + this.chatStartingPoint);
 	}
 
 	public void setHP()
@@ -206,14 +224,10 @@ public abstract class Character extends LivingCreature
 		super(thisid);
 		logger.trace("Inside Character constructor, finished making LC");
 
-		this.l2Window = new L2Window();
-		this.l2Window.hwnd = hwnd;
+		this.l2Window = new L2Window(hwnd);
 
 		l2Window.acceptWindowPosition();
 		logger.debug("after acceptWindowPos. now it is h " + l2Window.h + " w " + l2Window.w + " top-left " + l2Window.windowPosition);
-
-//		WinAPIAPI.showMessage("you can move/resize window now");	//todo test world class approach before deleting this
-//		l2window.x  ,y  ,h  ,w
 
 		pet = new Pet(l2Window);//including setHP
 		target = new Target(l2Window);
@@ -227,7 +241,7 @@ public abstract class Character extends LivingCreature
 //CLASSES
 
 
-	private class MessagePriorityComparator implements Comparator<ChatMessage>    //todo not tested
+	private class MessagePriorityComparator implements Comparator<ChatMessage>    //not tested
 	{
 
 		@Override
@@ -245,7 +259,7 @@ public abstract class Character extends LivingCreature
 
 
 	private class SetMacroFree extends TimerTask
-	{        //todo not tested
+	{        //not tested
 
 		@Override
 		public void run()
@@ -258,7 +272,7 @@ public abstract class Character extends LivingCreature
 
 
 	private class SetRebuff extends TimerTask
-	{        //todo not tested
+	{        //not tested
 
 		@Override
 		public void run()

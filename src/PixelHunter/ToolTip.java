@@ -41,7 +41,7 @@ public class ToolTip extends JFrame
 	}
 
 //    public static void main(String[] args) {
-//        ToolTip tt=new ToolTip("test run", new Point(100,200));
+//        ToolTip tt=new ToolTip("t est run", new Point(100,200));
 //
 //    }
 }

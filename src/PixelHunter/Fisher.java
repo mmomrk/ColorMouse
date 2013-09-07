@@ -55,14 +55,14 @@ public class Fisher    //todo finished making this class super cool
 	public void fish()
 	{
 		logger.trace(".fish");
-//		keyClick(KeyEvent.VK_NUMPAD1);    //not safe but anyway
+//		keyClickStatic(KeyEvent.VK_NUMPAD1);    //not safe but anyway
 		try {
 			Thread.sleep(timeToSleepMillis);
 		} catch (InterruptedException e) {
 			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 		}
 		if (!isFishingFrameExist()) {    //we killed the frame. correcting the mistake
-			keyClick(KeyEvent.VK_NUMPAD1);
+			keyClickStatic(KeyEvent.VK_NUMPAD1);
 		}
 
 		this.firstAnalysis = true;
@@ -78,7 +78,7 @@ public class Fisher    //todo finished making this class super cool
 		logger.info("finished fishing");
 	}
 
-	private boolean isNightTime()    //todo test it when nighttime support is added
+	private boolean isNightTime()    //test it when nighttime support is added
 	{
 		DateTime currentDateTime = DateTime.now();
 		int currentHour = currentDateTime.getHourOfDay();
@@ -157,9 +157,9 @@ public class Fisher    //todo finished making this class super cool
 	{
 		logger.trace(".act " + reel);
 		if (reel) {
-			keyClick(KeyEvent.VK_NUMPAD3);
+			keyClickStatic(KeyEvent.VK_NUMPAD3);
 		} else {
-			keyClick(KeyEvent.VK_NUMPAD2);
+			keyClickStatic(KeyEvent.VK_NUMPAD2);
 		}
 
 	}

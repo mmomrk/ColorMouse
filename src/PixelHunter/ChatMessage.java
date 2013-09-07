@@ -31,6 +31,10 @@ public class ChatMessage
 		return modeColor;
 	}
 
+	public String toString(){
+		return "Message.. From: "+ this.senderID+", Command: "+this.command+", mode: "+this.modeColor;
+	}
+
 	ChatMessage(int command, int senderSignature, int modeColor)
 	{
 		this.command = command;
