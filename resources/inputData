@@ -12,8 +12,12 @@ ID_Warlock  =   7
 ID_pet  =   100
 ID_target   =   101
 
+
 #MISC CONSTANTS
+
 CHAT_TASK_LIST_LENGTH   =   10
+INITIAL_DEBUG_MODE  =   0
+
 
 #INGAME COLORS
 
