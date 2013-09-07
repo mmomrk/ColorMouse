@@ -27,7 +27,7 @@ public class InfoFrame extends JFrame
 		this.setLocationRelativeTo(null);
 	}
 //    public static void main(String[] args) {
-//        final InfoFrame frame= new InfoFrame("Test Run");
+//        final InfoFrame frame= new InfoFrame("T est Run");
 //        frame.setVisible(true);
 //        frame.pack();
 //        Timer timer = new Timer();

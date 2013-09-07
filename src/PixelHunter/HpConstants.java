@@ -17,7 +17,7 @@ public class HpConstants
 		this.color = color;
 		this.coordinateLeft = left;
 		this.coordinateRight = right;
-		if (id == GroupedVariables.ProjectConstants.ID_TARGET) {
+		if (id == GroupedVariables.ProjectConstants.ID_PET) {
 			this.isPet = true;
 		} else {
 			this.isPet = false;

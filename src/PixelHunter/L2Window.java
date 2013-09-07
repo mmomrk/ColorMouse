@@ -49,9 +49,35 @@ public class L2Window
 		}
 	}
 
-	public static void keyClick(int key)
+	public void keyClick(int key)
 	{
-		logger.trace(".keyClick " + key);
+		logger.trace(".keyClick, non-static " + key);
+
+		WinAPIAPI.bringToFront(this.hwnd);	//watch it: this should not decrease productivity
+
+		robot.keyPress(key);
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		}
+
+		robot.keyRelease(key);
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		}
+
+		return;
+
+	}
+
+
+
+	public static void keyClickStatic(int key)
+	{
+		logger.trace(".keyClickStatic " + key);
 		robot.keyPress(key);
 		try {
 			Thread.sleep(100);
@@ -112,13 +138,13 @@ public class L2Window
 				if (debugMode == 2) {
 					WinAPIAPI.showMessage("Found chat line, " + chatStartingPoint);
 				}
-				return new Point(-1, -1);
+				return chatStartingPoint;
 			}
 
 			chatStartingPoint.y--;
 
 			if (chatStartingPoint.y == -69 && againFlag == true) {
-				chatStartingPoint.y = -45;    //maybe it is bad to use hardcoded constant twice todo:discuss
+				chatStartingPoint.y = -45;    //maybe it is bad to use hardcoded constant twice discuss
 				chatStartingPoint.x--;
 				againFlag = false;
 			}
@@ -126,8 +152,8 @@ public class L2Window
 		}
 		logger.error("Could not find chat line");
 		WinAPIAPI.showMessage("Failed to find chat line!!!");
-		noChatMode = true;
-		return chatStartingPoint;
+		this.noChatMode = true;
+		return new Point(-1, -1);
 	}
 
 
@@ -139,7 +165,7 @@ public class L2Window
 
 	public static boolean colorsAreClose(Color color1, Color color2)
 	{
-		final int threshold = 4;    //test it, watch it
+		final int threshold = 4;
 		int diffR = color1.getRed() - color2.getRed();
 		int diffG = color1.getGreen() - color2.getGreen();
 		int diffB = color1.getBlue() - color2.getBlue();
@@ -158,7 +184,7 @@ public class L2Window
 
 	public static boolean colorsAreClose(Color color1, Color color2, int thresholdIn)
 	{
-		final int threshold = thresholdIn;    //test it, watch it
+		final int threshold = thresholdIn;
 		int diffR = color1.getRed() - color2.getRed();
 		int diffG = color1.getGreen() - color2.getGreen();
 		int diffB = color1.getBlue() - color2.getBlue();
@@ -240,7 +266,7 @@ public class L2Window
 	}
 
 	public static void mouseClick_Absolute(Point absolutePoint)
-	{    //tested
+	{
 		logger.trace(".mouseClick Absolute to " + absolutePoint);
 
 		Point currentMousePosition = getMousePos();
@@ -252,8 +278,8 @@ public class L2Window
 		}
 	}
 
-	public void mouseClick_Relative(Point relativePoint)
-	{    //not tested
+	public void mouseClick_Relative(Point relativePoint)//not tested
+	{
 		logger.trace(".mouseClick Relative");
 
 		Point currentMousePosition = getMousePos();
@@ -267,7 +293,7 @@ public class L2Window
 
 	public int getHP(HpConstants hpConstants)
 	{
-		logger.trace("Inside l2window.getHP");
+		logger.trace(".getHP");
 		Color hpColor = hpConstants.color;
 		Point coordinateHp_l = hpConstants.coordinateLeft;
 		Point coordinateHp_r = hpConstants.coordinateRight;
@@ -276,9 +302,9 @@ public class L2Window
 		Point currentPoint = new Point(coordinateHp_r);
 
 		if (hpConstants.isPet) {
+			logger.debug(".getHP: checking for the pet=>click on the frame");
 			mouseClick_Relative(new Point(hpConstants.coordinateLeft.x - 10, hpConstants.coordinateLeft.y));
 		}
-		//todo: test it
 
 		int i = 0;
 		for (; i <= ticks; i++) {
@@ -293,6 +319,7 @@ public class L2Window
 
 	public void moveResize(int x, int y, int w, int h)
 	{
+		logger.trace(".moveResize");
 		this.windowPosition.x = x;
 		this.windowPosition.y = y;
 		this.w = w;
@@ -302,6 +329,7 @@ public class L2Window
 
 	public void advancedMouseMove(Point point)
 	{
+		logger.trace(".advancedMouseMove to "+point);
 		point = relativeToAbsoluteCoordinates(point);
 		robot.mouseMove(point.x, point.y);
 	}
@@ -348,14 +376,12 @@ public class L2Window
 		relativePoint.x = (int) absolutePoint.getX();
 		relativePoint.y = (int) absolutePoint.getY();
 		if ((absolutePoint.x > this.windowPosition.x + this.w) || (absolutePoint.y > this.windowPosition.y + this.h)) {
-			logger.error("Absolute coordinate to rel is out of range. requested " + absolutePoint);
-			WinAPIAPI.showMessage("Absolute coordinate to rel is out of range. requested " + absolutePoint, 3);//todo: remove after logger is understood
+			logger.error("Absolute coordinate to rel is out of range!!!!!! requested " + absolutePoint);
 			return new Point(-1, -1);
 		}
 
 		if (absolutePoint.x < 0 || absolutePoint.y < 0) {
 			logger.error("Absolute coordinate to rel is NEGATIVE!!!. requested " + absolutePoint);
-			WinAPIAPI.showMessage("Absolute coordinate to rel is NEGATIVE!!!. requested " + absolutePoint, 3);//todo: remove after logger is understood
 		}
 
 		relativePoint.x = relativePoint.x - this.windowPosition.x - this.frame_x;
