@@ -32,7 +32,7 @@ public abstract class Character extends LivingCreature
 	public  Pet    pet;    //remove public after tests are done
 	private Target target;
 
-	private Comparator<ChatMessage>    chatMessageComparator = new MessagePriorityComparator();
+	private Comparator<ChatMessage>    chatMessageComparator = new ChatMessage.MessagePriorityComparator();
 	private PriorityQueue<ChatMessage> toDoList              = new PriorityQueue<ChatMessage>(GroupedVariables.projectConstants.CHAT_TASK_LIST_LENGTH, chatMessageComparator);
 
 	private boolean
@@ -177,20 +177,22 @@ public abstract class Character extends LivingCreature
 		ChatMessage incomingMessage = readChat();
 		if (incomingMessage != null) {
 			spamSelf();
-			toDoList.add(incomingMessage);
+			toDoList.offer(incomingMessage);
 		}
 
 		boolean commandExecuted = false;
 		if (!toDoList.isEmpty()) {
 			commandExecuted = chatCommandExecute(toDoList.peek());
+			if (commandExecuted) {
+				logger.debug(".chatReact: Command executed");
+				toDoList.poll();
+			} else {
+				logger.debug(".chatReact: Command was not executed.");
+			}
+			System.out.println("Todo list:\n"+toDoList.toString());
 		}
 
-		if (commandExecuted) {
-			logger.debug(".chatReact: Command executed");
-			toDoList.poll();
-		} else {
-			logger.debug(".chatReact: Command was not executed");
-		}
+
 
 		return;
 	}
@@ -239,23 +241,6 @@ public abstract class Character extends LivingCreature
 	}
 
 //CLASSES
-
-
-	private class MessagePriorityComparator implements Comparator<ChatMessage>    //not tested
-	{
-
-		@Override
-		public int compare(ChatMessage chatMessage1, ChatMessage chatMessage2)
-		{
-			if (chatMessage1.getPriority() > chatMessage2.getPriority()) {
-				return 1;
-			}
-			if (chatMessage1.getPriority() < chatMessage2.getPriority()) {
-				return -1;
-			}
-			return 0;
-		}
-	}
 
 
 	private class SetMacroFree extends TimerTask

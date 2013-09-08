@@ -307,9 +307,7 @@ public class HotKeyHolder extends JFrame implements HotkeyListener, IntellitypeL
 			public void windowClosing(java.awt.event.WindowEvent evt) {
 				// don't forget to clean up any resources before close
 				JIntellitype.getInstance().cleanUp();
-				System.exit(0);
-			}
-		});
+				System.exit(0); }});
 
 		this.getContentPane().add(mainPanel);
 		this.pack();

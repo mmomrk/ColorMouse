@@ -26,7 +26,7 @@ public class L2Window
 	public Point windowPosition;
 	public int   h, w;//kinda bad. has to be refactored
 
-	public static int debugMode = GroupedVariables.projectConstants.INITIAL_DEBUG_MODE;
+	public static int debugMode = GroupedVariables.ProjectConstants.INITIAL_DEBUG_MODE;
 
 	private final int
 	frame_x  = 8,
@@ -53,7 +53,7 @@ public class L2Window
 	{
 		logger.trace(".keyClick, non-static " + key);
 
-		WinAPIAPI.bringToFront(this.hwnd);	//watch it: this should not decrease productivity
+		WinAPIAPI.bringToFront(this.hwnd);    //watch it: this should not decrease productivity
 
 		robot.keyPress(key);
 		try {
@@ -72,7 +72,6 @@ public class L2Window
 		return;
 
 	}
-
 
 
 	public static void keyClickStatic(int key)
@@ -131,8 +130,13 @@ public class L2Window
 		logger.trace("Entered find chat");
 		WinAPIAPI.showMessage("Setting up chat properties. Enter _______ to party chat.");
 		boolean againFlag = true;    //used to scan two lines in case of finding a spacebar in the first vertical
+		Color currentColor;
 		while (chatStartingPoint.y > -70) {
-			if (colorsAreClose(getRelPixelColor(chatStartingPoint), GroupedVariables.projectConstants.CHAT_COLOR_PARTY)) {
+			currentColor = getRelPixelColor(chatStartingPoint);
+			if (colorsAreClose(currentColor, GroupedVariables.ProjectConstants.CHAT_COLOR_PARTY)
+				||
+				colorsAreClose(currentColor, GroupedVariables.ProjectConstants.CHAT_COLOR_PRIVATE))
+			{
 				chatStartingPoint.y -= 2;    //difference between underline symbol and lowest pixel in ':'
 				logger.debug("Found chat line, " + chatStartingPoint);
 				if (debugMode == 2) {
@@ -205,10 +209,10 @@ public class L2Window
 	public void setHP(HpConstants hpConstants, int id)    //warning designed to work only with pet, target and party member (not party pet or character)
 	{
 		logger.trace(".setHP");
-		if (id == GroupedVariables.projectConstants.ID_PET) {
+		if (id == GroupedVariables.ProjectConstants.ID_PET) {
 			WinAPIAPI.showMessage("Set HP bar for the pet. Place mouse under fully healed HP bar and press OK");
 
-		} else if (id == GroupedVariables.projectConstants.ID_TARGET) {
+		} else if (id == GroupedVariables.ProjectConstants.ID_TARGET) {
 			WinAPIAPI.showMessage("Set HP bar for the target. Place mouse under fully healed HP bar and press OK");
 		} else {
 			logger.error("wrong id passed to setHP: " + id);
@@ -329,7 +333,7 @@ public class L2Window
 
 	public void advancedMouseMove(Point point)
 	{
-		logger.trace(".advancedMouseMove to "+point);
+		logger.trace(".advancedMouseMove to " + point);
 		point = relativeToAbsoluteCoordinates(point);
 		robot.mouseMove(point.x, point.y);
 	}
