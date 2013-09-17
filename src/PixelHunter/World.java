@@ -63,17 +63,19 @@ public class World
 
 			L2Window.initiateSize(0, hwnds.get(0));    //yes, static method access, not the class representative
 			//0=fully on the screen
+			WinAPIAPI.setActiveWindow(hwnds.get(0));
+//			WinAPIAPI.User32DLL.INSTANCE.ShowWindow(hwnds.get(0),0);
 			id = WinAPIAPI.dialogWindow("You can resize the window now in case you are not satisfied with its dimensions.\nEnter Character ID in the only window");
 			characters[0] = CharacterFactory.getCharacter(id, hwnds.get(0));
 
 		} else {    //todo change hwnds order: first is left. if one can do
 
-			WinAPIAPI.bringToFront(hwnds.get(0));
+			WinAPIAPI.setActiveWindow(hwnds.get(0));		//not implemented yet
 			L2Window.initiateSize(1, hwnds.get(0));    //1=left on the screen
 			id = WinAPIAPI.dialogWindow("You can resize the window now in case you are not satisfied with its dimensions.\nEnter Character ID in the left window");
 			characters[0] = CharacterFactory.getCharacter(id, hwnds.get(0));
 
-			WinAPIAPI.bringToFront(hwnds.get(1));
+			WinAPIAPI.setActiveWindow(hwnds.get(1));
 			L2Window.initiateSize(2, hwnds.get(1));    //2=right on the screen
 			id = WinAPIAPI.dialogWindow("You can resize the window now in case you are not satisfied with its dimensions.\nEnter Character ID in the right window");
 			characters[1] = CharacterFactory.getCharacter(id, hwnds.get(1));

@@ -88,6 +88,12 @@ public class WinAPIAPI
 
 		public static native boolean PeekMessage(MSG lpMsg, Pointer hWnd, int wMsgFilterMin, int wMsgFilterMax, int wRemoveMsg);
 
+		public static native WinDef.HWND ShowWindow(WinDef.HWND hwnd, int cmdShow);  //not as wanted
+
+		public static native boolean BringWindowToTop(WinDef.HWND hwnd);	//invalid
+
+		public static native boolean  SetForegroundWindow(WinDef.HWND hwnd);
+
 		@SuppressWarnings({"UnusedDeclaration"})
 		public static class MSG extends Structure
 		{
@@ -122,9 +128,17 @@ public class WinAPIAPI
 
 	public static void setActiveWindow(WinDef.HWND hwnd)
 	{
-		if (User32.INSTANCE.SetFocus(hwnd)==null){
-			logger.error(".setActiveWindow failed to activate window");
-		}
+		logger.info("User32.INSTANCE.SetForegroundWindow(hwnd);");
+//		User32.INSTANCE.SetFocus(hwnd);
+//		User32.INSTANCE.ShowWindow(hwnd,1);
+//		User32.INSTANCE.BringWindowToTop ();	//invalid
+		User32.INSTANCE.SetForegroundWindow(hwnd);	//after a long struggle
+//		logger.debug("User32.INSTANCE.UpdateWindow(hwnd);");
+		User32.INSTANCE.UpdateWindow(hwnd);
+//		logger.debug("User32.INSTANCE... finished");
+//		if (User32.INSTANCE.SetFocus(hwnd)==null){
+//			logger.error(".setActiveWindow failed to activate window");
+//		}
 
 	}
 

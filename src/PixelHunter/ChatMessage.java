@@ -42,8 +42,8 @@ public class ChatMessage
 		this.command = command;
 		this.modeColor = modeColor;
 		switch (senderSignature) {
-			case 0:    //todo after can get these values first-hand
-//				this.senderID = 554;
+			case 83:    //todo after can get these values first-hand
+				this.senderID = 10;
 				break;
 		}
 

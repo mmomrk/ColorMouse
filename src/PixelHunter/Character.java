@@ -88,9 +88,9 @@ public abstract class Character extends LivingCreature
 	{
 		logger.trace(".doTheToDo");
 		logger.debug(".doTheToDo: todolist: " + this.toDoList);
-		if (this.target.isDead()
-			||
-			this.target.getHP() >= 100
+		if ((this.target.isDead()
+			 ||
+			 this.target.getHP() >= 100)
 			&&
 			!toDoList.isEmpty())
 		{
@@ -284,7 +284,7 @@ public abstract class Character extends LivingCreature
 
 	private void selectPartyMemberByID(int id)
 	{
-		logger.trace(".selectPartyMemberByID: "+id);
+		logger.trace(".selectPartyMemberByID: " + id);
 		this.l2Window.keyClick(48 + GroupedVariables.ProjectConstants.partyPanelMatch.get(id));    //VK_0 is 48
 	}
 
@@ -414,6 +414,11 @@ public abstract class Character extends LivingCreature
 					break;
 				case 1:    //follow
 					selectPartyMemberByID(this.message.getSenderID());
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+					}
 					selectPartyMemberByID(this.message.getSenderID());
 					Character.this.modeFarm = false;
 					Character.this.modeBuff = false;
@@ -424,7 +429,7 @@ public abstract class Character extends LivingCreature
 					assistTarget();
 					break;
 				case 3:    //assi atta
-					if (id == iDValues.get("buffer")) {
+					if (id == iDValues.get("prophet")) {
 						break;
 					}
 					selectPartyMemberByID(this.message.getSenderID());
@@ -544,14 +549,14 @@ public abstract class Character extends LivingCreature
 			return result;
 		}
 
-		public ActionBuff(String buffName, int buttonNumber, int buffDelay, int macroDelayMillis)//btns from numpad
+		public ActionBuff(String buffName, int buttonNumber, int buffDelayMillis, int macroDelayMillis)//btns from numpad
 		{
 			super();    //auto setting ID
 			this.buffName = buffName;
 			this.isBuff = true;
 			this.priority = 350;
 			this.buttonNumber = buttonNumber;
-			this.buffDelay = buffDelay;
+			this.buffDelay = buffDelayMillis;
 			this.macroDelayMillis = macroDelayMillis;
 
 			logger.trace("Created ActionBuff. ID " + this.getID() + ", button Num_" + this.buttonNumber + ", macro delay " + this.macroDelayMillis);
@@ -590,11 +595,15 @@ public abstract class Character extends LivingCreature
 			if (this == o) {
 				return true;
 			}
-			if (o == null || getClass() != o.getClass()) {
+			if (o == null || getClass() != o.getClass()) {	//todo find a bug. this case does not return false
 				return false;
 			}
 
-			ActionChatCommand that = (ActionChatCommand) o;
+			try {
+				ActionChatCommand that = (ActionChatCommand) o;
+			} catch (Exception e) {
+				return false;
+			}
 
 			if (this.isPvE() != that.isPvE()) {
 				return false;

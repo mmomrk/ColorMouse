@@ -177,8 +177,10 @@ public class HotKeyHandler implements HotKeyListener
 		logger.trace(".toggleModeFarm");
 		if (lastModeFarm) {
 			World.deactivateFarm();
+			lastModeFarm	=	false;
 		} else {
 			World.activateFarm();
+			lastModeFarm	=	true;
 		}
 	}
 
@@ -187,8 +189,10 @@ public class HotKeyHandler implements HotKeyListener
 		logger.trace(".toggleModeBuff");
 		if (lastModeBuff) {
 			World.deactivateBuff();
+			lastModeBuff=false;
 		} else {
 			World.activateBuff();
+			lastModeBuff=true;
 		}
 	}
 
@@ -197,8 +201,10 @@ public class HotKeyHandler implements HotKeyListener
 		logger.trace(".toggleModeHomeRun");
 		if (lastModeHomeRun) {
 			World.deactivateHomeRun();
+			lastModeHomeRun=false;
 		} else {
 			World.activateHomeRun();
+			lastModeHomeRun=true;
 		}
 	}
 

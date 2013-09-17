@@ -85,7 +85,7 @@ public class WindowsProvider extends Provider
 		int id = idSeq++;
 		int code = KeyMap.getCode(hotKey);
 		if (RegisterHotKey(null, id, KeyMap.getModifiers(hotKey.keyStroke), code)) {
-			logger.info("Registering hotkey: " + hotKey);
+//			logger.info("Registering hotkey: " + hotKey);
 			hotKeys.put(id, hotKey);
 		} else {
 			logger.warn("Could not register hotkey: " + hotKey);
