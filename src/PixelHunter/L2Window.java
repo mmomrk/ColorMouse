@@ -10,7 +10,6 @@ import java.awt.event.InputEvent;
 
 import static PixelHunter.WinAPIAPI.getMousePos;
 import static java.lang.Math.abs;
-import static java.lang.Thread.sleep;
 
 /**
  * User: mrk
@@ -33,18 +32,22 @@ public class L2Window
 	frame_yt = 30,
 	frame_yb = 8;
 
+	private static final int activateDelay = GroupedVariables.ProjectConstants.WINDOW_ACTIVATE_DELAY_MILLIS;
+
 	private static Robot robot;
 
 	private Point chatStartingPoint;
 
 	private boolean noChatMode = false;    //++getter
 
-	public static void easySleep(int milliseconds)
-	{    //maybe it was a design mistake
+	public void activate()
+	{
+		logger.trace(".activate");
+		WinAPIAPI.setActiveWindow(this.hwnd);
 		try {
-			sleep(milliseconds);
+			Thread.sleep(activateDelay);
 		} catch (InterruptedException e) {
-			logger.error("Error in easy sleep. Interrupted");
+			logger.error("error while sleeping in activate");
 			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 		}
 	}
@@ -53,7 +56,7 @@ public class L2Window
 	{
 		logger.trace(".keyClick, non-static " + key);
 
-		WinAPIAPI.bringToFront(this.hwnd);    //watch it: this should not decrease productivity
+//		WinAPIAPI.setActiveWindow(this.hwnd);    //watch it: this should not decrease productivity
 
 		robot.keyPress(key);
 		try {
@@ -103,7 +106,7 @@ public class L2Window
 	}
 
 
-	public static void initiateSize(int windowNumber, HWND hwnd1)        //todo not tested
+	public static void initiateSize(int windowNumber, HWND hwnd1)
 	{
 		logger.trace("Inside L2window initiateSize");
 		Dimension screenDimentions = Toolkit.getDefaultToolkit().getScreenSize();
@@ -125,7 +128,7 @@ public class L2Window
 	public Point setChat()
 	{
 
-		chatStartingPoint = new Point(112, -45);
+		chatStartingPoint = new Point(114, -45);
 
 		logger.trace("Entered find chat");
 		WinAPIAPI.showMessage("Setting up chat properties. Enter _______ to party chat.");
@@ -137,7 +140,7 @@ public class L2Window
 				||
 				colorsAreClose(currentColor, GroupedVariables.ProjectConstants.CHAT_COLOR_PRIVATE))
 			{
-				chatStartingPoint.y -= 2;    //difference between underline symbol and lowest pixel in ':'
+				chatStartingPoint.y += 1;    //difference between underline symbol and lowest pixel in ':'
 				logger.debug("Found chat line, " + chatStartingPoint);
 				if (debugMode == 2) {
 					WinAPIAPI.showMessage("Found chat line, " + chatStartingPoint);
@@ -333,7 +336,9 @@ public class L2Window
 
 	public void advancedMouseMove(Point point)
 	{
-		logger.trace(".advancedMouseMove to " + point);
+		if (debugMode==3){
+			logger.trace(".advancedMouseMove to " + point);
+		}
 		point = relativeToAbsoluteCoordinates(point);
 		robot.mouseMove(point.x, point.y);
 	}
