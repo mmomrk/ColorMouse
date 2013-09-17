@@ -1,17 +1,17 @@
 package PixelHunter;
 
 
-import com.sun.jna.Callback;
-import com.sun.jna.Native;
-import com.sun.jna.Pointer;
+import com.sun.jna.*;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef;
 import com.sun.jna.ptr.PointerByReference;
+import com.sun.jna.win32.W32APIOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.TimerTask;
 
 //import static PixelHunter.WinAPIAPI.User32DLL.GetWindowRect;
@@ -21,7 +21,6 @@ public class WinAPIAPI
 {
 
 	private static final Logger logger = LoggerFactory.getLogger(WinAPIAPI.class);
-
 
 	private static class Psapi
 	{
@@ -54,10 +53,25 @@ public class WinAPIAPI
 	}
 
 
-	public static class User32DLL
+	public static class User32DLL		//used for both hotkeys and window management
 	{
+		public static final int MOD_ALT = 0x0001;
+		public static final int MOD_CONTROL = 0x0002;
+		public static final int MOD_NOREPEAT = 0x4000;
+		public static final int MOD_SHIFT = 0x0004;
+		public static final int MOD_WIN = 0x0008;
+		public static final int WM_HOTKEY = 0x0312;
+		public static final int VK_MEDIA_NEXT_TRACK = 0xB0;
+		public static final int VK_MEDIA_PREV_TRACK = 0xB1;
+		public static final int VK_MEDIA_STOP = 0xB2;
+		public static final int VK_MEDIA_PLAY_PAUSE = 0xB3;
+		public static final int PM_REMOVE = 0x0001;
+
+
 		static {
-			Native.register("user32");
+			Native.register(NativeLibrary.getInstance("user32", W32APIOptions.DEFAULT_OPTIONS));
+
+//			Native.register("user32");
 		}
 
 		public static native int GetWindowThreadProcessId(WinDef.HWND hWnd, PointerByReference pref);
@@ -68,7 +82,49 @@ public class WinAPIAPI
 
 		public static native int SetWindowLong(WinDef.HWND hWnd, int nIndex, Callback callback);
 
+		public static native boolean registerHotKey(Pointer hWnd, int id, int fsModifiers, int vk);
+
+		public static native boolean unregisterHotKey(Pointer hWnd, int id);
+
+		public static native boolean PeekMessage(MSG lpMsg, Pointer hWnd, int wMsgFilterMin, int wMsgFilterMax, int wRemoveMsg);
+
+		@SuppressWarnings({"UnusedDeclaration"})
+		public static class MSG extends Structure
+		{
+			public Pointer hWnd;
+			public int message;
+			public Parameter wParam;
+			public Parameter lParam;
+			public int time;
+			public int x;
+			public int y;
+
+			@Override
+			protected java.util.List getFieldOrder() {
+				return Arrays.asList("hWnd", "message", "wParam", "lParam", "time", "x", "y");
+			}
+		}
+		public static class Parameter extends IntegerType
+		{
+			@SuppressWarnings("UnusedDeclaration")
+			public Parameter() {
+				this(0);
+			}
+
+			public Parameter(long value) {
+				super(Pointer.SIZE, value);
+			}
+		}
+
 //		public static native boolean GetWindowRect(WinDef.HWND hwnd, WinDef.RECT rect);
+
+	}
+
+	public static void setActiveWindow(WinDef.HWND hwnd)
+	{
+		if (User32.INSTANCE.SetFocus(hwnd)==null){
+			logger.error(".setActiveWindow failed to activate window");
+		}
 
 	}
 
@@ -80,7 +136,7 @@ public class WinAPIAPI
 		return returnRectangle;
 	}
 
-	public static void bringToFront(WinDef.HWND hwnd)
+	public static void bringToFront(WinDef.HWND hwnd)	//todo delete it. is obsolete
 	{    //todo. needs to todo
 		return;
 	}

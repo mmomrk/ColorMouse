@@ -129,7 +129,7 @@ public class Fisher    //todo finished making this class super cool
 				e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 			}
 			logger.debug("conditions for exit: time(10s)" + (timePassed < 10000));
-			if (!isFishingFrameExist()){
+			if (!isFishingFrameExist()) {
 				return;
 			}
 		}
