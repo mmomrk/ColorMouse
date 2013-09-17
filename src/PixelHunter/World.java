@@ -1,6 +1,7 @@
 package PixelHunter;
 
 
+import PixelHunter.HotKeysByTulskiy.HotKeyHandler;
 import com.sun.jna.platform.win32.WinDef.HWND;
 
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import java.util.Arrays;
  */
 public class World
 {
+	private static int currentCharacterNumber = 0;
 	private static ProcessIdentifier processIdentifier;
 	private static ArrayList<HWND>   hwnds;
 	private static boolean     singleWindowMode = false;
@@ -26,6 +28,8 @@ public class World
 	public static void main(String[] args)
 	{
 		System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "TRACE");
+
+		HotKeyHandler hotKeyHandler = new HotKeyHandler();
 
 		//WELCOME MESSAGE TODO would suit here. also, gui would be just nice
 		ArrayList<String> argumentsList = new ArrayList<String>(Arrays.asList(args));
@@ -39,43 +43,52 @@ public class World
 			fisher.infiniteFish();
 			return;
 		}
+		if (argumentsList.contains("-t")) {    //talk to me mode
+			GroupedVariables.Mediator.talkToMeMode = true;
+		}
+
 
 
 		System.out.println("World found quantity of proper windows: " + hwnds.size());
 		int id = 0;
-		if (hwnds.size() == 1){
+		if (hwnds.size() == 1) {
 			singleWindowMode = true;
-		}   else {
+		} else {
 			singleWindowMode = false;
 		}
 
-		singleWindowMode	=	true;//remove this after any tests are over
+		singleWindowMode = true;//remove this after any tests are over
 
 		if (singleWindowMode) {
 
 			L2Window.initiateSize(0, hwnds.get(0));    //yes, static method access, not the class representative
 			//0=fully on the screen
-			id = WinAPIAPI.dialogWindow("You can resize the window now in case you are not satisfied with its dimensions.\nEnter Character ID in the right window");
-			characters[1] = CharacterFactory.getCharacter(id, hwnds.get(0));
+			id = WinAPIAPI.dialogWindow("You can resize the window now in case you are not satisfied with its dimensions.\nEnter Character ID in the only window");
+			characters[0] = CharacterFactory.getCharacter(id, hwnds.get(0));
 
-		} else {	//todo change hwnds order: first is left. if one can do
+		} else {    //todo change hwnds order: first is left. if one can do
 
 			WinAPIAPI.bringToFront(hwnds.get(0));
 			L2Window.initiateSize(1, hwnds.get(0));    //1=left on the screen
 			id = WinAPIAPI.dialogWindow("You can resize the window now in case you are not satisfied with its dimensions.\nEnter Character ID in the left window");
 			characters[0] = CharacterFactory.getCharacter(id, hwnds.get(0));
-			System.out.println(characters[0].pet.getHP());//todo delete it if you see it
 
 			WinAPIAPI.bringToFront(hwnds.get(1));
 			L2Window.initiateSize(2, hwnds.get(1));    //2=right on the screen
 			id = WinAPIAPI.dialogWindow("You can resize the window now in case you are not satisfied with its dimensions.\nEnter Character ID in the right window");
 			characters[1] = CharacterFactory.getCharacter(id, hwnds.get(1));
-			WinAPIAPI.showMessage("now getHP for pet");
-			System.out.println(characters[1].pet.getHP());//todo delete it if you see it
 		}
 
-		while (characters.length>0){
-			characters[1].chatReact();
+		while (characters.length > 0) {	//for the pure debug purpose
+			if (GroupedVariables.Mediator.sleepRegime) {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+				}
+			} else {
+				characters[0].lifeCycle();
+			}
 		}
 
 
@@ -83,7 +96,70 @@ public class World
 		return;
 	}
 
+	public static void forceRebuff()
+	{
+		characters[0].forceRebuff();
+		if (!singleWindowMode) {
+			characters[1].forceRebuff();
+		}
+	}
+
+	public static void deactivateFarm()
+	{
+		characters[(0)].deactivateModeFarm();
+		if (!singleWindowMode) {
+			characters[(1)].deactivateModeFarm();
+		}
+	}
+
+	public static void activateFarm()
+	{
+		characters[(0)].activateModeFarm();
+		if (!singleWindowMode) {
+			characters[(1)].activateModeFarm();
+		}
+	}
+
+	public static void deactivateBuff()
+	{
+		characters[(0)].deactivateModeBuff();
+		if (!singleWindowMode) {
+			characters[(1)].deactivateModeBuff();
+		}
+	}
+
+	public static void activateBuff()
+	{
+		characters[(0)].activateModeBuff();
+		if (!singleWindowMode) {
+			characters[(1)].activateModeBuff();
+		}
+	}
+
+	public static void deactivateHomeRun()
+	{
+		characters[(0)].deactivateModeHomeRun();
+		if (!singleWindowMode) {
+			characters[(1)].deactivateModeHomeRun();
+		}
+	}
+
+	public static void activateHomeRun()
+	{
+		characters[(0)].activateModeHomeRun();
+		if (!singleWindowMode) {
+			characters[(1)].activateModeHomeRun();
+		}
+	}
+
+
+	public static int getCurrentCharacterNumber()
+	{
+		return currentCharacterNumber;
+	}
+
 	static {
 		System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "TRACE");
 	}
+
 }

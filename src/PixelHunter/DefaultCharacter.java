@@ -15,10 +15,17 @@ public class DefaultCharacter extends Character
 		return super.getHP();
 	}
 
+
 	@Override
-	void buffRebuff()    //todo implement
+	public void classSpecificLifeCycle()	//IMPlement
 	{
-		return;
+
+	}
+
+	@Override
+	public void forceRebuff()
+	{
+
 	}
 
 	@Override

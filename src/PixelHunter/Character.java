@@ -7,11 +7,10 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.util.Comparator;
-import java.util.PriorityQueue;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
+import java.util.List;
 
+import static java.lang.Math.log;
 import static java.lang.Math.pow;
 
 /**
@@ -21,79 +20,169 @@ import static java.lang.Math.pow;
 public abstract class Character extends LivingCreature
 {
 
-	private static final Logger logger                  = LoggerFactory.getLogger(Character.class);
-	//	public timer    buffTimer, homerunTimer;
-//	private int buffTime;
-//	public  int farmMode, buffMode, homerunMode;
-	private static final int    maxChatStartExpectation = 100;
+	private static final Logger logger = LoggerFactory.getLogger(Character.class);
+
+	private static final int maxChatStartExpectation = 130;
+
+	private static final int[] homesToRun        =
+	{
+	GroupedVariables.ProjectConstants.ID_Prophet,
+	GroupedVariables.ProjectConstants.ID_Warcryer,
+	GroupedVariables.ProjectConstants.ID_Templeknight
+	};
+	private              int   homerunQueueDepth = 3;
+
+
+	private boolean
+	modeFarm    = false,
+	modeBuff    = false,
+	modeHomeRun = false,
+	followFlag  = false,
+	isMacroFree = true;
+
 
 	private Point chatStartingPoint;
 
-	public  Pet    pet;    //remove public after tests are done
-	private Target target;
+	protected Pet    pet;    //remove public after tests are done
+	protected Target target;
 
-	private Comparator<ChatMessage>    chatMessageComparator = new ChatMessage.MessagePriorityComparator();
-	private PriorityQueue<ChatMessage> toDoList              = new PriorityQueue<ChatMessage>(GroupedVariables.projectConstants.CHAT_TASK_LIST_LENGTH, chatMessageComparator);
 
-	private boolean
-	isMacroFree = true,
-	rebuff      = false;
+	private static Comparator            actionComparator = new PixelHunter.Action.ActionPriorityComparator();
+	private        PriorityQueue<Action> toDoList         = new PriorityQueue<Action>(GroupedVariables.ProjectConstants.CHAT_TASK_LIST_LENGTH, actionComparator);
 
-	private Timer macroLockTimer;
+	protected Timer        //discuss think of those protected after chars are done
+	macroLockTimer,
+	timerPvEAdd,
+	timerHomeRunAdd;
 
-	abstract void buffRebuff(); //should set rebuff to 0
+	protected List<ActionBuff>   presetBuffs = new LinkedList<ActionBuff>();
+	protected Map<String, Timer> buffTimers  = new HashMap<String, Timer>();
 
-	//	public boolean followFlag;
+	protected int homeRunNumber = 0;
+	protected int homeRunDelay  = GroupedVariables.ProjectConstants.HOMERUN_TIME * 1000;
+
 //	public void classSpecificDeed();//think of it twice
-//	public void pvE();
-//	public void runHome();
-//	public void target(int id);
+
 //	public void setMp();
 //	public void setPetHp();
 //	public void initializeWindow();    //in case of falling down of the prev window
-//	//commands from chat exec part
-//	public void follow(int id);
-//
-//	public void assistSender(int id);
-//
-//	public void assistSenderAndAttack(int id);
-//
-//	public void attackCurrentTarget();    //#4
-//
-//	//#5,6-reserved by now
-//	public void petAssistAttack(int id);    //#7
-//
-//	public void petStop();
-//
-//	public void petFollow();
-//
-//	public void toggleBuffMode();
-//
-//	public void toggleFarmMode();    //#11
-//
+
+//	public void follow(int id);                                 y
+
+	public abstract void classSpecificLifeCycle();
+
+	public void lifeCycle()
+	{
+		logger.trace("Character's " + iDValues.get(this.id) + " lifecycle");
+		this.l2Window.activate();
+		if (this.l2Window.isChatMode()) {
+			readChatAndOfferToDo();
+		}
+		//checkToDoSanity()	//hope i dont need this
+		doTheToDo();
+		classSpecificLifeCycle();
+
+	}
+
+	private void doTheToDo()
+	{
+		logger.trace(".doTheToDo");
+		logger.debug(".doTheToDo: todolist: " + this.toDoList);
+		if (this.target.isDead()
+			||
+			this.target.getHP() >= 100
+			&&
+			!toDoList.isEmpty())
+		{
+			toDoList.poll().perform();
+		}
+	}
+
+	private void readChatAndOfferToDo()
+	{
+		logger.trace(".redChatAndOfferToDo");
+		ChatMessage freshMessage = this.getChatMessage();
+		logger.debug(".redChatAndOfferToDo got " + freshMessage);
+		if (freshMessage != null) {
+			todoOffer(new ActionChatCommand(freshMessage));
+			spamSelf();
+		}
+	}
+
+	public void forceRebuff()    //todo
+	{
+		logger.trace(".forceRebuff");
+		for (ActionBuff currentBuff : this.presetBuffs) {
+			this.buffTimers.get(currentBuff.buffName).cancel();    //not tested. it looks so cute.
+			todoOffer(currentBuff);
+		}
+	}
+
+	protected void todoOffer(Action action)
+	{
+		logger.trace(".todoOffer");
+		if (!toDoList.contains(action)) {
+			logger.debug(".todoOffer adding " + action);
+			toDoList.offer(action);
+		} else {
+			logger.warn(".todoOffer todolist contains this action. this should not be");
+		}
+		return;
+	}
+
+	public void deactivateModeFarm()
+	{
+		logger.trace(".deactivateModeFarm");
+		this.modeFarm = false;
+		this.timerPvEAdd.cancel();
+	}
+
+	public void activateModeFarm()
+	{
+		logger.trace(".activateModeFarm");
+		this.modeFarm = true;
+		this.todoOffer(new ActionPvE());
+	}
+
+	public void deactivateModeBuff()
+	{
+		logger.trace(".deactivateModeBuff");
+		this.modeBuff = false;
+		for (ActionBuff currentBuff : this.presetBuffs) {
+			this.buffTimers.get(currentBuff.buffName).cancel();
+		}
+	}
+
+	public void activateModeBuff()
+	{
+		logger.trace(".activateModeBuff");
+		this.modeBuff = true;
+		forceRebuff();
+	}
+
+	public void deactivateModeHomeRun()    //todo on all deactiates: cancel all timers
+	{
+		logger.trace(".deactivateModeHomeRun");
+		this.modeHomeRun = false;
+		this.timerHomeRunAdd.cancel();
+	}
+
+	public void activateModeHomeRun()
+	{
+		logger.trace(".activateModeHomeRun");
+		this.modeHomeRun = true;
+		this.todoOffer(new ActionHomeRun());
+	}
+
 	public void spamSelf()
 	{
+		logger.trace(".spamSelf");
 		l2Window.keyClick(KeyEvent.VK_0);
 	}
 
-	private boolean chatCommandExecute(ChatMessage doIt)    //todo
-	{
-		logger.trace(".chatCommandExecute");
-		if (!(isMacroFree && (target.isDead() || target.getHP() == 100))) {    //impossible to execute the order if is not mFree and hp magic
-			return false;
-		}
-		switch (doIt.getCommand()) {
-			case 0:
-				//todo make a big switch for commands
-				//each command can ask macroLocksActions
-		}
-		return true;
-	}
-
-
 	private void macroLocksActions(int milliseconds)
 	{    //todo not tested
-		logger.trace(".macroLocksActions");
+		logger.trace(".macroLocksActions for " + milliseconds + " millis");
 		isMacroFree = false;
 		macroLockTimer.schedule(new SetMacroFree(), milliseconds);
 	}
@@ -101,7 +190,7 @@ public abstract class Character extends LivingCreature
 	private boolean chatPatternMatches(int i, boolean equalsExpectedColor)
 	{
 		logger.trace(".chatPatternMatches with pixel number " + i + " and matching green color of " + equalsExpectedColor);
-		logger.debug("first condition is " + (i % 5 < 3 && equalsExpectedColor) + " and second is " + (i % 5 >= 3 && !equalsExpectedColor));
+//		logger.debug("first condition is " + (i % 5 < 3 && equalsExpectedColor) + " and second is " + (i % 5 >= 3 && !equalsExpectedColor));
 		if ((i % 5 < 3 && equalsExpectedColor) || (i % 5 >= 3 && !equalsExpectedColor)) {    //is it magic? not yet. look int your chat
 			return true;
 		} else {
@@ -110,35 +199,42 @@ public abstract class Character extends LivingCreature
 		}
 	}
 
-	private ChatMessage readChat()
-	{    //todo implement
-		logger.trace(".readChat");
+	private ChatMessage getChatMessage()
+	{
+		logger.trace(".getChatMessage");
 		Color messageColor = Color.CYAN;    //compiler doesn't know this is not necessary
 		int senderSignature, receivedCode = 0, modeColor = 0;
 		int i;
-		Point currentPoint = new Point(0, this.chatStartingPoint.y + 3);//lower command pixel is 3 px under ':'
-
+		Point currentPoint = new Point(0, this.chatStartingPoint.y);//lower command pixel is 3 px under ':'
+		Color currentColor;
 		logger.debug("now searching first pixel in signature");
-		for (i = 50; i < this.maxChatStartExpectation; i++) {    //todo test the length
+		for (i = 50; i < this.maxChatStartExpectation; i += 3) {
 			currentPoint.x = i;
-			if (l2Window.colorsAreClose(l2Window.getRelPixelColor(currentPoint), GroupedVariables.projectConstants.CHAT_COLOR_PARTY)) {
-				messageColor = GroupedVariables.projectConstants.CHAT_COLOR_PARTY;
+			currentColor = l2Window.getRelPixelColor(currentPoint);
+			if (l2Window.colorsAreClose(currentColor, GroupedVariables.ProjectConstants.CHAT_COLOR_PARTY)) {
+				messageColor = GroupedVariables.ProjectConstants.CHAT_COLOR_PARTY;
 				modeColor = 0;
 				break;
 			}
-			if (l2Window.colorsAreClose(l2Window.getRelPixelColor(currentPoint), GroupedVariables.projectConstants.CHAT_COLOR_PRIVATE)) {
-				messageColor = GroupedVariables.projectConstants.CHAT_COLOR_PRIVATE;
+			if (l2Window.colorsAreClose(currentColor, GroupedVariables.ProjectConstants.CHAT_COLOR_PRIVATE)) {
+				messageColor = GroupedVariables.ProjectConstants.CHAT_COLOR_PRIVATE;
 				modeColor = 1;
 				break;
 			}
 		}
-		if (i == this.maxChatStartExpectation) {
+		if (i >= this.maxChatStartExpectation - 1) {
 			logger.info("Chat is empty");
 			return null;
+		} else {
+			currentPoint.x--;
+			while (L2Window.colorsAreClose(l2Window.getRelPixelColor(currentPoint), messageColor)) {
+				currentPoint.x--;
+			}
+			currentPoint.x++;
 		}
 		//found first pixel
-		senderSignature = i;
-		logger.debug("found signature " + i);
+		senderSignature = currentPoint.x;
+		logger.debug("found signature " + senderSignature + ", found mod " + modeColor);
 		//now check the pattern
 		for (i = 0; i < 17; i++) {
 			currentPoint.x = senderSignature + i;
@@ -149,52 +245,20 @@ public abstract class Character extends LivingCreature
 		//now we totally have in incoming
 		currentPoint.y--;    //to be in the information zone
 		// decoding
-		l2Window.debugMode = 2;    //remove after debugged
 		for (i = 0; i <= 5; i++) {//command binary capacity sits in this hardcoded 5
 			currentPoint.x = senderSignature + i * 5;
 			if (!l2Window.colorsAreClose(l2Window.getRelPixelColor(currentPoint), messageColor)) {//found bit true
 				if (l2Window.colorsAreClose(l2Window.getRelPixelColor(new Point(currentPoint.x + 2, currentPoint.y)), messageColor)) {
 					receivedCode += pow(2, i);
-				}else {
-					logger.warn(".ReadChat: Warning while decoding message: both left and right pivot points are empty");
+				} else {
+					logger.warn(".ReadChat: Warning while decoding message: both left and right pivot points are empty. this should not be");
 					break;
 				}
 			}
-			logger.debug(".readChat: decode. current val is " + receivedCode);
+			logger.debug(".getChatMessage: decode. current val is " + receivedCode);
 		}
-		logger.info(".readChat: Received chat command number " + receivedCode + " from sig " + senderSignature);
+		logger.info(".getChatMessage: Received chat command number " + receivedCode + " from sig " + senderSignature);
 		return new ChatMessage(receivedCode, senderSignature, modeColor);
-	}
-
-	public void chatReact()                   //todo not tested
-	{
-		logger.trace(".chatReact");
-
-		if (!l2Window.isChatMode()) {//means error while setting chat, no need to waste time for all this
-			return;
-		}
-
-		ChatMessage incomingMessage = readChat();
-		if (incomingMessage != null) {
-			spamSelf();
-			toDoList.offer(incomingMessage);
-		}
-
-		boolean commandExecuted = false;
-		if (!toDoList.isEmpty()) {
-			commandExecuted = chatCommandExecute(toDoList.peek());
-			if (commandExecuted) {
-				logger.debug(".chatReact: Command executed");
-				toDoList.poll();
-			} else {
-				logger.debug(".chatReact: Command was not executed.");
-			}
-			System.out.println("Todo list:\n"+toDoList.toString());
-		}
-
-
-
-		return;
 	}
 
 	public void setChat()
@@ -213,11 +277,47 @@ public abstract class Character extends LivingCreature
 		return 0;
 	}
 
-
 	public String toString()
 	{
-
 		return "Character. ID=" + this.id + ". Window " + l2Window.toString();
+	}
+
+	private void selectPartyMemberByID(int id)
+	{
+		logger.trace(".selectPartyMemberByID: "+id);
+		this.l2Window.keyClick(48 + GroupedVariables.ProjectConstants.partyPanelMatch.get(id));    //VK_0 is 48
+	}
+
+	private void assistTarget()
+	{
+		this.l2Window.keyClick(48 + GroupedVariables.ProjectConstants.partyPanelMatch.get(this.id));    //assi button in the right spot
+	}
+
+	private void attack()
+	{
+		this.l2Window.keyClick(KeyEvent.VK_F1);
+	}
+
+	private void petAttack()
+	{
+		this.l2Window.keyClick(KeyEvent.VK_F2);
+	}
+
+	private void petStop()
+	{
+		this.l2Window.keyClick(KeyEvent.VK_F3);
+	}
+
+	private void petFollow()
+	{
+		this.l2Window.keyClick(KeyEvent.VK_F4);
+	}
+
+	private void toggleBuffMode()
+	{
+		this.modeBuff = !this.modeBuff;
+		logger.info(".toggleBuffMode. Now buffmode is" + this.modeBuff);
+		forceRebuff();
 	}
 
 
@@ -240,30 +340,344 @@ public abstract class Character extends LivingCreature
 		this.macroLockTimer = new Timer();
 	}
 
+
 //CLASSES
 
 
-	private class SetMacroFree extends TimerTask
-	{        //not tested
+	protected class ActionHomeRun extends Action    //todo!!!
+	{
+
+		@Override
+		public void perform()
+		{
+			int id = Character.this.homeRunNumber++ % Character.this.homerunQueueDepth;
+
+			Character.this.selectPartyMemberByID(Character.homesToRun[id]);
+			Character.this.selectPartyMemberByID(Character.homesToRun[id]);
+			if (this.isHomeRun) {
+				timerHomeRunAdd.schedule(new HomeRunTask(), Character.this.homeRunDelay);
+			}
+		}
+
+		ActionHomeRun()
+		{
+			super();
+			this.priority = 200;
+			logger.trace("Created ActionHomeRun. ID " + this.getID());
+		}
+	}
+
+
+	/**
+	 * User: mrk
+	 * Date: 9/14/13; Time: 6:35 AM
+	 */
+	protected class ActionChatCommand extends Action
+	{
+		public final ChatMessage message;
+
+		@Override
+		public boolean equals(Object o)
+		{
+			if (this == o) {
+				return true;
+			}
+			if (o == null || getClass() != o.getClass()) {
+				return false;
+			}
+
+			ActionChatCommand that = (ActionChatCommand) o;
+
+			if (!message.equals(that.message)) {
+				return false;
+			}
+
+			return true;
+		}
+
+		@Override
+		public int hashCode()
+		{
+			return message.hashCode();
+		}
+
+		@Override
+		public void perform()
+		{
+			logger.trace("Action Chat.performing this: " + this.message);
+			if (this.message.getSenderID() == id) {    //this living creature id
+//				return;		//remove comments after messages are tested
+			}
+			switch (this.message.getCommand()) {
+				case 0:
+					logger.warn("command 0. Normally this should not be");
+					break;
+				case 1:    //follow
+					selectPartyMemberByID(this.message.getSenderID());
+					selectPartyMemberByID(this.message.getSenderID());
+					Character.this.modeFarm = false;
+					Character.this.modeBuff = false;
+					Character.this.modeHomeRun = false;
+					break;
+				case 2:    //assi
+					selectPartyMemberByID(this.message.getSenderID());
+					assistTarget();
+					break;
+				case 3:    //assi atta
+					if (id == iDValues.get("buffer")) {
+						break;
+					}
+					selectPartyMemberByID(this.message.getSenderID());
+					assistTarget();
+					if (id == iDValues.get("warlock")) {
+						petAttack();
+					} else {
+						attack();
+					}
+					break;
+				case 4:    //attack current target --use for peace purpose only
+					attack();
+					break;
+				case 5:    //class-specific, reserved
+					break;
+				case 6:    //reserved
+					break;
+				case 7:    //pet assist atta
+					selectPartyMemberByID(this.message.getSenderID());
+					assistTarget();
+					petAttack();
+					break;
+				case 8:    //pet stop
+					petStop();
+					break;
+				case 9:    //pet follow
+					petFollow();
+					break;
+				case 10:        //toggle buff
+					toggleBuffMode();
+					break;
+				case 11:        //activate mode PvE
+					Character.this.activateModeFarm();
+					Character.this.activateModeHomeRun();
+					break;
+				case 12:        //deactivate HR
+					Character.this.deactivateModeHomeRun();
+					break;
+				default: break;
+				//each command can ask macroLocksActions
+			}
+		}
+
+		public ActionChatCommand(ChatMessage message)
+		{
+			super();
+			this.priority = 300;
+			this.message = message;
+			this.isMessageReact = true;
+			logger.trace("Created ActionChatCommand. ID " + this.getID() + ", message " + this.message);
+		}
+	}
+
+
+	/**
+	 * User: mrk
+	 * Date: 9/14/13; Time: 6:35 AM
+	 */
+	public class ActionBuff extends Action // return protected after this is debugged with test class
+	{
+		public final int    buttonNumber;
+		public final int    macroDelayMillis;
+		public final String buffName;
+		public final int    buffDelay;
+
+		public int increasePriority(int increment)
+		{
+			logger.trace(".increasePriority" + this.toString());
+			this.priority += increment;
+			return this.priority;
+		}
+
+		@Override
+		public void perform()
+		{
+			logger.trace(".perform" + this.toString());
+			Character.this.l2Window.keyClick(97 + this.buttonNumber); //97 is num pad 0. increments lineary
+			macroLocksActions(this.macroDelayMillis);    //locks any action because macro is executed
+			if (Character.this.modeBuff) {
+				Character.this.buffTimers.get(this.buffName).schedule(new BuffTask(this), this.buffDelay);    //todo finished here.. adding reinitialization from buffTimers hashMap
+			}
+		}
+
+		@Override
+		public String toString()
+		{
+			return ("Buff action " + this.buffName + ". ID " + this.getID() + ", priority " + this.priority + ", button Num_" + this.buttonNumber + ", delayTime " + this.buffDelay + ", macro delay " + this.macroDelayMillis);
+		}
+
+		@Override
+		public boolean equals(Object o)
+		{
+			if (this == o) {
+				return true;
+			}
+			if (o == null || getClass() != o.getClass()) {
+				return false;
+			}
+
+			ActionBuff that = (ActionBuff) o;
+
+			if (buttonNumber != that.buttonNumber) {
+				return false;
+			}
+			if (!buffName.equals(that.buffName)) {
+				return false;
+			}
+
+			return true;
+		}
+
+		@Override
+		public int hashCode()
+		{
+			int result = buttonNumber;
+			result = 31 * result + buffName.hashCode();
+			return result;
+		}
+
+		public ActionBuff(String buffName, int buttonNumber, int buffDelay, int macroDelayMillis)//btns from numpad
+		{
+			super();    //auto setting ID
+			this.buffName = buffName;
+			this.isBuff = true;
+			this.priority = 350;
+			this.buttonNumber = buttonNumber;
+			this.buffDelay = buffDelay;
+			this.macroDelayMillis = macroDelayMillis;
+
+			logger.trace("Created ActionBuff. ID " + this.getID() + ", button Num_" + this.buttonNumber + ", macro delay " + this.macroDelayMillis);
+		}
+
+		public ActionBuff(ActionBuff buffExample)
+		{
+			super();
+			this.buffName = buffExample.buffName;
+			this.isBuff = true;
+			this.priority = buffExample.getPriority();
+			this.buttonNumber = buffExample.buttonNumber;
+			this.buffDelay = buffExample.buffDelay;
+			this.macroDelayMillis = buffExample.macroDelayMillis;
+
+			logger.trace("Created ActionBuff. ID " + this.getID() + ", button Num_" + this.buttonNumber + ", macro delay " + this.macroDelayMillis);
+		}
+	}
+
+
+	protected class ActionPvE extends Action
+	{
+
+		@Override
+		public void perform()
+		{
+			Character.this.l2Window.keyClick(KeyEvent.VK_F5);
+			if (Character.this.modeFarm) {
+				Character.this.todoOffer(new ActionPvE());
+			}
+		}
+
+		@Override
+		public boolean equals(Object o)
+		{
+			if (this == o) {
+				return true;
+			}
+			if (o == null || getClass() != o.getClass()) {
+				return false;
+			}
+
+			ActionChatCommand that = (ActionChatCommand) o;
+
+			if (this.isPvE() != that.isPvE()) {
+				return false;
+			}
+
+			return true;
+		}
+
+		public ActionPvE()
+		{
+			super();
+			this.isPvE = true;
+			this.priority = 100;
+			logger.trace("Created ActionPvE. ID " + this.getID());
+		}
+	}
+
+
+	private class SetMacroFree extends TimerTask              //not tested
+	{
 
 		@Override
 		public void run()
 		{
-			logger.trace("resetting macroFree by timerTask");
+			logger.trace("setting isMacroFree to true by timerTask");
 			Character.this.isMacroFree = true;
 			cancel();    //watch it. the correct behaviour is cancelling this very task, not the timer
 		}
 	}
 
 
-	private class SetRebuff extends TimerTask
-	{        //not tested
-
+	protected class SetRebuff extends TimerTask            //not tested
+	{
 		@Override
 		public void run()
 		{
 			logger.trace("resetting setRebuff by timerTask");
-			Character.this.rebuff = true;
+			Character.this.modeBuff = true;
+			cancel();    //watch it. the correct behaviour is cancelling this very task, not the timer
+		}
+	}
+
+
+	protected class BuffTask extends TimerTask
+	{
+
+		private final ActionBuff addThisBuff;
+
+		@Override
+		public void run()
+		{
+			logger.trace("BuffTask: adding ActionBuff: " + this.addThisBuff + " to todolist");
+			todoOffer(addThisBuff);
+			cancel();
+		}
+
+		BuffTask(ActionBuff specificBuff)
+		{
+			this.addThisBuff = specificBuff;
+		}
+	}
+
+
+	protected class PvETask extends TimerTask //not tested
+	{
+		@Override
+		public void run()
+		{
+			logger.trace("PvETask: adding Action PvE to todolist");
+			todoOffer(new ActionPvE());
+			cancel();
+		}
+	}
+
+
+	protected class HomeRunTask extends TimerTask               //not tested
+	{
+
+		@Override
+		public void run()
+		{
+			logger.trace("HomeRunTask: adding ActionHomeRun to todolist");
+			todoOffer(new ActionHomeRun());
 			cancel();    //watch it. the correct behaviour is cancelling this very task, not the timer
 		}
 	}

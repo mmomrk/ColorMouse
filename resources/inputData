@@ -1,3 +1,15 @@
+#GAMEPLAY CONSTANTS
+HOMERUN_TIME =   60
+   #seconds
+
+
+
+#MISC CONSTANTS
+
+CHAT_TASK_LIST_LENGTH   =   10
+INITIAL_DEBUG_MODE  =   0
+WINDOW_ACTIVATE_DELAY_MILLIS   = 100
+
 #ID's
 
 ID_DefaultCharacter =   0
@@ -8,15 +20,12 @@ ID_Warlord  =   4
 ID_Swordsinger  =   5
 ID_Bladedancer  =   6
 ID_Warlock  =   7
+ID_Templeknight =   8
+ID_Necromancer  =   9
+ID_Elvenelder   =   10
 
 ID_pet  =   100
 ID_target   =   101
-
-
-#MISC CONSTANTS
-
-CHAT_TASK_LIST_LENGTH   =   10
-INITIAL_DEBUG_MODE  =   2
 
 
 #INGAME COLORS
@@ -33,6 +42,6 @@ ChatColorParty_red     =   0
 ChatColorParty_green   =   252
 ChatColorParty_blue    =   0
 
-ChatColorPrivate_red     =   253
+ChatColorPrivate_red     =   252
 ChatColorPrivate_green   =   1
-ChatColorPrivate_blue    =   253
+ChatColorPrivate_blue    =   252

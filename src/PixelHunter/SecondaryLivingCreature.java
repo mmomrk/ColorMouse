@@ -49,8 +49,8 @@ public abstract class SecondaryLivingCreature extends LivingCreature
 			this.id = thisid;
 		}
 
-		if (l2Window == null) {    //todo delete this if?
-			WinAPIAPI.showMessage("window is null!!");
+		if (l2Window == null) {
+			logger.error("window is null!!");
 		}
 		this.l2Window = l2Window;
 
