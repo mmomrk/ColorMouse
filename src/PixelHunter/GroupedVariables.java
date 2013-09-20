@@ -89,7 +89,7 @@ public class GroupedVariables
 			ID_Necromancer = Integer.parseInt(properties.get("ID_Necromancer").toString());
 			ID_Elvenelder = Integer.parseInt(properties.get("ID_Elvenelder").toString());
 
-			partyPanelMatch.put(ID_DefaultCharacter,0);
+			partyPanelMatch.put(ID_DefaultCharacter,9);	//todo make this thing cool
 			partyPanelMatch.put(ID_Elvenelder,1);
 			partyPanelMatch.put(ID_Warcryer,2);
 			partyPanelMatch.put(ID_Bladedancer,3);

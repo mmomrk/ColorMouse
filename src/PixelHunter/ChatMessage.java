@@ -42,8 +42,11 @@ public class ChatMessage
 		this.command = command;
 		this.modeColor = modeColor;
 		switch (senderSignature) {
-			case 83:    //todo after can get these values first-hand
-				this.senderID = 10;
+			case 83:    //todo after can get these values first-hand 83 is resdead
+				this.senderID = 1;
+				break;
+			case 87:	//remove this after tests are over:87 is resdead          //my big bug
+				this.senderID	=	1;
 				break;
 		}
 

@@ -211,11 +211,12 @@ public class HotKeyHandler implements HotKeyListener
 	private void debugModeShift()
 	{
 		logger.trace(".debugModeShift");
-		logger.debug("Shifting debugmode to " + ++L2Window.debugMode);
 
+		L2Window.debugMode++;
 		if (L2Window.debugMode == 3) {
 			L2Window.debugMode = 0;
 		}
+		logger.debug("Shifting debugmode to " + L2Window.debugMode);
 	}
 
 

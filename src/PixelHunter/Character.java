@@ -10,7 +10,6 @@ import java.awt.event.KeyEvent;
 import java.util.*;
 import java.util.List;
 
-import static java.lang.Math.log;
 import static java.lang.Math.pow;
 
 /**
@@ -55,8 +54,9 @@ public abstract class Character extends LivingCreature
 	timerPvEAdd,
 	timerHomeRunAdd;
 
-	protected List<ActionBuff>   presetBuffs = new LinkedList<ActionBuff>();
-	protected Map<String, Timer> buffTimers  = new HashMap<String, Timer>();
+	protected List<ActionBuff>       presetBuffs  = new LinkedList<ActionBuff>();    //presetbuffs are to be set in character
+	protected Map<String, Timer>     buffTimers   = new HashMap<String, Timer>();    //and so are buffTimers to be initialised only after presetbuffs are done
+	protected Map<ActionBuff, Timer> buffTimerMap = new HashMap<ActionBuff, Timer>();
 
 	protected int homeRunNumber = 0;
 	protected int homeRunDelay  = GroupedVariables.ProjectConstants.HOMERUN_TIME * 1000;
@@ -68,6 +68,8 @@ public abstract class Character extends LivingCreature
 //	public void initializeWindow();    //in case of falling down of the prev window
 
 //	public void follow(int id);                                 y
+
+	protected abstract void cancelAllBuffScheduledTasks();
 
 	public abstract void classSpecificLifeCycle();
 
@@ -109,12 +111,17 @@ public abstract class Character extends LivingCreature
 		}
 	}
 
-	public void forceRebuff()    //todo
+	public void forceRebuff()    //todo        with cancell all. finished here
 	{
 		logger.trace(".forceRebuff");
-		for (ActionBuff currentBuff : this.presetBuffs) {
-			this.buffTimers.get(currentBuff.buffName).cancel();    //not tested. it looks so cute.
-			todoOffer(currentBuff);
+//		for (ActionBuff currentBuff : this.presetBuffs) {
+//			this.buffTimers.get(currentBuff.buffName).cancel();    //not tested. it looks so cute.
+//			todoOffer(currentBuff);
+//		}
+		cancelAllBuffScheduledTasks();
+		for (Map.Entry<ActionBuff, Timer> buffTimerEntry : this.buffTimerMap.entrySet()) {
+			buffTimerEntry.getValue().cancel();       //cancel kills the timer. new is needed!!!
+			todoOffer(new ActionBuff(buffTimerEntry.getKey()));    //todo:watch for proper todo offers in all cases. not this->todoOffer(currentBuff);
 		}
 	}
 
@@ -144,12 +151,13 @@ public abstract class Character extends LivingCreature
 		this.todoOffer(new ActionPvE());
 	}
 
-	public void deactivateModeBuff()
+	public void deactivateModeBuff()                    //not tested
 	{
 		logger.trace(".deactivateModeBuff");
 		this.modeBuff = false;
-		for (ActionBuff currentBuff : this.presetBuffs) {
-			this.buffTimers.get(currentBuff.buffName).cancel();
+		for (Map.Entry<ActionBuff, Timer> buffTimerEntry : this.buffTimerMap.entrySet()) {
+			buffTimerEntry.getValue().cancel();
+
 		}
 	}
 
@@ -226,26 +234,39 @@ public abstract class Character extends LivingCreature
 			logger.info("Chat is empty");
 			return null;
 		} else {
-			currentPoint.x--;
-			while (L2Window.colorsAreClose(l2Window.getRelPixelColor(currentPoint), messageColor)) {
+			do {
 				currentPoint.x--;
 			}
+			while (L2Window.colorsAreClose(l2Window.getRelPixelColor(currentPoint), messageColor));
 			currentPoint.x++;
 		}
-		//found first pixel
-		senderSignature = currentPoint.x;
-		logger.debug("found signature " + senderSignature + ", found mod " + modeColor);
+		//probably found first pixel
+
 		//now check the pattern
-		for (i = 0; i < 17; i++) {
-			currentPoint.x = senderSignature + i;
+		int startingX = currentPoint.x;
+		for (i = 15; i >= 0; i--) {    //bad things fail faster
+			currentPoint.x = startingX + i;
 			if (!chatPatternMatches(i, l2Window.colorsAreClose(l2Window.getRelPixelColor(currentPoint), messageColor))) {
 				return null;
 			}
 		}
+		currentPoint.x = startingX;
 		//now we totally have in incoming
+		//now we have a correct pattern, but not sure if it is the real first command bit
+		do {
+			currentPoint.x -= 5;
+		} while (l2Window.colorsAreClose(l2Window.getRelPixelColor(currentPoint), messageColor));
+
+		currentPoint.x += 5;
+
+		senderSignature = currentPoint.x;    //foolproof
+
+		logger.debug("found signature " + senderSignature + ", found mod " + modeColor);
+
+
 		currentPoint.y--;    //to be in the information zone
 		// decoding
-		for (i = 0; i <= 5; i++) {//command binary capacity sits in this hardcoded 5
+		for (i = 0; i <= 5; i++) {//command binary capacity sits in this hardcoded 5, means n+1 bits
 			currentPoint.x = senderSignature + i * 5;
 			if (!l2Window.colorsAreClose(l2Window.getRelPixelColor(currentPoint), messageColor)) {//found bit true
 				if (l2Window.colorsAreClose(l2Window.getRelPixelColor(new Point(currentPoint.x + 2, currentPoint.y)), messageColor)) {
@@ -329,7 +350,7 @@ public abstract class Character extends LivingCreature
 		this.l2Window = new L2Window(hwnd);
 
 		l2Window.acceptWindowPosition();
-		logger.debug("after acceptWindowPos. now it is h " + l2Window.h + " w " + l2Window.w + " top-left " + l2Window.windowPosition);
+		logger.debug(".Character after acceptWindowPos. now it is h " + l2Window.h + " w " + l2Window.w + " top-left " + l2Window.windowPosition);
 
 		pet = new Pet(l2Window);//including setHP
 		target = new Target(l2Window);
@@ -337,7 +358,11 @@ public abstract class Character extends LivingCreature
 		setChat();
 
 		//initing all tough structures
+		logger.trace(".Character: initializing timers ");
 		this.macroLockTimer = new Timer();
+		this.timerHomeRunAdd = new Timer();
+		this.timerPvEAdd = new Timer();
+
 	}
 
 
@@ -509,7 +534,9 @@ public abstract class Character extends LivingCreature
 			Character.this.l2Window.keyClick(97 + this.buttonNumber); //97 is num pad 0. increments lineary
 			macroLocksActions(this.macroDelayMillis);    //locks any action because macro is executed
 			if (Character.this.modeBuff) {
-				Character.this.buffTimers.get(this.buffName).schedule(new BuffTask(this), this.buffDelay);    //todo finished here.. adding reinitialization from buffTimers hashMap
+				logger.debug(".perform: making a hard task of adding new buff. watch it. watch it!");
+				Character.this.buffTimerMap.get(this).schedule(new BuffTask(this), this.buffDelay);
+//				Character.this.buffTimers.get(this.buffName).schedule(new BuffTask(this), this.buffDelay);    //todo finished here.. adding reinitialization from buffTimers hashMap
 			}
 		}
 
@@ -595,7 +622,7 @@ public abstract class Character extends LivingCreature
 			if (this == o) {
 				return true;
 			}
-			if (o == null || getClass() != o.getClass()) {	//todo find a bug. this case does not return false
+			if (o == null || getClass() != o.getClass()) {    //todo find a bug. this case does not return false
 				return false;
 			}
 
@@ -605,6 +632,7 @@ public abstract class Character extends LivingCreature
 				return false;
 			}
 
+			ActionChatCommand that = (ActionChatCommand) o;    //very bad.. very bad.. discuss
 			if (this.isPvE() != that.isPvE()) {
 				return false;
 			}
