@@ -54,8 +54,6 @@ public abstract class Character extends LivingCreature
 	timerPvEAdd,
 	timerHomeRunAdd;
 
-	protected List<ActionBuff>       presetBuffs  = new LinkedList<ActionBuff>();    //presetbuffs are to be set in character
-	protected Map<String, Timer>     buffTimers   = new HashMap<String, Timer>();    //and so are buffTimers to be initialised only after presetbuffs are done
 	protected Map<ActionBuff, Timer> buffTimerMap = new HashMap<ActionBuff, Timer>();
 
 	protected int homeRunNumber = 0;
@@ -70,6 +68,8 @@ public abstract class Character extends LivingCreature
 //	public void follow(int id);                                 y
 
 	protected abstract void cancelAllBuffScheduledTasks();
+
+	protected abstract void setupBuffTimerMap();
 
 	public abstract void classSpecificLifeCycle();
 
@@ -94,7 +94,9 @@ public abstract class Character extends LivingCreature
 			 ||
 			 this.target.getHP() >= 100)
 			&&
-			!toDoList.isEmpty())
+			!toDoList.isEmpty()
+			&&
+			this.isMacroFree)
 		{
 			toDoList.poll().perform();
 		}
@@ -114,13 +116,8 @@ public abstract class Character extends LivingCreature
 	public void forceRebuff()    //todo        with cancell all. finished here
 	{
 		logger.trace(".forceRebuff");
-//		for (ActionBuff currentBuff : this.presetBuffs) {
-//			this.buffTimers.get(currentBuff.buffName).cancel();    //not tested. it looks so cute.
-//			todoOffer(currentBuff);
-//		}
 		cancelAllBuffScheduledTasks();
 		for (Map.Entry<ActionBuff, Timer> buffTimerEntry : this.buffTimerMap.entrySet()) {
-			buffTimerEntry.getValue().cancel();       //cancel kills the timer. new is needed!!!
 			todoOffer(new ActionBuff(buffTimerEntry.getKey()));    //todo:watch for proper todo offers in all cases. not this->todoOffer(currentBuff);
 		}
 	}
@@ -250,7 +247,7 @@ public abstract class Character extends LivingCreature
 				return null;
 			}
 		}
-		currentPoint.x = startingX;
+		currentPoint.x = startingX;         //half an hour is gone
 		//now we totally have in incoming
 		//now we have a correct pattern, but not sure if it is the real first command bit
 		do {
@@ -531,7 +528,7 @@ public abstract class Character extends LivingCreature
 		public void perform()
 		{
 			logger.trace(".perform" + this.toString());
-			Character.this.l2Window.keyClick(97 + this.buttonNumber); //97 is num pad 0. increments lineary
+			Character.this.l2Window.keyClick(96 + this.buttonNumber); //96 is num pad 0. increments lineary
 			macroLocksActions(this.macroDelayMillis);    //locks any action because macro is executed
 			if (Character.this.modeBuff) {
 				logger.debug(".perform: making a hard task of adding new buff. watch it. watch it!");
