@@ -43,10 +43,10 @@ public class ChatMessage
 		this.modeColor = modeColor;
 		switch (senderSignature) {
 			case 83:    //todo after can get these values first-hand 83 is resdead
-				this.senderID = 1;
+				this.senderID = GroupedVariables.ProjectConstants.ID_Elvenelder;
 				break;
-			case 87:	//remove this after tests are over:87 is resdead          //my big bug
-				this.senderID	=	1;
+			default:
+				this.senderID = GroupedVariables.ProjectConstants.ID_Elvenelder;	//because it is 1
 				break;
 		}
 

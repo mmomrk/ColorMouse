@@ -8,13 +8,14 @@ import org.slf4j.LoggerFactory;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.*;
-import java.util.List;
 
 import static java.lang.Math.pow;
 
 /**
  * User: mrk
  * Date: 9/1/13; Time: 1:17 PM
+ * <p/>
+ * manor mode is not implemented
  */
 public abstract class Character extends LivingCreature
 {
@@ -32,12 +33,17 @@ public abstract class Character extends LivingCreature
 	private              int   homerunQueueDepth = 3;
 
 
-	private boolean
+	protected boolean
 	modeFarm    = false,
 	modeBuff    = false,
-	modeHomeRun = false,
+	modeHomeRun = false,     //is used, bit not tested
+	modeManor   = false,        //not yet implemented
+	modeRB      = false,    //lol. should only activate some additional skilluses in classspecific
+
 	followFlag  = false,
 	isMacroFree = true;
+
+	protected boolean isHomeRunner;
 
 
 	private Point chatStartingPoint;
@@ -57,7 +63,7 @@ public abstract class Character extends LivingCreature
 	protected Map<ActionBuff, Timer> buffTimerMap = new HashMap<ActionBuff, Timer>();
 
 	protected int homeRunNumber = 0;
-	protected int homeRunDelay  = GroupedVariables.ProjectConstants.HOMERUN_TIME * 1000;
+	protected int homeRunDelay  = GroupedVariables.ProjectConstants.HOMERUN_TIME * 1000;    //can be set individually btw
 
 //	public void classSpecificDeed();//think of it twice
 
@@ -67,11 +73,36 @@ public abstract class Character extends LivingCreature
 
 //	public void follow(int id);                                 y
 
-	protected abstract void cancelAllBuffScheduledTasks();
+	protected void cancelAllBuffScheduledTasks()
+	{
+		logger.trace("cancelAllBuffScheduledTasks");
+		for (Map.Entry<ActionBuff, Timer> buffTimerEntry : this.buffTimerMap.entrySet()) {
+			buffTimerEntry.getValue().cancel();
+		}
+		this.buffTimerMap.clear();
+		setupBuffTimerMap();
+
+	}
 
 	protected abstract void setupBuffTimerMap();
 
 	public abstract void classSpecificLifeCycle();
+
+	public abstract void onKill();
+
+	protected static void easySleep(int timeMillis)
+	{
+		try {
+			Thread.sleep(timeMillis);
+		} catch (InterruptedException e) {
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		}
+	}
+
+	protected void useSkill(Skill skill)
+	{
+		skill.perform();
+	}
 
 	public void lifeCycle()
 	{
@@ -81,8 +112,15 @@ public abstract class Character extends LivingCreature
 			readChatAndOfferToDo();
 		}
 		//checkToDoSanity()	//hope i dont need this
-		doTheToDo();
-		classSpecificLifeCycle();
+		if (this.isMacroFree) {
+			onKill();    //also checks for isDead
+			doTheToDo();
+			classSpecificLifeCycle();
+
+			if (this.modeFarm) {
+				todoOffer(new ActionPvE());
+			}
+		}
 
 	}
 
@@ -186,7 +224,7 @@ public abstract class Character extends LivingCreature
 	}
 
 	private void macroLocksActions(int milliseconds)
-	{    //todo not tested
+	{
 		logger.trace(".macroLocksActions for " + milliseconds + " millis");
 		isMacroFree = false;
 		macroLockTimer.schedule(new SetMacroFree(), milliseconds);
@@ -292,7 +330,7 @@ public abstract class Character extends LivingCreature
 
 	public int getHP()
 	{    //todo when time comes don't forget to do this
-		return 0;
+		return 100;
 	}
 
 	public String toString()
@@ -300,38 +338,38 @@ public abstract class Character extends LivingCreature
 		return "Character. ID=" + this.id + ". Window " + l2Window.toString();
 	}
 
-	private void selectPartyMemberByID(int id)
+	protected void selectPartyMemberByID(int id)
 	{
 		logger.trace(".selectPartyMemberByID: " + id);
 		this.l2Window.keyClick(48 + GroupedVariables.ProjectConstants.partyPanelMatch.get(id));    //VK_0 is 48
 	}
 
-	private void assistTarget()
+	protected void assistTarget()
 	{
 		this.l2Window.keyClick(48 + GroupedVariables.ProjectConstants.partyPanelMatch.get(this.id));    //assi button in the right spot
 	}
 
-	private void attack()
+	protected void attack()
 	{
 		this.l2Window.keyClick(KeyEvent.VK_F1);
 	}
 
-	private void petAttack()
+	protected void petAttack()
 	{
 		this.l2Window.keyClick(KeyEvent.VK_F2);
 	}
 
-	private void petStop()
+	protected void petStop()
 	{
 		this.l2Window.keyClick(KeyEvent.VK_F3);
 	}
 
-	private void petFollow()
+	protected void petFollow()
 	{
 		this.l2Window.keyClick(KeyEvent.VK_F4);
 	}
 
-	private void toggleBuffMode()
+	protected void toggleBuffMode()
 	{
 		this.modeBuff = !this.modeBuff;
 		logger.info(".toggleBuffMode. Now buffmode is" + this.modeBuff);
@@ -366,15 +404,71 @@ public abstract class Character extends LivingCreature
 //CLASSES
 
 
+	protected class Skill extends Action
+	{
+
+		protected final int
+		key,
+		reuseTimeMillis;
+
+		protected boolean isReady = true;
+
+		protected Timer readySetTimer = new Timer();
+
+		protected void setReadySetTimer()    //allows execution after reuseTime timeout
+		{
+			this.readySetTimer.schedule
+							   (new TimerTask()
+							   {
+								   @Override
+								   public void run()
+								   {
+									   Skill.this.isReady = true;
+								   }
+							   }, this.reuseTimeMillis);
+		}
+
+		@Override
+		public void perform()
+		{
+			if (this.isReady) {
+				logger.trace(".perform();");
+				Character.this.l2Window.keyClick(key);
+				this.isReady = false;
+				setReadySetTimer();
+			} else {
+				logger.debug("got skill .perform that is not ready yet");
+			}
+
+		}
+
+		public Skill(int key, int reuseTimeSecs)
+		{
+			super();
+			this.isSkill = true;
+//			this.priority	=	//skill has no priority. it is not to be used in queue
+			this.key = key;
+			this.reuseTimeMillis = reuseTimeSecs * 1000;
+
+		}
+
+	}
+
+
 	protected class ActionHomeRun extends Action    //todo!!!
 	{
 
 		@Override
 		public void perform()
 		{
+			if (!Character.this.isHomeRunner) {
+				return;
+			}
+			logger.trace("ActionHomeRun.perform");
+
 			int id = Character.this.homeRunNumber++ % Character.this.homerunQueueDepth;
 
-			Character.this.selectPartyMemberByID(Character.homesToRun[id]);
+			Character.this.selectPartyMemberByID(Character.homesToRun[id]);        //test this
 			Character.this.selectPartyMemberByID(Character.homesToRun[id]);
 			if (this.isHomeRun) {
 				timerHomeRunAdd.schedule(new HomeRunTask(), Character.this.homeRunDelay);
@@ -384,6 +478,7 @@ public abstract class Character extends LivingCreature
 		ActionHomeRun()
 		{
 			super();
+			this.isHomeRun = true;
 			this.priority = 200;
 			logger.trace("Created ActionHomeRun. ID " + this.getID());
 		}
@@ -428,23 +523,25 @@ public abstract class Character extends LivingCreature
 		{
 			logger.trace("Action Chat.performing this: " + this.message);
 			if (this.message.getSenderID() == id) {    //this living creature id
-//				return;		//remove comments after messages are tested
+				logger.debug("Action chat: not executing my commands");
+				return;
 			}
+			if (Character.this.followFlag && this.message.getCommand() != 1) {    //any command resets follow mode
+				Character.this.followFlag = false;
+			}
+
 			switch (this.message.getCommand()) {
 				case 0:
 					logger.warn("command 0. Normally this should not be");
 					break;
 				case 1:    //follow
 					selectPartyMemberByID(this.message.getSenderID());
-					try {
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-						e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-					}
+					easySleep(500);
 					selectPartyMemberByID(this.message.getSenderID());
 					Character.this.modeFarm = false;
 					Character.this.modeBuff = false;
 					Character.this.modeHomeRun = false;
+					Character.this.followFlag = true;
 					break;
 				case 2:    //assi
 					selectPartyMemberByID(this.message.getSenderID());
@@ -466,8 +563,10 @@ public abstract class Character extends LivingCreature
 					attack();
 					break;
 				case 5:    //class-specific, reserved
+					message5(message.getSenderID());
 					break;
 				case 6:    //reserved
+					message6(message.getSenderID());
 					break;
 				case 7:    //pet assist atta
 					selectPartyMemberByID(this.message.getSenderID());
@@ -490,7 +589,22 @@ public abstract class Character extends LivingCreature
 				case 12:        //deactivate HR
 					Character.this.deactivateModeHomeRun();
 					break;
-				default: break;
+				case 13:        //call for help.. should be different from assi atta
+					if (Math.random() > 0.7) {    //assi atta
+						Character.this.selectPartyMemberByID(message.getSenderID());
+						Character.this.assistTarget();
+						Character.this.attack();
+					} else {
+						Character.this.selectPartyMemberByID(message.getSenderID());
+						Character.this.selectPartyMemberByID(message.getSenderID());
+						Character.this.easySleep(4000);
+						new ActionPvE().perform();
+					}
+
+
+
+				default:
+					break;
 				//each command can ask macroLocksActions
 			}
 		}
@@ -505,12 +619,22 @@ public abstract class Character extends LivingCreature
 		}
 	}
 
+	protected void message6(int callerID)
+	{
+		logger.trace("message6();. the empty one");
+	}
+
+	protected void message5(int callerID)
+	{
+		logger.trace("message5();. the empty one");
+	}
+
 
 	/**
 	 * User: mrk
 	 * Date: 9/14/13; Time: 6:35 AM
 	 */
-	public class ActionBuff extends Action // return protected after this is debugged with test class
+	protected class ActionBuff extends Action
 	{
 		public final int    buttonNumber;
 		public final int    macroDelayMillis;
@@ -519,7 +643,7 @@ public abstract class Character extends LivingCreature
 
 		public int increasePriority(int increment)
 		{
-			logger.trace(".increasePriority" + this.toString());
+			Character.this.logger.trace(".increasePriority" + this.toString());
 			this.priority += increment;
 			return this.priority;
 		}
@@ -527,13 +651,16 @@ public abstract class Character extends LivingCreature
 		@Override
 		public void perform()
 		{
+			if (buffName == null) {
+				logger.debug("cancelled buff execution");
+				return;
+			}
 			logger.trace(".perform" + this.toString());
 			Character.this.l2Window.keyClick(96 + this.buttonNumber); //96 is num pad 0. increments lineary
 			macroLocksActions(this.macroDelayMillis);    //locks any action because macro is executed
 			if (Character.this.modeBuff) {
 				logger.debug(".perform: making a hard task of adding new buff. watch it. watch it!");
 				Character.this.buffTimerMap.get(this).schedule(new BuffTask(this), this.buffDelay);
-//				Character.this.buffTimers.get(this.buffName).schedule(new BuffTask(this), this.buffDelay);    //todo finished here.. adding reinitialization from buffTimers hashMap
 			}
 		}
 
@@ -576,6 +703,7 @@ public abstract class Character extends LivingCreature
 		public ActionBuff(String buffName, int buttonNumber, int buffDelayMillis, int macroDelayMillis)//btns from numpad
 		{
 			super();    //auto setting ID
+
 			this.buffName = buffName;
 			this.isBuff = true;
 			this.priority = 350;
@@ -607,10 +735,13 @@ public abstract class Character extends LivingCreature
 		@Override
 		public void perform()
 		{
-			Character.this.l2Window.keyClick(KeyEvent.VK_F5);
-			if (Character.this.modeFarm) {
-				Character.this.todoOffer(new ActionPvE());
+			logger.trace("ActionPvE.perform");
+			if (Character.this.target.isDead()) {
+				Character.this.l2Window.keyClick(KeyEvent.VK_F5);
+			} else {
+				Character.this.attack();
 			}
+
 		}
 
 		@Override
@@ -658,19 +789,6 @@ public abstract class Character extends LivingCreature
 			cancel();    //watch it. the correct behaviour is cancelling this very task, not the timer
 		}
 	}
-
-
-	protected class SetRebuff extends TimerTask            //not tested
-	{
-		@Override
-		public void run()
-		{
-			logger.trace("resetting setRebuff by timerTask");
-			Character.this.modeBuff = true;
-			cancel();    //watch it. the correct behaviour is cancelling this very task, not the timer
-		}
-	}
-
 
 	protected class BuffTask extends TimerTask
 	{

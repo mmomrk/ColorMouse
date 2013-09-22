@@ -1,8 +1,7 @@
 package PixelHunter;
 import com.sun.jna.platform.win32.WinDef.HWND;
 
-import static PixelHunter.GroupedVariables.ProjectConstants.ID_DefaultCharacter;
-import static PixelHunter.GroupedVariables.ProjectConstants.ID_Templeknight;
+import static PixelHunter.GroupedVariables.ProjectConstants.*;
 
 /**
  * User: mrk
@@ -15,8 +14,15 @@ public class CharacterFactory
 		if (id == ID_DefaultCharacter) {
 			return new DefaultCharacter(hwnd);
 		} else if (id == ID_Templeknight) {
-
+			return new TempleKnight(hwnd);
+		} else if (id == ID_Warcryer) {
+			return new Warcryer(hwnd);
+		} else if (id == ID_Warlock) {
+			return new Warlock(hwnd);
+		} else if (id == ID_Spoiler) {
+			return new Spoiler(hwnd);
 		}
+
 		return new DefaultCharacter(hwnd);    //remove this after things are better
 
 	}

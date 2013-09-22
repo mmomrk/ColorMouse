@@ -3,7 +3,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
-import java.util.List;
 
 /**
  * User: mrk
@@ -11,7 +10,7 @@ import java.util.List;
  */
 abstract class Action
 {
-	private static final Logger logger = LoggerFactory.getLogger(Action.class);
+	protected static final Logger logger = LoggerFactory.getLogger(Action.class);
 
 	private static int currentID = 1;
 	protected final int iD;
@@ -20,6 +19,7 @@ abstract class Action
 	isBuff,
 	isPvE,
 	isMessageReact,
+	isSkill,
 	isHomeRun;
 //	protected L2Window l2Window;
 	protected int      priority;    //pve-100;	homerun-200; message-300; buff-350
@@ -58,12 +58,12 @@ abstract class Action
 	}
 
 
-	protected 	Action()	//watch it!!! todo<-l2window
+	protected 	Action()
 	{
 		this.iD = currentID++;
 		if (currentID == Integer.MAX_VALUE) {
 			currentID = 1;
-			WinAPIAPI.showMessage("ID has reached MAX VALUE. unexpected things may happen");
+			logger.warn("ID has reached MAX VALUE. unexpected things may happen");
 		}
 //		this.l2Window = l2Window;
 	}

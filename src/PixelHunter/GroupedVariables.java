@@ -135,14 +135,7 @@ public class GroupedVariables
 
 	public static class ChatConstants
 	{
-		//		public final
-		public Point coordinateLeft;
+		public Point coordinateLeft;	//can't make it final. bad
 		public Point coordinateRight;
-
-		//		ChatConstants()	todo: set all coordinates for decyphering caller name in static{}
-		public static int convertSignatureToID(int signature)	//todo implement
-		{
-			return 0;
-		}
 	}
 }
