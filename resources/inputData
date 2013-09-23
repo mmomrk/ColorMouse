@@ -1,7 +1,15 @@
 #GAMEPLAY CONSTANTS
 HOMERUN_TIME =   60
    #seconds
+HEAL_FROM   =   70
+HEAL_TO =   80
+MAJOR_HEAL_FROM =   40
+MAJOR_HEAL_TO   =   71
 
+HEAL_FROM   =   70
+HEAL_TO =   80
+MAJOR_HEAL_FROM =   40
+MAJOR_HEAL_TO   =   71
 
 
 #MISC CONSTANTS
@@ -26,6 +34,8 @@ ID_Elvenelder   =   10
 
 ID_pet  =   100
 ID_target   =   101
+ID_PartyMember  =   102
+ID_PartyMembersPet  =   103
 
 
 #INGAME COLORS
@@ -38,6 +48,10 @@ PartyMembersPetHpColor_red  =  141
 PartyMembersPetHpColor_green  = 23
 PartyMembersPetHpColor_blue  =  17
 
+PartyMembersFrameColor_red  =   59
+PartyMembersFrameColor_green   =49
+PartyMembersFrameColor_blue       =35
+
 ChatColorParty_red     =   0
 ChatColorParty_green   =   252
 ChatColorParty_blue    =   0
@@ -45,3 +59,4 @@ ChatColorParty_blue    =   0
 ChatColorPrivate_red     =   252
 ChatColorPrivate_green   =   1
 ChatColorPrivate_blue    =   252
+
