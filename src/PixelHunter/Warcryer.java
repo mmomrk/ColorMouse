@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.event.KeyEvent;
-import java.util.Map;
 import java.util.Timer;
 
 /**
@@ -17,8 +16,8 @@ import java.util.Timer;
 public class Warcryer extends Character
 {
 	private static final Logger logger = LoggerFactory.getLogger(Warcryer.class);
-	private final        ActionBuff    //second parameter is numpad key number
-								buff1  = new ActionBuff("20-minute buff", 1, (20 * 60 - 15) * 1000, 20 * 1000);
+	private final        ActionSelfBuff    //second parameter is numpad key number
+								buff1  = new ActionSelfBuff("20-minute buff", 1, (20 * 60 - 15) * 1000, 20 * 1000);
 
 	@Override
 	protected void message5(int callerID)
@@ -34,7 +33,7 @@ public class Warcryer extends Character
 //	protected void cancelAllBuffScheduledTasks()//not tested
 //	{
 //		logger.trace("cancelAllBuffScheduledTasks");
-//		for (Map.Entry<ActionBuff, Timer> buffTimerEntry : this.buffTimerMap.entrySet()) {
+//		for (Map.Entry<ActionSelfBuff, Timer> buffTimerEntry : this.buffTimerMap.entrySet()) {
 //			buffTimerEntry.getValue().cancel();
 //		}
 //		this.buffTimerMap.clear();
@@ -50,7 +49,7 @@ public class Warcryer extends Character
 	}
 
 	@Override
-	public void classSpecificLifeCycle()    //IMPlement
+	public void classSpecificLifeCycle()
 	{
 		logger.trace(".classSpecificLifeCycle");
 

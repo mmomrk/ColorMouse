@@ -60,7 +60,7 @@ public abstract class Character extends LivingCreature
 	timerPvEAdd,
 	timerHomeRunAdd;
 
-	protected Map<ActionBuff, Timer> buffTimerMap = new HashMap<ActionBuff, Timer>();
+	protected Map<ActionSelfBuff, Timer> buffTimerMap = new HashMap<ActionSelfBuff, Timer>();
 
 	protected int homeRunNumber = 0;
 	protected int homeRunDelay  = GroupedVariables.ProjectConstants.HOMERUN_TIME * 1000;    //can be set individually btw
@@ -76,7 +76,7 @@ public abstract class Character extends LivingCreature
 	protected void cancelAllBuffScheduledTasks()
 	{
 		logger.trace("cancelAllBuffScheduledTasks");
-		for (Map.Entry<ActionBuff, Timer> buffTimerEntry : this.buffTimerMap.entrySet()) {
+		for (Map.Entry<ActionSelfBuff, Timer> buffTimerEntry : this.buffTimerMap.entrySet()) {
 			buffTimerEntry.getValue().cancel();
 		}
 		this.buffTimerMap.clear();
@@ -155,8 +155,8 @@ public abstract class Character extends LivingCreature
 	{
 		logger.trace(".forceRebuff");
 		cancelAllBuffScheduledTasks();
-		for (Map.Entry<ActionBuff, Timer> buffTimerEntry : this.buffTimerMap.entrySet()) {
-			todoOffer(new ActionBuff(buffTimerEntry.getKey()));    //todo:watch for proper todo offers in all cases. not this->todoOffer(currentBuff);
+		for (Map.Entry<ActionSelfBuff, Timer> buffTimerEntry : this.buffTimerMap.entrySet()) {
+			todoOffer(new ActionSelfBuff(buffTimerEntry.getKey()));    //todo:watch for proper todo offers in all cases. not this->todoOffer(currentBuff);
 		}
 	}
 
@@ -190,7 +190,7 @@ public abstract class Character extends LivingCreature
 	{
 		logger.trace(".deactivateModeBuff");
 		this.modeBuff = false;
-		for (Map.Entry<ActionBuff, Timer> buffTimerEntry : this.buffTimerMap.entrySet()) {
+		for (Map.Entry<ActionSelfBuff, Timer> buffTimerEntry : this.buffTimerMap.entrySet()) {
 			buffTimerEntry.getValue().cancel();
 
 		}
@@ -634,7 +634,7 @@ public abstract class Character extends LivingCreature
 	 * User: mrk
 	 * Date: 9/14/13; Time: 6:35 AM
 	 */
-	protected class ActionBuff extends Action
+	protected class ActionSelfBuff extends Action
 	{
 		public final int    buttonNumber;
 		public final int    macroDelayMillis;
@@ -652,10 +652,10 @@ public abstract class Character extends LivingCreature
 		public void perform()
 		{
 			if (buffName == null) {
-				logger.debug("cancelled buff execution");
+				logger.warn("cancelled buff execution.. maybe this means something");
 				return;
 			}
-			logger.trace(".perform" + this.toString());
+			logger.trace("ActionSelfBuff.perform" + this.toString());
 			Character.this.l2Window.keyClick(96 + this.buttonNumber); //96 is num pad 0. increments lineary
 			macroLocksActions(this.macroDelayMillis);    //locks any action because macro is executed
 			if (Character.this.modeBuff) {
@@ -680,7 +680,7 @@ public abstract class Character extends LivingCreature
 				return false;
 			}
 
-			ActionBuff that = (ActionBuff) o;
+			ActionSelfBuff that = (ActionSelfBuff) o;
 
 			if (buttonNumber != that.buttonNumber) {
 				return false;
@@ -700,7 +700,7 @@ public abstract class Character extends LivingCreature
 			return result;
 		}
 
-		public ActionBuff(String buffName, int buttonNumber, int buffDelayMillis, int macroDelayMillis)//btns from numpad
+		public ActionSelfBuff(String buffName, int buttonNumber, int buffDelayMillis, int macroDelayMillis)//btns from numpad
 		{
 			super();    //auto setting ID
 
@@ -711,10 +711,10 @@ public abstract class Character extends LivingCreature
 			this.buffDelay = buffDelayMillis;
 			this.macroDelayMillis = macroDelayMillis;
 
-			logger.trace("Created ActionBuff. ID " + this.getID() + ", button Num_" + this.buttonNumber + ", macro delay " + this.macroDelayMillis);
+			logger.trace("Created ActionSelfBuff. ID " + this.getID() + ", button Num_" + this.buttonNumber + ", macro delay " + this.macroDelayMillis);
 		}
 
-		public ActionBuff(ActionBuff buffExample)
+		public ActionSelfBuff(ActionSelfBuff buffExample)
 		{
 			super();
 			this.buffName = buffExample.buffName;
@@ -724,7 +724,7 @@ public abstract class Character extends LivingCreature
 			this.buffDelay = buffExample.buffDelay;
 			this.macroDelayMillis = buffExample.macroDelayMillis;
 
-			logger.trace("Created ActionBuff. ID " + this.getID() + ", button Num_" + this.buttonNumber + ", macro delay " + this.macroDelayMillis);
+			logger.trace("Created ActionSelfBuff. ID " + this.getID() + ", button Num_" + this.buttonNumber + ", macro delay " + this.macroDelayMillis);
 		}
 	}
 
@@ -793,17 +793,17 @@ public abstract class Character extends LivingCreature
 	protected class BuffTask extends TimerTask
 	{
 
-		private final ActionBuff addThisBuff;
+		private final ActionSelfBuff addThisBuff;
 
 		@Override
 		public void run()
 		{
-			logger.trace("BuffTask: adding ActionBuff: " + this.addThisBuff + " to todolist");
+			logger.trace("BuffTask: adding ActionSelfBuff: " + this.addThisBuff + " to todolist");
 			todoOffer(addThisBuff);
 			cancel();
 		}
 
-		BuffTask(ActionBuff specificBuff)
+		BuffTask(ActionSelfBuff specificBuff)
 		{
 			this.addThisBuff = specificBuff;
 		}

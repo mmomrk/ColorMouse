@@ -13,17 +13,17 @@ import java.util.Timer;
 public class DefaultCharacter extends Character
 {
 	private static final Logger logger = LoggerFactory.getLogger(DefaultCharacter.class);
-	private final        ActionBuff    //second parameter is numpad key number
-								buff1  = new ActionBuff("20-minute buff", 1, (20 * 60 - 15) * 1000, 20 * 1000),
-	buff2                              = new ActionBuff("5-minute buff", 2, (5 * 60 - 15) * 1000, 10 * 1000),
-	buff3                              = new ActionBuff("1-minute buff", 3, (1 * 60 - 15) * 1000, 4 * 1000);
+	private final        ActionSelfBuff    //second parameter is numpad key number
+								buff1  = new ActionSelfBuff("20-minute buff", 1, (20 * 60 - 15) * 1000, 20 * 1000),
+	buff2                              = new ActionSelfBuff("5-minute buff", 2, (5 * 60 - 15) * 1000, 10 * 1000),
+	buff3                              = new ActionSelfBuff("1-minute buff", 3, (1 * 60 - 15) * 1000, 4 * 1000);
 
 
 	@Override
 	protected void cancelAllBuffScheduledTasks()//not tested
 	{
 		logger.trace("cancelAllBuffScheduledTasks");
-		for (Map.Entry<ActionBuff, Timer> buffTimerEntry : this.buffTimerMap.entrySet()) {
+		for (Map.Entry<ActionSelfBuff, Timer> buffTimerEntry : this.buffTimerMap.entrySet()) {
 			buffTimerEntry.getValue().cancel();
 
 		}
@@ -33,7 +33,7 @@ public class DefaultCharacter extends Character
 	}
 
 	@Override
-	protected void setupBuffTimerMap()	//not tested
+	protected void setupBuffTimerMap()    //not tested
 	{
 		logger.trace(".setupBuffTimerMap");
 		this.buffTimerMap.put(this.buff1, new Timer());
@@ -42,7 +42,7 @@ public class DefaultCharacter extends Character
 	}
 
 	@Override
-	public void classSpecificLifeCycle()    //IMPlement
+	public void classSpecificLifeCycle()
 	{
 		logger.trace(".classSpecificLifeCycle");
 	}

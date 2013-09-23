@@ -14,13 +14,13 @@ public class Spoiler extends Character
 {
 	private static final Logger logger = LoggerFactory.getLogger(Spoiler.class);
 
-	private final ActionBuff buffStub  = new ActionBuff(null, 0, 0, 0);
+	private final ActionSelfBuff buffStub  = new ActionSelfBuff(null, 0, 0, 0);
 	private       boolean
-							 modeSpoil = false,
-	temporarySpoil                     = false,
-	iSpoiledTheMob                     = false;
+								 modeSpoil = false,
+	temporarySpoil                         = false,
+	iSpoiledTheMob                         = false;
 
-	protected void message5(int caller)	//spoil my mob
+	protected void message5(int caller)    //spoil my mob
 	{
 		logger.trace(".Spoil my mob Mode");
 		this.temporarySpoil = true;
