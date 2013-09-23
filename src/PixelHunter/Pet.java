@@ -17,7 +17,7 @@ public class Pet extends SecondaryLivingCreature
 	{
 		super(GroupedVariables.projectConstants.ID_PET, l2Window);
 		logger.trace("creating pet in window" + l2Window);
-
+		setHP();
 	}
 
 }

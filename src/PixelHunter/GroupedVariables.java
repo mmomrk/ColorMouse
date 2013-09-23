@@ -22,7 +22,7 @@ public class GroupedVariables
 	public static class Mediator
 	{
 		public static boolean talkToMeMode = false;
-		public static boolean sleepRegime	=	false;
+		public static boolean sleepRegime  = false;
 	}
 
 
@@ -31,9 +31,16 @@ public class GroupedVariables
 		private static final Logger logger = LoggerFactory.getLogger(GroupedVariables.ProjectConstants.class);
 		//refactor all these were static.note this
 		public static final int HOMERUN_TIME;
+		public static final int HEAL_FROM;
+		public static final int HEAL_TO;
+		public static final int MAJOR_HEAL_FROM;
+		public static final int MAJOR_HEAL_TO;
 
 		public static final int ID_PET;
 		public static final int ID_TARGET;
+		public static final int ID_PartyMember;
+		public static final int ID_PartyMembersPet;
+
 		public static final int ID_DefaultCharacter;
 		public static final int ID_Warcryer;
 		public static final int ID_Spoiler;
@@ -45,12 +52,14 @@ public class GroupedVariables
 		public static final int ID_Templeknight;
 		public static final int ID_Necromancer;
 		public static final int ID_Elvenelder;
-		public static final Map<Integer,Integer> partyPanelMatch	=	new HashMap<Integer, Integer>();	//filled in static..todo dynamic filling. later
+		public static final Map<Integer, Integer> partyPanelMatch = new HashMap<Integer, Integer>();    //filled in static..todo dynamic filling. later
 
 		public static final Color SECONDARY_LIVING_CREATURE_HP_COLOR;
 		public static final Color PARTY_MEMBERS_PET_HP_COLOR;
+		public static final Color PARTY_MEMBERS_FRAME;
 		public static final Color CHAT_COLOR_PARTY;
 		public static final Color CHAT_COLOR_PRIVATE;
+
 
 		public static final int CHAT_TASK_LIST_LENGTH;
 		public static final int INITIAL_DEBUG_MODE;
@@ -73,9 +82,15 @@ public class GroupedVariables
 			}
 
 			HOMERUN_TIME = Integer.parseInt(properties.get("HOMERUN_TIME").toString());    //seconds
+			HEAL_FROM = Integer.parseInt(properties.get("HEAL_FROM").toString());
+			HEAL_TO = Integer.parseInt(properties.get("HEAL_TO").toString());
+			MAJOR_HEAL_FROM = Integer.parseInt(properties.get("MAJOR_HEAL_FROM").toString());
+			MAJOR_HEAL_TO = Integer.parseInt(properties.get("MAJOR_HEAL_TO").toString());
 
 			ID_PET = Integer.parseInt(properties.get("ID_pet").toString());
 			ID_TARGET = Integer.parseInt(properties.get("ID_target").toString());
+			ID_PartyMember= Integer.parseInt(properties.get("ID_PartyMember").toString());
+			ID_PartyMembersPet= Integer.parseInt(properties.get("ID_PartyMembersPet").toString());
 
 			ID_DefaultCharacter = Integer.parseInt(properties.get("ID_DefaultCharacter").toString());
 			ID_Warcryer = Integer.parseInt(properties.get("ID_Warcryer").toString());
@@ -89,15 +104,15 @@ public class GroupedVariables
 			ID_Necromancer = Integer.parseInt(properties.get("ID_Necromancer").toString());
 			ID_Elvenelder = Integer.parseInt(properties.get("ID_Elvenelder").toString());
 
-			partyPanelMatch.put(ID_DefaultCharacter,9);	//todo make this thing cool
-			partyPanelMatch.put(ID_Elvenelder,1);
-			partyPanelMatch.put(ID_Warcryer,2);
-			partyPanelMatch.put(ID_Bladedancer,3);
-			partyPanelMatch.put(ID_Swordsinger,4);
-			partyPanelMatch.put(ID_Necromancer,5);
-			partyPanelMatch.put(ID_Spoiler,6);
-			partyPanelMatch.put(ID_Warlock,7);
-			partyPanelMatch.put(ID_Templeknight,8);
+			partyPanelMatch.put(ID_DefaultCharacter, 9);    //todo make this thing cool
+			partyPanelMatch.put(ID_Elvenelder, 1);
+			partyPanelMatch.put(ID_Warcryer, 2);
+			partyPanelMatch.put(ID_Bladedancer, 3);
+			partyPanelMatch.put(ID_Swordsinger, 4);
+			partyPanelMatch.put(ID_Necromancer, 5);
+			partyPanelMatch.put(ID_Spoiler, 6);
+			partyPanelMatch.put(ID_Warlock, 7);
+			partyPanelMatch.put(ID_Templeknight, 8);
 
 			CHAT_TASK_LIST_LENGTH = Integer.parseInt(properties.get("CHAT_TASK_LIST_LENGTH").toString());
 			INITIAL_DEBUG_MODE = Integer.parseInt(properties.get("INITIAL_DEBUG_MODE").toString());
@@ -113,6 +128,11 @@ public class GroupedVariables
 			green = Integer.parseInt(properties.get("PartyMembersPetHpColor_green").toString());
 			blue = Integer.parseInt(properties.get("PartyMembersPetHpColor_blue").toString());
 			PARTY_MEMBERS_PET_HP_COLOR = new Color(red, green, blue);
+
+			red = Integer.parseInt(properties.get("PartyMembersFrameColor_red").toString());
+			green = Integer.parseInt(properties.get("PartyMembersFrameColor_green").toString());
+			blue = Integer.parseInt(properties.get("PartyMembersFrameColor_blue").toString());
+			PARTY_MEMBERS_FRAME = new Color(red, green, blue);
 
 			red = Integer.parseInt(properties.get("ChatColorParty_red").toString());
 			green = Integer.parseInt(properties.get("ChatColorParty_green").toString());
@@ -135,7 +155,7 @@ public class GroupedVariables
 
 	public static class ChatConstants
 	{
-		public Point coordinateLeft;	//can't make it final. bad
+		public Point coordinateLeft;    //can't make it final. bad
 		public Point coordinateRight;
 	}
 }

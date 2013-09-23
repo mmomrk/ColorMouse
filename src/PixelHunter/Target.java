@@ -9,13 +9,13 @@ import org.slf4j.LoggerFactory;
 public class Target extends SecondaryLivingCreature
 {
 	//	public L2Window l2Window;
-	private static final Logger logger = LoggerFactory.getLogger(Target.class);
+	private static final Logger logger = LoggerFactory.getLogger(PartyMember.class);
 
 	public Target(L2Window l2Window)
 	{
 		super(GroupedVariables.projectConstants.ID_TARGET, l2Window);
 		logger.trace("creating target in window" + l2Window);
-
+		setHP();
 	}
 
 }

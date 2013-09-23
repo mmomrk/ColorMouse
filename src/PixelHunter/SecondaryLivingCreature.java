@@ -40,7 +40,7 @@ public abstract class SecondaryLivingCreature extends LivingCreature
 		this.l2Window.setHP(this.hpConstants, this.id);
 	}
 
-	public SecondaryLivingCreature(int thisid, L2Window l2Window)
+	protected SecondaryLivingCreature(int thisid, L2Window l2Window)
 	{
 		super(thisid);
 		logger.trace("SecondaryLC constructor");
@@ -54,11 +54,16 @@ public abstract class SecondaryLivingCreature extends LivingCreature
 		}
 		this.l2Window = l2Window;
 
-		hpConstants = new HpConstants(projectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR, new Point(0, 0), new Point(0, 0), thisid); //primary pet and target hp colors are equal
+
+		if (thisid == GroupedVariables.ProjectConstants.ID_PartyMembersPet) {
+			hpConstants = new HpConstants(GroupedVariables.ProjectConstants.PARTY_MEMBERS_PET_HP_COLOR, new Point(0, 0), new Point(0, 0), thisid);
+		} else {
+			hpConstants = new HpConstants(projectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR, new Point(0, 0), new Point(0, 0), thisid); //primary pet and target hp colors are equal
+		}
 
 
 
-		setHP();
+
 
 	}
 }

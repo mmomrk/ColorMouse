@@ -217,7 +217,11 @@ public class L2Window
 
 		} else if (id == GroupedVariables.ProjectConstants.ID_TARGET) {
 			WinAPIAPI.showMessage("Set HP bar for the target. Place mouse under fully healed HP bar and press OK");
-		} else {
+		} else if (id == GroupedVariables.ProjectConstants.ID_PartyMember) {
+			WinAPIAPI.showMessage("Set HP bar for the party member. Place mouse under highest fully healed HP bar and press OK");
+		} else if (id == GroupedVariables.ProjectConstants.ID_PartyMembersPet) {
+			WinAPIAPI.showMessage("Set HP bar for the party member's pet. Place mouse under highest fully healed HP bar and press OK");
+		}   else {
 			logger.error("wrong id passed to setHP: " + id);
 			return;
 		}
