@@ -121,6 +121,7 @@ public class TempleKnight extends Character
 	{
 		super(GroupedVariables.ProjectConstants.ID_Templeknight, hwnd);
 		setupBuffTimerMap();
-		isHomeRunner = true;
+		this.isHomeRunner = true;
+		this.isPhysicAttacker	=	true;
 	}
 }

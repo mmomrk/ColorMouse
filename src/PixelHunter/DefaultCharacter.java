@@ -23,7 +23,7 @@ public class DefaultCharacter extends Character
 	protected void cancelAllBuffScheduledTasks()//not tested
 	{
 		logger.trace("cancelAllBuffScheduledTasks");
-		for (Map.Entry<ActionSelfBuff, Timer> buffTimerEntry : this.buffTimerMap.entrySet()) {
+		for (Map.Entry<ActionAbstractBuff, Timer> buffTimerEntry : this.buffTimerMap.entrySet()) {
 			buffTimerEntry.getValue().cancel();
 
 		}
@@ -58,6 +58,7 @@ public class DefaultCharacter extends Character
 		super(GroupedVariables.ProjectConstants.ID_DefaultCharacter, hwnd);
 	    setupBuffTimerMap();
 		this.isHomeRunner	=	true;
+		this.isPhysicAttacker	=	true;
 
 	}
 }

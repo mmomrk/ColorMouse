@@ -16,9 +16,9 @@ public class Spoiler extends Character
 
 	private final ActionSelfBuff buffStub  = new ActionSelfBuff(null, 0, 0, 0);
 	private       boolean
-								 modeSpoil = false,
-	temporarySpoil                         = false,
-	iSpoiledTheMob                         = false;
+									 modeSpoil = false,
+	temporarySpoil                             = false,
+	iSpoiledTheMob                             = false;
 
 	protected void message5(int caller)    //spoil my mob
 	{
@@ -110,5 +110,6 @@ public class Spoiler extends Character
 		super(GroupedVariables.ProjectConstants.ID_Spoiler, hwnd);
 		this.buffTimerMap.put(this.buffStub, new Timer());
 		this.isHomeRunner = true;
+		this.isPhysicAttacker	=	true;
 	}
 }

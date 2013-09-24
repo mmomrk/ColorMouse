@@ -33,7 +33,7 @@ public class Warcryer extends Character
 //	protected void cancelAllBuffScheduledTasks()//not tested
 //	{
 //		logger.trace("cancelAllBuffScheduledTasks");
-//		for (Map.Entry<ActionSelfBuff, Timer> buffTimerEntry : this.buffTimerMap.entrySet()) {
+//		for (Map.Entry<ActionAbstractBuff, Timer> buffTimerEntry : this.buffTimerMap.entrySet()) {
 //			buffTimerEntry.getValue().cancel();
 //		}
 //		this.buffTimerMap.clear();
@@ -64,8 +64,11 @@ public class Warcryer extends Character
 	public Warcryer(WinDef.HWND hwnd)
 	{
 		super(GroupedVariables.ProjectConstants.ID_Warcryer, hwnd);
+		logger.trace("Warcryer constructor");
 		setupBuffTimerMap();
-		isHomeRunner = false;
+		this.isHomeRunner = false;
+		this.isPhysicAttacker	=	true;
+
 	}
 
 	class ActionHeal extends Action

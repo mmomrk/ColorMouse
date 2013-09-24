@@ -4,7 +4,7 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 
-import static PixelHunter.GroupedVariables.projectConstants;
+import static PixelHunter.GroupedVariables.ProjectConstants.*;
 
 
 /**
@@ -44,7 +44,7 @@ public abstract class SecondaryLivingCreature extends LivingCreature
 	{
 		super(thisid);
 		logger.trace("SecondaryLC constructor");
-		if (thisid != GroupedVariables.ProjectConstants.ID_PET && thisid != GroupedVariables.ProjectConstants.ID_TARGET) {
+		if (thisid != ID_PET && thisid != ID_TARGET) {
 			logger.error("error in constructor of secondary LC. wrong ID");
 			this.id = thisid;
 		}
@@ -55,15 +55,11 @@ public abstract class SecondaryLivingCreature extends LivingCreature
 		this.l2Window = l2Window;
 
 
-		if (thisid == GroupedVariables.ProjectConstants.ID_PartyMembersPet) {
-			hpConstants = new HpConstants(GroupedVariables.ProjectConstants.PARTY_MEMBERS_PET_HP_COLOR, new Point(0, 0), new Point(0, 0), thisid);
+		if (thisid == ID_PartyMembersPet) {
+			hpConstants = new HpConstants(PARTY_MEMBERS_PET_HP_COLOR, new Point(0, 0), new Point(0, 0), thisid);
 		} else {
-			hpConstants = new HpConstants(projectConstants.SECONDARY_LIVING_CREATURE_HP_COLOR, new Point(0, 0), new Point(0, 0), thisid); //primary pet and target hp colors are equal
+			hpConstants = new HpConstants(SECONDARY_LIVING_CREATURE_HP_COLOR, new Point(0, 0), new Point(0, 0), thisid); //primary pet and target hp colors are equal
 		}
-
-
-
-
-
+		//there used to be setHP(), but it was removed because of need for simple partyMember second constructor
 	}
 }

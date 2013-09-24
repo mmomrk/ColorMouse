@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.*;
+import java.util.List;
 
 import static java.lang.Math.pow;
 
@@ -34,6 +35,11 @@ public abstract class Character extends LivingCreature
 
 
 	protected boolean
+	isSupport        = false,                //no attacks from chat messages
+	isSummoner       = false,        //only pet attacks from chat messages
+	isBDSWS          = false,        //funny buffs
+	isPhysicAttacker = false,    //everything else
+
 	modeFarm    = false,
 	modeBuff    = false,
 	modeHomeRun = false,     //is used, bit not tested
@@ -50,7 +56,7 @@ public abstract class Character extends LivingCreature
 
 	protected Pet         pet;    //remove public after tests are done
 	protected PartyMember target;
-
+	protected List<PartyMember> partyStack = new LinkedList<PartyMember>();
 
 	private static Comparator            actionComparator = new PixelHunter.Action.ActionPriorityComparator();
 	private        PriorityQueue<Action> toDoList         = new PriorityQueue<Action>(GroupedVariables.ProjectConstants.CHAT_TASK_LIST_LENGTH, actionComparator);
@@ -60,7 +66,7 @@ public abstract class Character extends LivingCreature
 	timerPvEAdd,
 	timerHomeRunAdd;
 
-	protected Map<ActionSelfBuff, Timer> buffTimerMap = new HashMap<ActionSelfBuff, Timer>();
+	protected Map<ActionAbstractBuff, Timer> buffTimerMap = new HashMap<ActionAbstractBuff, Timer>();
 
 	protected int homeRunNumber = 0;
 	protected int homeRunDelay  = GroupedVariables.ProjectConstants.HOMERUN_TIME * 1000;    //can be set individually btw
@@ -76,7 +82,7 @@ public abstract class Character extends LivingCreature
 	protected void cancelAllBuffScheduledTasks()
 	{
 		logger.trace("cancelAllBuffScheduledTasks");
-		for (Map.Entry<ActionSelfBuff, Timer> buffTimerEntry : this.buffTimerMap.entrySet()) {
+		for (Map.Entry<ActionAbstractBuff, Timer> buffTimerEntry : this.buffTimerMap.entrySet()) {
 			buffTimerEntry.getValue().cancel();
 		}
 		this.buffTimerMap.clear();
@@ -89,6 +95,24 @@ public abstract class Character extends LivingCreature
 	public abstract void classSpecificLifeCycle();
 
 	public abstract void onKill();
+
+
+	public ActionSelfBuff cloneBuff(Character.ActionSelfBuff oldSelfBuff)
+	{
+		return new ActionSelfBuff(oldSelfBuff);
+	}
+
+	protected void setPartyMembers()    //not tested
+	{
+		logger.trace("setPartyMembers();");
+		PartyMember member = new PartyMember(this.l2Window);
+		this.partyStack.add(member);
+		while (member.nextExists()) {
+			member = new PartyMember(member);
+			this.partyStack.add(member);
+		}
+
+	}
 
 	protected static void easySleep(int timeMillis)
 	{
@@ -106,7 +130,7 @@ public abstract class Character extends LivingCreature
 
 	public void lifeCycle()
 	{
-		logger.trace("Character's " + iDValues.get(this.id) + " lifecycle");
+		logger.trace("Character's " + this.id + " lifecycle");
 		this.l2Window.activate();
 		if (this.l2Window.isChatMode()) {
 			readChatAndOfferToDo();
@@ -155,8 +179,9 @@ public abstract class Character extends LivingCreature
 	{
 		logger.trace(".forceRebuff");
 		cancelAllBuffScheduledTasks();
-		for (Map.Entry<ActionSelfBuff, Timer> buffTimerEntry : this.buffTimerMap.entrySet()) {
-			todoOffer(new ActionSelfBuff(buffTimerEntry.getKey()));    //watch for proper todo offers in all cases. not this->todoOffer(currentBuff);
+		for (Map.Entry<ActionAbstractBuff, Timer> buffTimerEntry : this.buffTimerMap.entrySet()) {
+			todoOffer(buffTimerEntry.getKey().getNewCopy());
+//			todoOffer(new ActionAbstractBuff(buffTimerEntry.getKey()));    //watch for proper todo offers in all cases. not this->todoOffer(currentBuff);
 		}
 	}
 
@@ -190,7 +215,7 @@ public abstract class Character extends LivingCreature
 	{
 		logger.trace(".deactivateModeBuff");
 		this.modeBuff = false;
-		for (Map.Entry<ActionSelfBuff, Timer> buffTimerEntry : this.buffTimerMap.entrySet()) {
+		for (Map.Entry<ActionAbstractBuff, Timer> buffTimerEntry : this.buffTimerMap.entrySet()) {
 			buffTimerEntry.getValue().cancel();
 
 		}
@@ -338,10 +363,26 @@ public abstract class Character extends LivingCreature
 		return "Character. ID=" + this.id + ". Window " + l2Window.toString();
 	}
 
+	/*
+	*   works nice for positive as expected.
+	*   for negative: abs is number in party stack
+	* */
+	protected void selectPartyMembersPetByID(int id)	//10 is reserved for self pet.
+	{
+		logger.trace(".selectPartyMembers__PET__ByID: " + id);
+		this.l2Window.mouseClick_Relative(this.partyStack.get(-1 * id).petHpConstants.coordinateLeft);//not tested
+	}
+
 	protected void selectPartyMemberByID(int id)
 	{
-		logger.trace(".selectPartyMemberByID: " + id);
-		this.l2Window.keyClick(48 + GroupedVariables.ProjectConstants.partyPanelMatch.get(id));    //VK_0 is 48
+		if (id != this.id) {
+			logger.trace(".selectPartyMemberByID: " + id);
+			this.l2Window.keyClick(48 + GroupedVariables.ProjectConstants.partyPanelMatch.get(id));    //VK_0 is 48
+		}	else{
+			logger.warn("attempt to select self through selectPartyMemberByID");
+		}
+
+
 	}
 
 	protected void assistTarget()
@@ -402,6 +443,12 @@ public abstract class Character extends LivingCreature
 
 
 //CLASSES
+
+
+	public abstract class ActionAbstractBuff extends Action
+	{
+		public abstract Action getNewCopy();
+	}
 
 
 	protected class Skill extends Action
@@ -548,13 +595,14 @@ public abstract class Character extends LivingCreature
 					assistTarget();
 					break;
 				case 3:    //assi atta
-					if (id == iDValues.get("prophet")) {
+					if (Character.this.isSupport) {
 						break;
 					}
 					selectPartyMemberByID(this.message.getSenderID());
 					assistTarget();
-					if (id == iDValues.get("warlock")) {
+					if (Character.this.isSummoner) {
 						petAttack();
+						break;
 					} else {
 						attack();
 					}
@@ -634,7 +682,7 @@ public abstract class Character extends LivingCreature
 	 * User: mrk
 	 * Date: 9/14/13; Time: 6:35 AM
 	 */
-	protected class ActionSelfBuff extends Action
+	protected class ActionSelfBuff extends PixelHunter.Character.ActionAbstractBuff
 	{
 		public final int    buttonNumber;
 		public final int    macroDelayMillis;
@@ -652,14 +700,14 @@ public abstract class Character extends LivingCreature
 		public void perform()
 		{
 			if (buffName == null) {
-				logger.warn("cancelled buff execution.. maybe this means something");
+				Action.logger.warn("cancelled buff execution.. maybe this means something");
 				return;
 			}
-			logger.trace("ActionSelfBuff.perform" + this.toString());
+			Action.logger.trace("ActionAbstractBuff.perform" + this.toString());
 			Character.this.l2Window.keyClick(96 + this.buttonNumber); //96 is num pad 0. increments lineary
 			macroLocksActions(this.macroDelayMillis);    //locks any action because macro is executed
 			if (Character.this.modeBuff) {
-				logger.debug(".perform: making a hard task of adding new buff. watch it. watch it!");
+				Action.logger.debug(".perform: making a hard task of adding new buff. watch it. watch it!");
 				Character.this.buffTimerMap.get(this).schedule(new SelfBuffTask(this), this.buffDelay);
 			}
 		}
@@ -711,7 +759,7 @@ public abstract class Character extends LivingCreature
 			this.buffDelay = buffDelayMillis;
 			this.macroDelayMillis = macroDelayMillis;
 
-			logger.trace("Created ActionSelfBuff. ID " + this.getID() + ", button Num_" + this.buttonNumber + ", macro delay " + this.macroDelayMillis);
+			Action.logger.trace("Created ActionAbstractBuff. ID " + this.getID() + ", button Num_" + this.buttonNumber + ", macro delay " + this.macroDelayMillis);
 		}
 
 		public ActionSelfBuff(ActionSelfBuff buffExample)
@@ -724,7 +772,13 @@ public abstract class Character extends LivingCreature
 			this.buffDelay = buffExample.buffDelay;
 			this.macroDelayMillis = buffExample.macroDelayMillis;
 
-			logger.trace("Created ActionSelfBuff. ID " + this.getID() + ", button Num_" + this.buttonNumber + ", macro delay " + this.macroDelayMillis);
+			Action.logger.trace("Created ActionAbstractBuff. ID " + this.getID() + ", button Num_" + this.buttonNumber + ", macro delay " + this.macroDelayMillis);
+		}
+
+		@Override
+		public Action getNewCopy()
+		{
+			return new ActionSelfBuff(this);
 		}
 	}
 
@@ -790,20 +844,21 @@ public abstract class Character extends LivingCreature
 		}
 	}
 
+
 	protected class SelfBuffTask extends TimerTask
 	{
 
-		private final ActionSelfBuff addThisBuff;
+		private final ActionAbstractBuff addThisBuff;
 
 		@Override
 		public void run()
 		{
-			logger.trace("SelfBuffTask: adding ActionSelfBuff: " + this.addThisBuff + " to todolist");
+			logger.trace("SelfBuffTask: adding ActionAbstractBuff: " + this.addThisBuff + " to todolist");
 			todoOffer(addThisBuff);
 			cancel();
 		}
 
-		SelfBuffTask(ActionSelfBuff specificBuff)
+		SelfBuffTask(ActionAbstractBuff specificBuff)
 		{
 			this.addThisBuff = specificBuff;
 		}

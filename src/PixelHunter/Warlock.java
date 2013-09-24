@@ -65,7 +65,8 @@ public class Warlock extends Character
 	{
 		super(GroupedVariables.ProjectConstants.ID_Warlock, hwnd);
 		setupBuffTimerMap();
-		isHomeRunner = true;
+		this.isHomeRunner = true;
+		this.isSummoner=true;
 	}
 
 }
