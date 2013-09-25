@@ -19,25 +19,34 @@ public class TempleKnight extends Character
 	summonStormCubic                            = new ActionSelfBuff("Storm Cube", 2, (15 * 60) * 1000, 0),    //todo:what's the time?
 	summonAttractCubic                          = new ActionSelfBuff("Attract Cube", 3, (15 * 60) * 1000, 0);
 
-	private boolean temporaryAggroMode = false;
+	private boolean
+	canUseUD           = false,
+	temporaryAggroMode = false;
 
-	private void toggleGuardStance()
-	{
-		logger.trace("toggleGuardStance();");
-		this.l2Window.keyClick(VK_NUMPAD0);
+	private Skill
+	ultimateDefence      = new Skill(VK_NUMPAD5, 30),
+	attackSkill          = new Skill(VK_NUMPAD6, 3),
+	aggro                = new Skill(VK_NUMPAD7, 15 * 60),
+	massAggro            = new Skill(VK_NUMPAD8, 40),
+	shieldFortressToggle = new Skill(VK_NUMPAD9, 1),
+	guardStanceToggle    = new Skill(VK_NUMPAD0, 1);
+
+
+	@Override
+	protected void message6(int callerID)
+	{    //everything is bad. mass aggr
+		logger.trace(".message6();");
+		useSkill(massAggro);
+		this.temporaryAggroMode = true;
+		this.canUseUD = true;
+
 	}
 
-	private void toggleShieldFortress()
+	protected void message5(int callerID)
 	{
-		logger.trace("toggleShieldFortress();");
-		this.l2Window.keyClick(VK_NUMPAD9);
+		aggrHis(callerID);
 	}
 
-	private void useAttackSkill()
-	{
-		logger.trace("useAttackSkill();");
-		this.l2Window.keyClick(VK_NUMPAD6);
-	}
 
 	private void aggrHis(int callerID)
 	{
@@ -48,41 +57,13 @@ public class TempleKnight extends Character
 		this.temporaryAggroMode = true;
 	}
 
-	private void ultimateDefence()
+	private void aggr()
 	{
-		this.l2Window.keyClick(VK_NUMPAD5);
-		logger.trace(".ultimateDefence();");
-		this.temporaryAggroMode	=	true;
-	}
-
-	private void aggr(){
 		logger.trace(".aggr");
 		this.l2Window.keyClick(VK_NUMPAD7);
-		attack();	//discuss if this is needed. watch it
+		attack();    //discuss if this is needed. watch it
 	}
 
-	protected void message5(int callerID){
-		aggrHis(callerID);
-	}
-
-//	@Override		//remove after test
-//	protected void cancelAllBuffScheduledTasks()
-//	{
-//		logger.trace("cancelAllBuffScheduledTasks");
-//		for (Map.Entry<Character.ActionSelfBuff, Timer> buffTimerEntry : this.buffTimerMap.entrySet()) {
-//			buffTimerEntry.getValue().cancel();
-//		}
-//		this.buffTimerMap.clear();
-//		setupBuffTimerMap();
-//
-//		logger.trace("cancelAllBuffScheduledTasks");
-//		for (Map.Entry<ActionSelfBuff, Timer> buffTimerEntry : this.buffTimerMap.entrySet()) {
-//			buffTimerEntry.getValue().cancel();
-//		}
-//		this.buffTimerMap.clear();
-//		setupBuffTimerMap();
-//
-//	}
 
 	@Override
 	protected void setupBuffTimerMap()
@@ -98,13 +79,19 @@ public class TempleKnight extends Character
 	{
 		logger.trace(".classSpecificLifeCycle");
 
-		if (this.modeRB || this.temporaryAggroMode){
+		if (this.modeRB || this.temporaryAggroMode) {
 			aggr();
 		}
 
-		if (getHP()<25){	//very bad. very bad
+		if (getHP() < 25) {    //very bad. very bad
 			logger.warn("character is dying!!");
-			ultimateDefence();
+			useSkill(ultimateDefence);
+			this.l2Window.keyClick(VK_F6);    //chat help
+		}
+
+		if (this.canUseUD && getHP() < 50) {
+			useSkill(ultimateDefence);
+			this.canUseUD = false;
 		}
 
 	}
@@ -112,8 +99,8 @@ public class TempleKnight extends Character
 	@Override
 	public void onKill()
 	{
-		if (this.temporaryAggroMode){
-			this.temporaryAggroMode	=	false;
+		if (this.temporaryAggroMode) {
+			this.temporaryAggroMode = false;
 		}
 	}
 
@@ -122,6 +109,6 @@ public class TempleKnight extends Character
 		super(GroupedVariables.ProjectConstants.ID_Templeknight, hwnd);
 		setupBuffTimerMap();
 		this.isHomeRunner = true;
-		this.isPhysicAttacker	=	true;
+		this.isPhysicAttacker = true;
 	}
 }

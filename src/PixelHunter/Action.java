@@ -26,6 +26,20 @@ abstract class Action
 
 	public abstract void perform();    //returns macro delay
 
+	public int increasePriority(int incrementPriority)
+	{
+		logger.trace(".increasePriority" + this.toString());
+		this.priority += incrementPriority;
+		return this.priority;
+	}
+
+	public int setPriority(int newPriority)
+	{
+		logger.trace(".increasePriority" + this.toString());
+		this.priority = newPriority;
+		return this.priority;
+	}
+
 	public boolean isBuff()
 	{
 		return isBuff;

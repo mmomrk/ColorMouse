@@ -37,7 +37,6 @@ public class World
 		processIdentifier = new ProcessIdentifier();
 		hwnds = ProcessIdentifier.getL2HwndArray();
 
-
 		if (argumentsList.contains("-f")) {    //fishing
 			Fisher fisher = new Fisher(new L2Window(hwnds.get(0)));
 			fisher.infiniteFish();
@@ -64,7 +63,6 @@ public class World
 			L2Window.initiateSize(0, hwnds.get(0));    //yes, static method access, not the class representative
 			//0=fully on the screen
 			WinAPIAPI.setActiveWindow(hwnds.get(0));
-//			WinAPIAPI.User32DLL.INSTANCE.ShowWindow(hwnds.get(0),0);
 			id = WinAPIAPI.dialogWindow("You can resize the window now in case you are not satisfied with its dimensions.\nEnter Character ID in the only window");
 			characters[0] = CharacterFactory.getCharacter(id, hwnds.get(0));
 
@@ -80,6 +78,8 @@ public class World
 			id = WinAPIAPI.dialogWindow("You can resize the window now in case you are not satisfied with its dimensions.\nEnter Character ID in the right window");
 			characters[1] = CharacterFactory.getCharacter(id, hwnds.get(1));
 		}
+
+
 
 		while (characters.length > 0) {	//for the pure debug purpose
 			if (GroupedVariables.Mediator.sleepRegime) {

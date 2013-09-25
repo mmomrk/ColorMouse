@@ -26,13 +26,16 @@ public class ElvenElder extends PixelHunter.Character    //todo
 	buff2 = new ActionBuff("20-minute buff for pAttackers' PETS", 1, (20 * 60 - 30), 20, 0, true),
 	buff3 = new ActionBuff("20-minute buff for nukers", 2, (20 * 60 - 30), 20, 0, false),
 	buff4 = new ActionBuff("20-minute buff for supports and summoners", 3, (20 * 60 - 30), 15, 0, false),
-	buff5 = new ActionBuff("20-minute buff for shielded party members", 1, (20 * 60 - 30), 5, 0, true);
+	buff5 = new ActionBuff("20-minute buff for my hen", 3, (20 * 60 - 30), 15, 0, true),
+	buff6 = new ActionBuff("20-minute buff for shielded party members", 1, (20 * 60 - 30), 5, 0, false);
 
 
-	private boolean iAmHealing  = false;
-	private Skill
-					GreaterHeal = new Heal(5, 2),    //watch it: 2 may not be true
-	MajorHeal                   = new Heal(6, 1);    //watch this too. needs to be verified
+	private boolean iAmHealing    = false;
+	private Skill    //comment
+					serenadeOfEva = new Skill(8, 4), //watch it
+	invocation                    = new Skill(9, 20),    //watch it. nobody knows it
+	greaterHeal                   = new Heal(5, 2),    //watch it: 2 may not be true
+	majorHeal                     = new Heal(6, 1);    //watch this too. needs to be verified
 
 
 	public Character.ActionAbstractBuff cloneBuff(ElvenElder.ActionBuff oldSelfBuff)
@@ -45,8 +48,7 @@ public class ElvenElder extends PixelHunter.Character    //todo
 	{
 		logger.trace(".message5(); from " + callerID);
 		selectPartyMemberByID(callerID);
-		useSkill(MajorHeal);
-		todoOffer(new ActionHeal(6, 10, false));
+		useSkill(majorHeal);
 	}
 
 	@Override
@@ -58,14 +60,18 @@ public class ElvenElder extends PixelHunter.Character    //todo
 		buffTimerMap.put(new ActionBuff(buff1, ID_Templeknight), new Timer());
 		buffTimerMap.put(new ActionBuff(buff1, ID_Swordsinger), new Timer());
 		buffTimerMap.put(new ActionBuff(buff1, ID_Bladedancer), new Timer());
-		buffTimerMap.put(new ActionBuff(buff3, ID_Necromancer), new Timer()); 	//nuke
-		buffTimerMap.put(new ActionBuff(buff4, ID_Warlock), new Timer());		//support protective
+
+		buffTimerMap.put(new ActionBuff(buff3, ID_Necromancer), new Timer());     //nuke
+
+		buffTimerMap.put(new ActionBuff(buff4, ID_Warlock), new Timer());        //support protective
 		buffTimerMap.put(new ActionBuff(buff4, this.id), new Timer());
 
-		buffTimerMap.put(new ActionBuff(buff5, ID_Templeknight), new Timer());	//++shield
-		buffTimerMap.put(new ActionBuff(buff5, ID_Swordsinger), new Timer());
-		buffTimerMap.put(new ActionBuff(buff5, ID_Spoiler), new Timer());
-		buffTimerMap.put(new ActionBuff(buff5, ID_Warlock), new Timer());
+		buffTimerMap.put(new ActionBuff(buff5, this.id), new Timer());       //for the chicken hen
+
+		buffTimerMap.put(new ActionBuff(buff6, ID_Templeknight), new Timer());    //++shield
+		buffTimerMap.put(new ActionBuff(buff6, ID_Swordsinger), new Timer());
+		buffTimerMap.put(new ActionBuff(buff6, ID_Spoiler), new Timer());
+		buffTimerMap.put(new ActionBuff(buff6, ID_Warlock), new Timer());
 
 		int t = 0;
 		for (PartyMember member : partyStack) {    //for all party members' pets
@@ -78,26 +84,110 @@ public class ElvenElder extends PixelHunter.Character    //todo
 	public void classSpecificLifeCycle()
 	{
 		logger.trace(".classSpecificLifeCycle");
+		int
+		maxHP = 0,
+		currentTotalHP = 0;
+
+		for (PartyMember partyMember : partyStack) {
+
+			int charHP = partyMember.getHP();
+			ActionHealPartyMemberFromStack supposedHeal;
+
+			maxHP += 100;
+			currentTotalHP += charHP;
+
+			if (charHP < GroupedVariables.ProjectConstants.MAJOR_HEAL_FROM) {
+				supposedHeal = new ActionHealPartyMemberFromStack(6, partyMember, false);
+				supposedHeal.increasePriority(100 - charHP);        //less hp=>higher priority
+				todoOffer(supposedHeal);
+			} else if (charHP < GroupedVariables.ProjectConstants.HEAL_FROM) {
+				supposedHeal = new ActionHealPartyMemberFromStack(5, partyMember, false);
+				supposedHeal.increasePriority(100 - charHP);
+				todoOffer(supposedHeal);
+			}
+
+			if (!partyMember.isSingle) {
+
+				int petHP = partyMember.getHP("pet");
+
+				maxHP += 100;
+				currentTotalHP += petHP;
+
+				if (petHP < GroupedVariables.ProjectConstants.MAJOR_HEAL_FROM) {
+					supposedHeal = new ActionHealPartyMemberFromStack(6, partyMember, true);
+					supposedHeal.increasePriority(100 - petHP);        //less hp=>higher priority
+					todoOffer(supposedHeal);
+				} else if (petHP < GroupedVariables.ProjectConstants.HEAL_FROM) {
+					supposedHeal = new ActionHealPartyMemberFromStack(5, partyMember, true);
+					supposedHeal.increasePriority(100 - petHP);
+					todoOffer(supposedHeal);
+				}
+			}
+
+		}
+		if (maxHP * 0.7 > currentTotalHP) {          //watch it
+			this.l2Window.keyClick(KeyEvent.VK_MULTIPLY);//panic   .
+		}
 
 	}
 
 	@Override
 	public void onKill()
 	{
-		logger.warn("EE.onKill.. this normally should not happen");
+		logger.trace(".onKill();..empty<-EE");
 	}
 
 	public ElvenElder(WinDef.HWND hwnd)
 	{
 		super(GroupedVariables.ProjectConstants.ID_Warcryer, hwnd);
 		setPartyMembers();
-		setupBuffTimerMap();     //todo
+		setupBuffTimerMap();
 		this.isHomeRunner = false;
 		this.isSupport = true;
 	}
 
-	class ActionHeal extends Action    //not tested. unlikely to work
+	/*should work only with party hp check.
+	 no action heal from chat.
+	 extends to member's pet with proper flag*/
+	class ActionHealPartyMemberFromStack extends Action    //not tested. unlikely to work
 	{
+		public final int
+		buttonNumber;
+
+		public final boolean
+		targetIsPet;
+
+		public final PartyMember partyMember;
+
+		@Override
+		public void perform()
+		{
+			logger.trace("ActionHealPartyMemberFromStack.perform ");
+			if (targetIsPet) {
+				selectClickPartyMembersPetByPartyStackPlace(this.partyMember);
+			} else {
+				selectClickPartyMemberByPartyStackPlace(this.partyMember);
+			}
+
+			if (buttonNumber == 5) {    //grHeal
+				ElvenElder.this.iAmHealing = true;
+
+				while (ElvenElder.this.getPartyMemberHP(this.partyMember, this.targetIsPet) < HEAL_TO) {    //ID here is party stack position!!!
+					useSkill(ElvenElder.this.greaterHeal);
+				}
+
+				ElvenElder.this.iAmHealing = false;
+
+			} else if (buttonNumber == 6) {//majHeal
+				ElvenElder.this.iAmHealing = true;
+
+				while (ElvenElder.this.getPartyMemberHP(this.partyMember, this.targetIsPet) < MAJOR_HEAL_TO) {    //ID here is party stack position!!!
+					useSkill(ElvenElder.this.majorHeal);
+				}
+			}
+			ElvenElder.this.iAmHealing = false;
+		}
+
 		@Override
 		public boolean equals(Object o)
 		{
@@ -108,15 +198,15 @@ public class ElvenElder extends PixelHunter.Character    //todo
 				return false;
 			}
 
-			ActionHeal that = (ActionHeal) o;
+			ActionHealPartyMemberFromStack that = (ActionHealPartyMemberFromStack) o;
 
 			if (buttonNumber != that.buttonNumber) {
 				return false;
 			}
-			if (targetID != that.targetID) {
+			if (targetIsPet != that.targetIsPet) {
 				return false;
 			}
-			if (targetIsPet != that.targetIsPet) {
+			if (!partyMember.equals(that.partyMember)) {
 				return false;
 			}
 
@@ -126,49 +216,13 @@ public class ElvenElder extends PixelHunter.Character    //todo
 		@Override
 		public int hashCode()
 		{
-			int result = targetID;
-			result = 31 * result + buttonNumber;
+			int result = buttonNumber;
 			result = 31 * result + (targetIsPet ? 1 : 0);
+			result = 31 * result + partyMember.hashCode();
 			return result;
 		}
 
-		public final int
-		targetID,
-		buttonNumber;
-
-		public final boolean
-		targetIsPet;
-
-		@Override
-		public void perform()
-		{
-			logger.trace("ActionHeal.perform ");
-			if (targetIsPet) {
-				selectPartyMembersPetByID(this.targetID);
-			} else {
-				selectPartyMemberByID(this.targetID);
-			}
-
-			if (buttonNumber == 5) {    //grHeal
-				ElvenElder.this.iAmHealing = true;
-
-				while (ElvenElder.this.getPartyMemberHP(this.targetID, this.targetIsPet) < HEAL_TO) {    //ID here is party stack position!!!
-					useSkill(ElvenElder.this.GreaterHeal);
-				}
-
-				ElvenElder.this.iAmHealing = false;
-
-			} else if (buttonNumber == 6) {//majHeal
-				ElvenElder.this.iAmHealing = true;
-
-				while (ElvenElder.this.getPartyMemberHP(this.targetID, this.targetIsPet) < MAJOR_HEAL_TO) {    //ID here is party stack position!!!
-					useSkill(ElvenElder.this.MajorHeal);
-				}
-			}
-			ElvenElder.this.iAmHealing = false;
-		}
-
-		ActionHeal(int buttonNumber, int targetIdOrPartyMemberNumber, boolean targetIsPet)
+		ActionHealPartyMemberFromStack(int buttonNumber, PartyMember partyMember, boolean targetIsPet)
 		{
 			super();
 			this.isBuff = true;
@@ -180,10 +234,9 @@ public class ElvenElder extends PixelHunter.Character    //todo
 				logger.warn("actionheal with button " + buttonNumber + ".. this should not happen");
 			}
 			this.buttonNumber = buttonNumber;
-			this.targetID = targetIdOrPartyMemberNumber;
+			this.partyMember = partyMember;
 			this.targetIsPet = targetIsPet;
-
-			logger.trace("Created ActionHeal. ID " + this.getID() + ", button Num_" + this.buttonNumber);
+			logger.trace("Created ActionHealPartyMemberFromStack. ID " + this.getID() + ", button Num_" + this.buttonNumber);
 		}
 	}
 
@@ -206,11 +259,13 @@ public class ElvenElder extends PixelHunter.Character    //todo
 		{
 			logger.trace("ActionBuff.perform " + this.buffName);
 			if (targetIsPet) {
-				if (targetID == 10) {    //my hen
-					ElvenElder.this.l2Window.keyClick(KeyEvent.VK_DIVIDE);    //select hen, numpad'/'//watch it. not sure
+
+				if (this.targetID == ElvenElder.this.id) {
+					selectClickPartyMembersPetByPartyStackPlace(10);
 				} else {
-					selectPartyMembersPetByID(this.targetID);
+					selectClickPartyMembersPetByPartyStackPlace(this.targetID);
 				}
+
 			} else if (this.targetID == ElvenElder.this.id) {    //selfbuff
 				ElvenElder.this.l2Window.keyClick(KeyEvent.VK_NUMPAD0);//target self
 			} else {
@@ -350,12 +405,4 @@ public class ElvenElder extends PixelHunter.Character    //todo
 
 	}
 
-	private int getPartyMemberHP(int partyStackPosition, boolean petFlag)
-	{
-		if (petFlag) {
-			return this.partyStack.get(partyStackPosition).getHP("pet");
-		} else {
-			return this.partyStack.get(partyStackPosition).getHP();
-		}
-	}
 }

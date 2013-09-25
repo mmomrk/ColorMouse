@@ -32,7 +32,7 @@ public class WinAPIAPI
 	}
 
 
-	private static class Kernel32
+	public static class Kernel32
 	{
 		static {
 			Native.register("kernel32");
@@ -42,6 +42,7 @@ public class WinAPIAPI
 		public static int PROCESS_VM_READ           = 0x0010;
 
 		public static native int GetLastError();
+		public static native boolean Beep(double freq,double duration);
 
 		public static native Pointer OpenProcess(int dwDesiredAccess, boolean bInheritHandle, Pointer pointer);
 	}

@@ -96,12 +96,6 @@ public abstract class Character extends LivingCreature
 
 	public abstract void onKill();
 
-
-	public ActionSelfBuff cloneBuff(Character.ActionSelfBuff oldSelfBuff)
-	{
-		return new ActionSelfBuff(oldSelfBuff);
-	}
-
 	protected void setPartyMembers()    //not tested
 	{
 		logger.trace("setPartyMembers();");
@@ -119,6 +113,7 @@ public abstract class Character extends LivingCreature
 		try {
 			Thread.sleep(timeMillis);
 		} catch (InterruptedException e) {
+			logger.error("Exceprion while sleeping");
 			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 		}
 	}
@@ -363,25 +358,68 @@ public abstract class Character extends LivingCreature
 		return "Character. ID=" + this.id + ". Window " + l2Window.toString();
 	}
 
+	protected int getPartyMemberHP(PartyMember partyMember, boolean petFlag)
+	{
+		if (petFlag) {
+			return partyMember.getHP("pet");
+		} else {
+			return partyMember.getHP();
+		}
+	}
+
 	/*
 	*   works nice for positive as expected.
 	*   for negative: abs is number in party stack
 	* */
-	protected void selectPartyMembersPetByID(int id)	//10 is reserved for self pet.
+	protected void selectClickPartyMembersPetByPartyStackPlace(int id)    //10 is reserved for self pet.
 	{
 		logger.trace(".selectPartyMembers__PET__ByID: " + id);
-		this.l2Window.mouseClick_Relative(this.partyStack.get(-1 * id).petHpConstants.coordinateLeft);//not tested
+		if (id != 10) {
+			this.l2Window.mouseClick_Relative(this.partyStack.get(id).petHpConstants.coordinateLeft);//not tested
+		} else {
+			if (this.isSupport) {
+				this.l2Window.keyClick(KeyEvent.VK_DIVIDE);    //'/' is for the pet(num11)
+			} else {
+				logger.warn("non-support wanted to select its pet. this should not be!!");
+			}
+		}
 	}
+
+	protected void selectClickPartyMemberByPartyStackPlace(int id)    //10 is reserved for self.
+	{
+		logger.trace(".selectPartyMembers__PET__ByID: " + id);
+		if (id != 10) {
+			this.l2Window.mouseClick_Relative(this.partyStack.get(id).petHpConstants.coordinateLeft);//not tested
+		} else {
+			if (this.isSupport) {
+				this.l2Window.keyClick(KeyEvent.VK_NUMPAD0);
+			} else {
+				logger.warn("non-support wanted to select self. this should not be!!");
+			}
+		}
+	}
+
+	protected void selectClickPartyMembersPetByPartyStackPlace(PartyMember partyMember)
+	{
+		logger.trace("selectClickPartyMembers__Pet__ByPartyStackPlace");
+		this.l2Window.mouseClick_Relative(this.partyStack.get(id).petHpConstants.coordinateLeft);//not tested
+	}
+
+	protected void selectClickPartyMemberByPartyStackPlace(PartyMember partyMember)
+	{
+		logger.trace(".selectClickPartyMemberByPartyStackPlace(); --partyMember access");
+		this.l2Window.mouseClick_Relative(this.partyStack.get(id).hpConstants.coordinateLeft);//not tested
+	}
+
 
 	protected void selectPartyMemberByID(int id)
 	{
 		if (id != this.id) {
 			logger.trace(".selectPartyMemberByID: " + id);
 			this.l2Window.keyClick(48 + GroupedVariables.ProjectConstants.partyPanelMatch.get(id));    //VK_0 is 48
-		}	else{
+		} else {
 			logger.warn("attempt to select self through selectPartyMemberByID");
 		}
-
 
 	}
 
@@ -408,6 +446,16 @@ public abstract class Character extends LivingCreature
 	protected void petFollow()
 	{
 		this.l2Window.keyClick(KeyEvent.VK_F4);
+	}
+
+	protected void message6(int callerID)
+	{
+		logger.trace("message6();. the empty one");
+	}
+
+	protected void message5(int callerID)
+	{
+		logger.trace("message5();. the empty one");
 	}
 
 	protected void toggleBuffMode()
@@ -442,8 +490,7 @@ public abstract class Character extends LivingCreature
 	}
 
 
-//CLASSES
-
+	//CLASSES
 
 	public abstract class ActionAbstractBuff extends Action
 	{
@@ -667,16 +714,6 @@ public abstract class Character extends LivingCreature
 		}
 	}
 
-	protected void message6(int callerID)
-	{
-		logger.trace("message6();. the empty one");
-	}
-
-	protected void message5(int callerID)
-	{
-		logger.trace("message5();. the empty one");
-	}
-
 
 	/**
 	 * User: mrk
@@ -688,13 +725,6 @@ public abstract class Character extends LivingCreature
 		public final int    macroDelayMillis;
 		public final String buffName;
 		public final int    buffDelay;
-
-		public int increasePriority(int increment)
-		{
-			Character.this.logger.trace(".increasePriority" + this.toString());
-			this.priority += increment;
-			return this.priority;
-		}
 
 		@Override
 		public void perform()
