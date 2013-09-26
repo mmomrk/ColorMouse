@@ -26,12 +26,6 @@ public class Warlock extends Character
 
 
 	@Override
-	protected void attack()
-	{
-		petAttack();
-	}
-
-	@Override
 	protected void setupBuffTimerMap()
 	{
 		logger.trace(".setupBuffTimerMap");
@@ -48,7 +42,7 @@ public class Warlock extends Character
 			useSkill(summonCat);
 			return;
 		}
-		if (pet.getHP()<70){
+		if (pet.getHP() < 70) {
 			useSkill(healPet);
 		}
 
@@ -58,15 +52,16 @@ public class Warlock extends Character
 	@Override
 	public void onKill()
 	{
-
+		logger.trace(".onKill();");
 	}
 
 	public Warlock(WinDef.HWND hwnd)
 	{
 		super(GroupedVariables.ProjectConstants.ID_Warlock, hwnd);
+		logger.trace(".warlock constructor");
 		setupBuffTimerMap();
 		this.isHomeRunner = true;
-		this.isSummoner=true;
+		this.isSummoner = true;
 	}
 
 }

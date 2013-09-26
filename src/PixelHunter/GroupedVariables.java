@@ -21,8 +21,16 @@ public class GroupedVariables
 
 	public static class Mediator
 	{
-		public static boolean talkToMeMode = false;
-		public static boolean sleepRegime  = false;
+		public static boolean talkToMeMode = false;   //beeper. implement would be cool
+		public static boolean sleepRegime  = false;          //alt-break
+		public static boolean BDSWSInDaHouse	=	false;
+	}
+
+
+	public static class BDSWSBrains
+	{
+		public static boolean pair;
+
 	}
 
 
@@ -89,8 +97,8 @@ public class GroupedVariables
 
 			ID_PET = Integer.parseInt(properties.get("ID_pet").toString());
 			ID_TARGET = Integer.parseInt(properties.get("ID_target").toString());
-			ID_PartyMember= Integer.parseInt(properties.get("ID_PartyMember").toString());
-			ID_PartyMembersPet= Integer.parseInt(properties.get("ID_PartyMembersPet").toString());
+			ID_PartyMember = Integer.parseInt(properties.get("ID_PartyMember").toString());
+			ID_PartyMembersPet = Integer.parseInt(properties.get("ID_PartyMembersPet").toString());
 
 			ID_DefaultCharacter = Integer.parseInt(properties.get("ID_DefaultCharacter").toString());
 			ID_Warcryer = Integer.parseInt(properties.get("ID_Warcryer").toString());

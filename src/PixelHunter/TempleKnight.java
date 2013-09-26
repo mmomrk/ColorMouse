@@ -110,5 +110,6 @@ public class TempleKnight extends Character
 		setupBuffTimerMap();
 		this.isHomeRunner = true;
 		this.isPhysicAttacker = true;
+		this.isTank	=	true;
 	}
 }

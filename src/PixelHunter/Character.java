@@ -38,7 +38,9 @@ public abstract class Character extends LivingCreature
 	isSupport        = false,                //no attacks from chat messages
 	isSummoner       = false,        //only pet attacks from chat messages
 	isBDSWS          = false,        //funny buffs
+	isTank           = false,        //comments?
 	isPhysicAttacker = false,    //everything else
+	isHomeRunner,
 
 	modeFarm    = false,
 	modeBuff    = false,
@@ -47,24 +49,26 @@ public abstract class Character extends LivingCreature
 	modeRB      = false,    //lol. should only activate some additional skilluses in classspecific
 
 	followFlag  = false,
-	isMacroFree = true;
+	isMacroFree = true,
 
-	protected boolean isHomeRunner;
+	targetWasAlive  = false,
+	petUseIsAllowed = true;
 
 
 	private Point chatStartingPoint;
 
-	protected Pet         pet;    //remove public after tests are done
-	protected PartyMember target;
+	protected Pet    pet;    //remove public after tests are done
+	protected Target target;
 	protected List<PartyMember> partyStack = new LinkedList<PartyMember>();
 
 	private static Comparator            actionComparator = new PixelHunter.Action.ActionPriorityComparator();
 	private        PriorityQueue<Action> toDoList         = new PriorityQueue<Action>(GroupedVariables.ProjectConstants.CHAT_TASK_LIST_LENGTH, actionComparator);
 
-	protected Timer        //discuss think of those protected after chars are done
+	protected final Timer        //discuss think of those protected after chars are done
 	macroLockTimer,
 	timerPvEAdd,
-	timerHomeRunAdd;
+	timerHomeRunAdd,
+	timerPetUseIsAllowed;
 
 	protected Map<ActionAbstractBuff, Timer> buffTimerMap = new HashMap<ActionAbstractBuff, Timer>();
 
@@ -95,6 +99,12 @@ public abstract class Character extends LivingCreature
 	public abstract void classSpecificLifeCycle();
 
 	public abstract void onKill();
+
+	protected void deselect()
+	{
+		logger.trace(".deselect();");
+		this.l2Window.keyClick(KeyEvent.VK_ESCAPE);
+	}
 
 	protected void setPartyMembers()    //not tested
 	{
@@ -132,12 +142,21 @@ public abstract class Character extends LivingCreature
 		}
 		//checkToDoSanity()	//hope i dont need this
 		if (this.isMacroFree) {
-			onKill();    //also checks for isDead
+			if (this.targetWasAlive && this.target.isDead()) {
+				onKill();    //also checks for isDead
+			}
 			doTheToDo();
+
 			classSpecificLifeCycle();
 
 			if (this.modeFarm) {
-				todoOffer(new ActionPvE());
+				if (this.target.isDead()) {        //i am farming and i see a dead target after i've done onkill
+					todoOffer(new ActionPvE());
+				} else {
+					if (!this.isSupport) {        //no killing for supports. only attackers attack
+						attack();
+					}
+				}
 			}
 		}
 
@@ -425,26 +444,37 @@ public abstract class Character extends LivingCreature
 
 	protected void assistTarget()
 	{
+		logger.trace(".assistTarget");
 		this.l2Window.keyClick(48 + GroupedVariables.ProjectConstants.partyPanelMatch.get(this.id));    //assi button in the right spot
 	}
 
 	protected void attack()
 	{
+		logger.trace(".attack");
+		if (this.isSupport) {
+			return;
+		}
+		if (this.isSummoner) {
+			petAttack();
+		}
 		this.l2Window.keyClick(KeyEvent.VK_F1);
 	}
 
 	protected void petAttack()
 	{
+		logger.trace(".petAttack");
 		this.l2Window.keyClick(KeyEvent.VK_F2);
 	}
 
 	protected void petStop()
 	{
+		logger.trace(".petStop");
 		this.l2Window.keyClick(KeyEvent.VK_F3);
 	}
 
 	protected void petFollow()
 	{
+		logger.trace(".petFollow");
 		this.l2Window.keyClick(KeyEvent.VK_F4);
 	}
 
@@ -458,6 +488,34 @@ public abstract class Character extends LivingCreature
 		logger.trace("message5();. the empty one");
 	}
 
+	protected void championCallReaction(int callerID)
+	{
+		logger.trace(".championCallReaction();--default");
+		if (this.isSupport) {
+			return;
+		}
+		selectPartyMemberByID(callerID);
+		assistTarget();
+		if (this.isHomeRunner) {        //can't move. go and help him
+			petAttack();
+			this.petUseIsAllowed = false;
+			this.timerPetUseIsAllowed.schedule(new SetPetUseIsAllowedToTrue(), 30 * 1000);
+			deselect();
+			return;
+		}
+		if (this.isTank) {
+			message5(callerID);    //active aggro-mode on his target by assist
+			return;
+		}
+		if (this.id == GroupedVariables.ProjectConstants.ID_Spoiler) {
+			message5(callerID);    //spoilMyChamp
+			return;
+		}
+
+		attack();    //totally running criminal
+
+	}
+
 	protected void toggleBuffMode()
 	{
 		this.modeBuff = !this.modeBuff;
@@ -466,9 +524,9 @@ public abstract class Character extends LivingCreature
 	}
 
 
-	public Character(int thisid, WinDef.HWND hwnd)        //windownumber can only be 1 or 0
+	public Character(int hisID, WinDef.HWND hwnd)        //windownumber can only be 1 or 0
 	{
-		super(thisid);
+		super(hisID);
 		logger.trace("Inside Character constructor, finished making LC");
 
 		this.l2Window = new L2Window(hwnd);
@@ -477,7 +535,7 @@ public abstract class Character extends LivingCreature
 		logger.debug(".Character after acceptWindowPos. now it is h " + l2Window.h + " w " + l2Window.w + " top-left " + l2Window.windowPosition);
 
 		pet = new Pet(l2Window);//including setHP
-		target = new PartyMember(l2Window);
+		target = new Target(l2Window);
 
 		setChat();
 
@@ -486,11 +544,12 @@ public abstract class Character extends LivingCreature
 		this.macroLockTimer = new Timer();
 		this.timerHomeRunAdd = new Timer();
 		this.timerPvEAdd = new Timer();
-
+		this.timerPetUseIsAllowed = new Timer();
 	}
 
 
 	//CLASSES
+
 
 	public abstract class ActionAbstractBuff extends Action
 	{
@@ -695,9 +754,10 @@ public abstract class Character extends LivingCreature
 						Character.this.easySleep(4000);
 						new ActionPvE().perform();
 					}
-
-
-
+					break;
+				case 14:    //champion Detected
+					championCallReaction(message.getSenderID());
+					break;
 				default:
 					break;
 				//each command can ask macroLocksActions
@@ -862,9 +922,20 @@ public abstract class Character extends LivingCreature
 	}
 
 
+	protected class SetPetUseIsAllowedToTrue extends TimerTask    //test
+	{
+		@Override
+		public void run()
+		{
+			logger.trace("SetPetUseIsAllowedToTrue");
+			Character.this.petUseIsAllowed = true;
+			cancel();
+		}
+	}
+
+
 	private class SetMacroFree extends TimerTask              //not tested
 	{
-
 		@Override
 		public void run()
 		{
@@ -918,5 +989,4 @@ public abstract class Character extends LivingCreature
 			cancel();    //watch it. the correct behaviour is cancelling this very task, not the timer
 		}
 	}
-
 }

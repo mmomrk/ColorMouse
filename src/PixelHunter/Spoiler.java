@@ -74,10 +74,6 @@ public class Spoiler extends Character
 	@Override
 	public void onKill()
 	{
-		if (!this.target.isDead()) {          //looks stupid but that's the architecture
-			return;
-		}
-
 		logger.trace(".onKill");
 
 		if (this.temporarySpoil){

@@ -20,6 +20,11 @@ public class Warcryer extends Character
 								buff1  = new ActionSelfBuff("20-minute buff", 1, (20 * 60 - 15) * 1000, 20 * 1000);
 
 	@Override
+	protected void message6(int callerID){
+		message5(callerID);
+	}
+
+	@Override
 	protected void message5(int callerID)
 	{
 		logger.trace(".healAll");
@@ -28,18 +33,6 @@ public class Warcryer extends Character
 		}
 		todoOffer(new ActionHeal());
 	}
-
-//	@Override		//remove after test
-//	protected void cancelAllBuffScheduledTasks()//not tested
-//	{
-//		logger.trace("cancelAllBuffScheduledTasks");
-//		for (Map.Entry<ActionAbstractBuff, Timer> buffTimerEntry : this.buffTimerMap.entrySet()) {
-//			buffTimerEntry.getValue().cancel();
-//		}
-//		this.buffTimerMap.clear();
-//		setupBuffTimerMap();
-//
-//	}
 
 	@Override
 	protected void setupBuffTimerMap()    //not tested
@@ -58,7 +51,7 @@ public class Warcryer extends Character
 	@Override
 	public void onKill()
 	{
-
+		logger.trace(".onKill();");
 	}
 
 	public Warcryer(WinDef.HWND hwnd)

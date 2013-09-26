@@ -22,8 +22,6 @@ public class World
 	private static ArrayList<HWND>   hwnds;
 	private static boolean     singleWindowMode = false;
 	private static Character[] characters       = new Character[2];
-	public static L2Window l2Window;
-
 
 	public static void main(String[] args)
 	{
@@ -68,7 +66,7 @@ public class World
 
 		} else {    //todo change hwnds order: first is left. if one can do
 
-			WinAPIAPI.setActiveWindow(hwnds.get(0));		//not implemented yet
+			WinAPIAPI.setActiveWindow(hwnds.get(0));        //not implemented yet
 			L2Window.initiateSize(1, hwnds.get(0));    //1=left on the screen
 			id = WinAPIAPI.dialogWindow("You can resize the window now in case you are not satisfied with its dimensions.\nEnter Character ID in the left window");
 			characters[0] = CharacterFactory.getCharacter(id, hwnds.get(0));
@@ -79,23 +77,42 @@ public class World
 			characters[1] = CharacterFactory.getCharacter(id, hwnds.get(1));
 		}
 
+		if ((characters[0].id == GroupedVariables.ProjectConstants.ID_Swordsinger
+			 ||
+			 characters[0].id == GroupedVariables.ProjectConstants.ID_Bladedancer)
+			&&
+			(characters[1].id == GroupedVariables.ProjectConstants.ID_Swordsinger
+			 ||
+			 characters[1].id == GroupedVariables.ProjectConstants.ID_Bladedancer)){
+			GroupedVariables.Mediator.BDSWSInDaHouse	=	true;
+		}	else {
+			GroupedVariables.Mediator.BDSWSInDaHouse	=	false;
+		}
 
-
-		while (characters.length > 0) {	//for the pure debug purpose
-			if (GroupedVariables.Mediator.sleepRegime) {
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		{
+			while (characters.length > 0) {    //for the pure debug purpose
+				if (GroupedVariables.Mediator.sleepRegime) {
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+					}
+				} else {
+					characters[0].lifeCycle();
 				}
-			} else {
-				characters[0].lifeCycle();
 			}
 		}
 
 
 
 		return;
+	}
+
+	public static void BDSWSBuff()	//implement todo
+	{
+		if (GroupedVariables.Mediator.BDSWSInDaHouse){
+			//finished here
+		}
 	}
 
 	public static void forceRebuff()

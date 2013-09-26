@@ -1,5 +1,7 @@
 package PixelHunter;
 import com.sun.jna.platform.win32.WinDef.HWND;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static PixelHunter.GroupedVariables.ProjectConstants.*;
 
@@ -9,6 +11,8 @@ import static PixelHunter.GroupedVariables.ProjectConstants.*;
  */
 public class CharacterFactory
 {
+	private static final Logger logger = LoggerFactory.getLogger(CharacterFactory.class);
+
 	public static Character getCharacter(int id, HWND hwnd)
 	{
 		if (id == ID_DefaultCharacter) {
@@ -21,9 +25,12 @@ public class CharacterFactory
 			return new Warlock(hwnd);
 		} else if (id == ID_Spoiler) {
 			return new Spoiler(hwnd);
+		} else if (id == ID_Elvenelder) {
+			return new ElvenElder(hwnd);
 		}
 
-		return new DefaultCharacter(hwnd);    //remove this after things are better
 
+		logger.warn("DefaultCharacter has been created");
+		return new DefaultCharacter(hwnd);    //remove this after things are better
 	}
 }

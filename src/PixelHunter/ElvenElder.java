@@ -27,7 +27,7 @@ public class ElvenElder extends PixelHunter.Character    //todo
 	buff3 = new ActionBuff("20-minute buff for nukers", 2, (20 * 60 - 30), 20, 0, false),
 	buff4 = new ActionBuff("20-minute buff for supports and summoners", 3, (20 * 60 - 30), 15, 0, false),
 	buff5 = new ActionBuff("20-minute buff for my hen", 3, (20 * 60 - 30), 15, 0, true),
-	buff6 = new ActionBuff("20-minute buff for shielded party members", 1, (20 * 60 - 30), 5, 0, false);
+	buff6 = new ActionBuff("20-minute buff for shielded party members", 4, (20 * 60 - 30), 5, 0, false);
 
 
 	private boolean iAmHealing    = false;
@@ -38,9 +38,49 @@ public class ElvenElder extends PixelHunter.Character    //todo
 	majorHeal                     = new Heal(6, 1);    //watch this too. needs to be verified
 
 
-	public Character.ActionAbstractBuff cloneBuff(ElvenElder.ActionBuff oldSelfBuff)
+	protected int healWoundedPartyMembers()
 	{
-		return new ElvenElder.ActionBuff(oldSelfBuff, oldSelfBuff.targetID);
+		int
+		maxHP = 0,
+		currentTotalHP = 0;
+
+		for (PartyMember partyMember : partyStack) {
+
+			int charHP = partyMember.getHP();
+			ActionHealPartyMemberFromStack supposedHeal;
+
+			maxHP += 100;
+			currentTotalHP += charHP;
+
+			if (charHP < GroupedVariables.ProjectConstants.MAJOR_HEAL_FROM) {
+				supposedHeal = new ActionHealPartyMemberFromStack(6, partyMember, false);
+				supposedHeal.increasePriority(100 - charHP);        //less hp=>higher priority
+				todoOffer(supposedHeal);
+			} else if (charHP < GroupedVariables.ProjectConstants.HEAL_FROM) {
+				supposedHeal = new ActionHealPartyMemberFromStack(5, partyMember, false);
+				supposedHeal.increasePriority(100 - charHP);
+				todoOffer(supposedHeal);
+			}
+
+			if (!partyMember.isSingle) {
+
+				int petHP = partyMember.getHP("pet");
+
+				maxHP += 100;
+				currentTotalHP += petHP;
+
+				if (petHP < GroupedVariables.ProjectConstants.MAJOR_HEAL_FROM) {
+					supposedHeal = new ActionHealPartyMemberFromStack(6, partyMember, true);
+					supposedHeal.increasePriority(100 - petHP);        //less hp=>higher priority
+					todoOffer(supposedHeal);
+				} else if (petHP < GroupedVariables.ProjectConstants.HEAL_FROM) {
+					supposedHeal = new ActionHealPartyMemberFromStack(5, partyMember, true);
+					supposedHeal.increasePriority(100 - petHP);
+					todoOffer(supposedHeal);
+				}
+			}
+		}
+		return 100 * maxHP / currentTotalHP;
 	}
 
 	@Override
@@ -84,51 +124,11 @@ public class ElvenElder extends PixelHunter.Character    //todo
 	public void classSpecificLifeCycle()
 	{
 		logger.trace(".classSpecificLifeCycle");
-		int
-		maxHP = 0,
-		currentTotalHP = 0;
-
-		for (PartyMember partyMember : partyStack) {
-
-			int charHP = partyMember.getHP();
-			ActionHealPartyMemberFromStack supposedHeal;
-
-			maxHP += 100;
-			currentTotalHP += charHP;
-
-			if (charHP < GroupedVariables.ProjectConstants.MAJOR_HEAL_FROM) {
-				supposedHeal = new ActionHealPartyMemberFromStack(6, partyMember, false);
-				supposedHeal.increasePriority(100 - charHP);        //less hp=>higher priority
-				todoOffer(supposedHeal);
-			} else if (charHP < GroupedVariables.ProjectConstants.HEAL_FROM) {
-				supposedHeal = new ActionHealPartyMemberFromStack(5, partyMember, false);
-				supposedHeal.increasePriority(100 - charHP);
-				todoOffer(supposedHeal);
+		if (this.modeFarm) {
+			if (healWoundedPartyMembers()<70) {          //watch it
+				this.l2Window.keyClick(KeyEvent.VK_MULTIPLY);//panic   .
 			}
-
-			if (!partyMember.isSingle) {
-
-				int petHP = partyMember.getHP("pet");
-
-				maxHP += 100;
-				currentTotalHP += petHP;
-
-				if (petHP < GroupedVariables.ProjectConstants.MAJOR_HEAL_FROM) {
-					supposedHeal = new ActionHealPartyMemberFromStack(6, partyMember, true);
-					supposedHeal.increasePriority(100 - petHP);        //less hp=>higher priority
-					todoOffer(supposedHeal);
-				} else if (petHP < GroupedVariables.ProjectConstants.HEAL_FROM) {
-					supposedHeal = new ActionHealPartyMemberFromStack(5, partyMember, true);
-					supposedHeal.increasePriority(100 - petHP);
-					todoOffer(supposedHeal);
-				}
-			}
-
 		}
-		if (maxHP * 0.7 > currentTotalHP) {          //watch it
-			this.l2Window.keyClick(KeyEvent.VK_MULTIPLY);//panic   .
-		}
-
 	}
 
 	@Override
