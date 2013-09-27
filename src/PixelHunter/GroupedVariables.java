@@ -21,16 +21,18 @@ public class GroupedVariables
 
 	public static class Mediator
 	{
-		public static boolean talkToMeMode = false;   //beeper. implement would be cool
-		public static boolean sleepRegime  = false;          //alt-break
-		public static boolean BDSWSInDaHouse	=	false;
+		public static boolean talkToMeMode   = false;   //beeper. implement would be cool
+		public static boolean sleepRegime    = false;          //alt-break
+		public static boolean BDSWSInDaHouse = false;
+		public static boolean noPetMode      = false;
 	}
 
 
 	public static class BDSWSBrains
 	{
 		public static boolean pair;
-
+		public static boolean masterIsFree   = true;
+		public static boolean songDanceReady = false;
 	}
 
 
@@ -38,11 +40,12 @@ public class GroupedVariables
 	{
 		private static final Logger logger = LoggerFactory.getLogger(GroupedVariables.ProjectConstants.class);
 		//refactor all these were static.note this
-		public static final int HOMERUN_TIME;
-		public static final int HEAL_FROM;
-		public static final int HEAL_TO;
-		public static final int MAJOR_HEAL_FROM;
-		public static final int MAJOR_HEAL_TO;
+		public static final int  HOMERUN_TIME;
+		public static final int  HEAL_FROM;
+		public static final int  HEAL_TO;
+		public static final int  MAJOR_HEAL_FROM;
+		public static final int  MAJOR_HEAL_TO;
+		public static final long CHAMPION_SUSPICION_TIME_SECONDS;
 
 		public static final int ID_PET;
 		public static final int ID_TARGET;
@@ -94,6 +97,7 @@ public class GroupedVariables
 			HEAL_TO = Integer.parseInt(properties.get("HEAL_TO").toString());
 			MAJOR_HEAL_FROM = Integer.parseInt(properties.get("MAJOR_HEAL_FROM").toString());
 			MAJOR_HEAL_TO = Integer.parseInt(properties.get("MAJOR_HEAL_TO").toString());
+			CHAMPION_SUSPICION_TIME_SECONDS = Long.parseLong(properties.get("CHAMPION_SUSPICION_TIME").toString());
 
 			ID_PET = Integer.parseInt(properties.get("ID_pet").toString());
 			ID_TARGET = Integer.parseInt(properties.get("ID_target").toString());

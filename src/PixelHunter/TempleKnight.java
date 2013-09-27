@@ -16,7 +16,7 @@ public class TempleKnight extends Character
 	private static final Logger logger          = LoggerFactory.getLogger(TempleKnight.class);
 	private final        ActionSelfBuff                //second parameter is numpad key number
 								summonLifeCubic = new ActionSelfBuff("Life Cube", 1, (15 * 60) * 1000, 0),
-	summonStormCubic                            = new ActionSelfBuff("Storm Cube", 2, (15 * 60) * 1000, 0),    //todo:what's the time?
+	summonStormCubic                            = new ActionSelfBuff("Storm Cube", 2, (15 * 60) * 1000, 0),    //watch:what's the time?
 	summonAttractCubic                          = new ActionSelfBuff("Attract Cube", 3, (15 * 60) * 1000, 0);
 
 	private boolean
@@ -51,8 +51,10 @@ public class TempleKnight extends Character
 	private void aggrHis(int callerID)
 	{
 		logger.trace(".aggrHis");
-		selectPartyMemberByID(callerID);
-		assistTarget();
+		if (callerID != this.id) {
+			selectPartyMemberByID(callerID);
+			assistTarget();
+		}
 		aggr();
 		this.temporaryAggroMode = true;
 	}
@@ -110,6 +112,6 @@ public class TempleKnight extends Character
 		setupBuffTimerMap();
 		this.isHomeRunner = true;
 		this.isPhysicAttacker = true;
-		this.isTank	=	true;
+		this.isTank = true;
 	}
 }

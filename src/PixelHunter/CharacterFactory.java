@@ -27,6 +27,10 @@ public class CharacterFactory
 			return new Spoiler(hwnd);
 		} else if (id == ID_Elvenelder) {
 			return new ElvenElder(hwnd);
+		} else if (id == ID_Bladedancer) {
+			return new BladeDancer(hwnd);
+		} else if (id == ID_Swordsinger) {
+			return new SwordSinger(hwnd);
 		}
 
 

@@ -17,30 +17,35 @@ import static PixelHunter.GroupedVariables.ProjectConstants.*;
  * <p/>
  * !!!!!!!!!!!!!!!!!!!!!!!have to think of selecting party members pets and buffing different buffs on them. Watch Party member class. needs to be done
  */
-public class ElvenElder extends PixelHunter.Character    //todo
+public class ElvenElder extends PixelHunter.Character
 {
 	private static final Logger logger = LoggerFactory.getLogger(ElvenElder.class);
 
 	private final ActionBuff    //second parameter is numpad key number
 	buff1 = new ActionBuff("20-minute buff for pAttackers", 1, (20 * 60 - 30), 20, 0, false),    //todo: very much todo: set all macro times
-	buff2 = new ActionBuff("20-minute buff for pAttackers' PETS", 1, (20 * 60 - 30), 20, 0, true),
+	buff2 = new ActionBuff("20-minute buff for pAttackers' PETS", 1, (20 * 60 - 30), 20, 0, true),    //i mean watch them
 	buff3 = new ActionBuff("20-minute buff for nukers", 2, (20 * 60 - 30), 20, 0, false),
 	buff4 = new ActionBuff("20-minute buff for supports and summoners", 3, (20 * 60 - 30), 15, 0, false),
 	buff5 = new ActionBuff("20-minute buff for my hen", 3, (20 * 60 - 30), 15, 0, true),
 	buff6 = new ActionBuff("20-minute buff for shielded party members", 4, (20 * 60 - 30), 5, 0, false);
 
 
-	private boolean iAmHealing    = false;
+	private boolean iAmHealing  = false;
 	private Skill    //comment
-					serenadeOfEva = new Skill(8, 4), //watch it
-	invocation                    = new Skill(9, 20),    //watch it. nobody knows it
-	greaterHeal                   = new Heal(5, 2),    //watch it: 2 may not be true
-	majorHeal                     = new Heal(6, 1);    //watch this too. needs to be verified
+					greaterHeal = new Heal(5, 2),    //watch it: 2 may not be true
+	majorHeal                   = new Heal(6, 1),    //watch this too. needs to be verified
+	partyRecall                 = new Skill(7, 30),
+	serenadeOfEva               = new Skill(8, 4), //watch it
+	invocation                  = new Skill(9, 20);    //watch it. nobody knows it
 
 
 	protected int healWoundedPartyMembers()
 	{
+
 		int
+		maxAlivePartyMembers = 0,
+		numberOfAlivePartyembers = 0,
+
 		maxHP = 0,
 		currentTotalHP = 0;
 
@@ -49,6 +54,10 @@ public class ElvenElder extends PixelHunter.Character    //todo
 			int charHP = partyMember.getHP();
 			ActionHealPartyMemberFromStack supposedHeal;
 
+			maxAlivePartyMembers++;
+			if (charHP > 2) {
+				numberOfAlivePartyembers++;
+			}
 			maxHP += 100;
 			currentTotalHP += charHP;
 
@@ -66,6 +75,10 @@ public class ElvenElder extends PixelHunter.Character    //todo
 
 				int petHP = partyMember.getHP("pet");
 
+				maxAlivePartyMembers++;
+				if (petHP > 2) {
+					numberOfAlivePartyembers++;
+				}
 				maxHP += 100;
 				currentTotalHP += petHP;
 
@@ -79,6 +92,10 @@ public class ElvenElder extends PixelHunter.Character    //todo
 					todoOffer(supposedHeal);
 				}
 			}
+		}
+		if (numberOfAlivePartyembers < 0.7 * maxAlivePartyMembers && maxAlivePartyMembers > 3) {
+			useSkill(this.partyRecall);
+			System.exit(1);	//discuss. don't think this should be changed
 		}
 		return 100 * maxHP / currentTotalHP;
 	}
@@ -125,7 +142,7 @@ public class ElvenElder extends PixelHunter.Character    //todo
 	{
 		logger.trace(".classSpecificLifeCycle");
 		if (this.modeFarm) {
-			if (healWoundedPartyMembers()<70) {          //watch it
+			if (healWoundedPartyMembers() < 70) {          //watch it
 				this.l2Window.keyClick(KeyEvent.VK_MULTIPLY);//panic   .
 			}
 		}
@@ -343,7 +360,7 @@ public class ElvenElder extends PixelHunter.Character    //todo
 			logger.trace("Created ActionBuff. ID " + this.getID() + ", button Num_" + this.buttonNumber + ", macro delay " + this.macroDelayMillis);
 		}
 
-		public ActionBuff(ActionBuff oldBuff, int targetID)                                        //TODO!!!!
+		public ActionBuff(ActionBuff oldBuff, int targetID)
 		{
 			super();
 			this.isBuff = true;

@@ -74,6 +74,7 @@ public abstract class Character extends LivingCreature
 
 	protected int homeRunNumber = 0;
 	protected int homeRunDelay  = GroupedVariables.ProjectConstants.HOMERUN_TIME * 1000;    //can be set individually btw
+	private long iStartedToKillTargetAt;
 
 //	public void classSpecificDeed();//think of it twice
 
@@ -99,6 +100,37 @@ public abstract class Character extends LivingCreature
 	public abstract void classSpecificLifeCycle();
 
 	public abstract void onKill();
+
+
+	protected void everyonesOnKill()
+	{
+		logger.trace(".everyonesOnKill");
+		this.targetWasAlive = false;
+		onKill();    //each has it overriden
+	}
+
+	protected boolean iThinkIAmFacingAChampion()
+	{
+		logger.trace(".iThinkIAmFacingAChampion()");
+		if (System.currentTimeMillis() - this.iStartedToKillTargetAt > GroupedVariables.ProjectConstants.CHAMPION_SUSPICION_TIME_SECONDS * 1000) {
+			if (this.targetWasAlive) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void nowWeWillSingDance()
+	{
+		logger.warn(".nowWeWillSingDance --default character's. this should not be");
+
+	}
+
+	public boolean nextSongDance()
+	{
+		logger.warn("inside characters nestSongDance. this should not be!!!");
+		return true;
+	}
 
 	protected void deselect()
 	{
@@ -143,25 +175,55 @@ public abstract class Character extends LivingCreature
 		//checkToDoSanity()	//hope i dont need this
 		if (this.isMacroFree) {
 			if (this.targetWasAlive && this.target.isDead()) {
-				onKill();    //also checks for isDead
+				everyonesOnKill();    //also checks for isDead
 			}
-			doTheToDo();
+		}
+		doTheToDo();
 
+		if (this.isMacroFree) {
 			classSpecificLifeCycle();
+		}
 
+		if (this.isMacroFree) {
 			if (this.modeFarm) {
 				if (this.target.isDead()) {        //i am farming and i see a dead target after i've done onkill
 					todoOffer(new ActionPvE());
 				} else {
 					if (!this.isSupport) {        //no killing for supports. only attackers attack
 						attack();
+					} else {
+						logger.warn("for some reason support has non-zero hp target.maybe it's ok");
+					}
+					if (iThinkIAmFacingAChampion()) {
+						onChampion();
 					}
 				}
 			}
 		}
 
+		if (!this.target.isDead()) {        //targ is alive
+			if (!this.targetWasAlive) {      //and targ was not alive
+				this.iStartedToKillTargetAt = System.currentTimeMillis();
+			}
+			this.targetWasAlive = true;
+		}
 	}
 
+	private void onChampion()
+	{
+		logger.trace(".onChampion();");
+		if (this.isTank) {
+			message5(this.id);
+		}
+		if (this.isSupport) {
+			logger.warn("support is facing a champion. things are pretty bad");
+			return;
+		}
+		this.l2Window.keyClick(KeyEvent.VK_F7);
+
+	}
+
+	/*checks for allowness of tod o*/
 	private void doTheToDo()
 	{
 		logger.trace(".doTheToDo");
@@ -362,13 +424,18 @@ public abstract class Character extends LivingCreature
 		logger.info("Finished setChat. Now chatStartingPoint is " + this.chatStartingPoint);
 	}
 
-	public void setHP()
-	{    //todo if needed
+	public void setHP()    //todo if needed
+	{
 
 	}
 
-	public int getHP()
-	{    //todo when time comes don't forget to do this
+	public int getHP()   //todo when time comes don't forget to do this
+	{
+		return 100;
+	}
+
+	protected int getMP()//todo: implement
+	{
 		return 100;
 	}
 
@@ -442,6 +509,12 @@ public abstract class Character extends LivingCreature
 
 	}
 
+	protected void attackWithoutPet()
+	{
+		logger.trace(".attackWithoutPet");
+		this.l2Window.keyClick(KeyEvent.VK_F8);
+	}
+
 	protected void assistTarget()
 	{
 		logger.trace(".assistTarget");
@@ -451,6 +524,10 @@ public abstract class Character extends LivingCreature
 	protected void attack()
 	{
 		logger.trace(".attack");
+		if (GroupedVariables.Mediator.noPetMode || !this.petUseIsAllowed) {
+			logger.trace(".attack without pet redirect");
+			attackWithoutPet();
+		}
 		if (this.isSupport) {
 			return;
 		}
@@ -462,8 +539,11 @@ public abstract class Character extends LivingCreature
 
 	protected void petAttack()
 	{
-		logger.trace(".petAttack");
-		this.l2Window.keyClick(KeyEvent.VK_F2);
+		if (!GroupedVariables.Mediator.noPetMode && this.petUseIsAllowed) {
+			logger.trace(".petAttack");
+			this.l2Window.keyClick(KeyEvent.VK_F2);
+		}
+
 	}
 
 	protected void petStop()

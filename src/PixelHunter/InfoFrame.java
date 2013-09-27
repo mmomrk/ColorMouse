@@ -10,11 +10,53 @@ package PixelHunter;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
-public class InfoFrame extends JFrame
+public class InfoFrame extends JFrame	implements WindowListener
 {
 	private JLabel  label;
 	private JButton okButton;
+
+	@Override
+	public void windowOpened(WindowEvent e)
+	{
+
+	}
+
+	public void windowClosing(WindowEvent e){
+
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e)
+	{
+		WinAPIAPI.frameExists=false;
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e)
+	{
+
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e)
+	{
+
+	}
+
+	@Override
+	public void windowActivated(WindowEvent e)
+	{
+
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e)
+	{
+
+	}
 
 	public InfoFrame(String text)
 	{
@@ -24,6 +66,7 @@ public class InfoFrame extends JFrame
 		okButton = new JButton("OK");
 		add(label, BorderLayout.NORTH);
 		add(okButton, BorderLayout.SOUTH);
+
 		this.setLocationRelativeTo(null);
 	}
 //    public static void main(String[] args) {

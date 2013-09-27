@@ -175,18 +175,29 @@ public class WinAPIAPI
 	}
 
 
+	static boolean frameExists=false;
+
 	public static void showMessage(String s)
 	{
-//       InfoFrame frame= new InfoFrame(s);
-//       frame.setVisible(true);
-//       frame.pack();
-		System.out.println("Non-timed-out info frame. Text:\n" + s);
-
-		try {        //todo remove this after showmessage is fixed
-			System.in.read();
-		} catch (IOException e) {
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+       InfoFrame frame= new InfoFrame(s);
+       frame.setVisible(true);
+       frame.pack();
+		frameExists=true;
+		while (frameExists){
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+				logger.warn("exception in infoframe sleep");
+			}
 		}
+//		System.out.println("Non-timed-out info frame. Text:\n" + s);
+//
+//		try {        //todo remove this after showmessage is fixed
+//			System.in.read();
+//		} catch (IOException e) {
+//			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//		}
 
 	}
 
@@ -202,6 +213,15 @@ public class WinAPIAPI
 		final InfoFrame frame = new InfoFrame(s);
 		frame.setVisible(true);
 		frame.pack();
+		while (frameExists){
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+				logger.warn("exception in infoframe sleep");
+			}
+
+		}
 
 		java.util.Timer timer = new java.util.Timer();
 		timer.schedule(new TimerTask()
@@ -210,14 +230,15 @@ public class WinAPIAPI
 			public void run()
 			{
 				frame.dispose();
+				frameExists=false;
 			}
-		}, 5 * 1000);
+		}, t * 1000);
 
-		try {        //todo remove this after showmessage is fixed
-			System.in.read();
-		} catch (IOException e) {
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-		}
+//		try {        //todo remove this after showmessage is fixed
+//			System.in.read();
+//		} catch (IOException e) {
+//			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//		}
 	}
 
 	public static void toolTip(String s, int x, int y)

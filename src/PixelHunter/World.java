@@ -35,18 +35,31 @@ public class World
 		processIdentifier = new ProcessIdentifier();
 		hwnds = ProcessIdentifier.getL2HwndArray();
 
-		if (argumentsList.contains("-f")) {    //fishing
+		if (argumentsList.contains("-f")
+			||
+			argumentsList.contains("--fishing"))
+		{    //fishing
 			Fisher fisher = new Fisher(new L2Window(hwnds.get(0)));
 			fisher.infiniteFish();
 			return;
 		}
-		if (argumentsList.contains("-t")) {    //talk to me mode
+		if (argumentsList.contains("-t")
+			||
+			argumentsList.contains("--talktome"))
+		{    //talk to me mode
 			GroupedVariables.Mediator.talkToMeMode = true;
+		}
+		if (argumentsList.contains("-np")
+			||
+			argumentsList.contains("--nopetmode")){
+			GroupedVariables.Mediator.noPetMode=true;
 		}
 
 
 
-		System.out.println("World found quantity of proper windows: " + hwnds.size());
+		{
+			System.out.println("World found quantity of proper windows: " + hwnds.size());
+		}
 		int id = 0;
 		if (hwnds.size() == 1) {
 			singleWindowMode = true;
@@ -83,10 +96,11 @@ public class World
 			&&
 			(characters[1].id == GroupedVariables.ProjectConstants.ID_Swordsinger
 			 ||
-			 characters[1].id == GroupedVariables.ProjectConstants.ID_Bladedancer)){
-			GroupedVariables.Mediator.BDSWSInDaHouse	=	true;
-		}	else {
-			GroupedVariables.Mediator.BDSWSInDaHouse	=	false;
+			 characters[1].id == GroupedVariables.ProjectConstants.ID_Bladedancer))
+		{
+			GroupedVariables.Mediator.BDSWSInDaHouse = true;
+		} else {
+			GroupedVariables.Mediator.BDSWSInDaHouse = false;
 		}
 
 		{
@@ -108,10 +122,54 @@ public class World
 		return;
 	}
 
-	public static void BDSWSBuff()	//implement todo
+	public static void BDSWSBuff()    //implement todo
 	{
-		if (GroupedVariables.Mediator.BDSWSInDaHouse){
-			//finished here
+
+		if (GroupedVariables.Mediator.BDSWSInDaHouse) {
+			characters[0].nowWeWillSingDance();
+			characters[1].nowWeWillSingDance();
+			int bDPosition, sWSPosition;
+			if (characters[0].id == GroupedVariables.ProjectConstants.ID_Bladedancer) {
+				bDPosition = 0;
+				sWSPosition = 1;
+			} else {
+				bDPosition = 1;
+				sWSPosition = 0;
+			}
+
+			boolean finished = false;
+			boolean bDFinished = false, sWSFinished = false;
+			int i = 0;
+			while (!finished) {
+				if (i % 2 == 0) {
+					bDFinished = characters[bDPosition].nextSongDance();
+				} else {
+					sWSFinished = characters[sWSPosition].nextSongDance();
+				}
+				finished = bDFinished && sWSFinished;
+				i++;
+			}
+		} else {
+			int bDSWSPosition;
+			if (characters[0].id == GroupedVariables.ProjectConstants.ID_Bladedancer
+				||
+				characters[0].id == GroupedVariables.ProjectConstants.ID_Swordsinger)
+			{
+				bDSWSPosition = 0;
+			} else if (characters[1].id == GroupedVariables.ProjectConstants.ID_Bladedancer
+					   ||
+					   characters[1].id == GroupedVariables.ProjectConstants.ID_Swordsinger)
+			{
+				bDSWSPosition = 1;
+			} else {
+				WinAPIAPI.showMessage("invalid BDSWS call", 5);
+				return;
+			}
+			characters[bDSWSPosition].nowWeWillSingDance();
+			while (!characters[bDSWSPosition].nextSongDance()) {
+
+			}
+
 		}
 	}
 
