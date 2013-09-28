@@ -65,6 +65,8 @@ public class GroupedVariables
 		public static final int ID_Elvenelder;
 		public static final Map<Integer, Integer> partyPanelMatch = new HashMap<Integer, Integer>();    //filled in static..todo dynamic filling. later
 
+		public static final Color CHARACTER_HP_COLOR;
+		public static final Color CHARACTER_MP_COLOR;
 		public static final Color SECONDARY_LIVING_CREATURE_HP_COLOR;
 		public static final Color PARTY_MEMBERS_PET_HP_COLOR;
 		public static final Color PARTY_MEMBERS_FRAME;
@@ -97,7 +99,7 @@ public class GroupedVariables
 			HEAL_TO = Integer.parseInt(properties.get("HEAL_TO").toString());
 			MAJOR_HEAL_FROM = Integer.parseInt(properties.get("MAJOR_HEAL_FROM").toString());
 			MAJOR_HEAL_TO = Integer.parseInt(properties.get("MAJOR_HEAL_TO").toString());
-			CHAMPION_SUSPICION_TIME_SECONDS = Long.parseLong(properties.get("CHAMPION_SUSPICION_TIME").toString());
+			CHAMPION_SUSPICION_TIME_SECONDS = Long.parseLong(properties.get("CHAMPION_SUSPICION_TIME_SECONDS").toString());
 
 			ID_PET = Integer.parseInt(properties.get("ID_pet").toString());
 			ID_TARGET = Integer.parseInt(properties.get("ID_target").toString());
@@ -131,6 +133,16 @@ public class GroupedVariables
 			WINDOW_ACTIVATE_DELAY_MILLIS = Integer.parseInt(properties.get("WINDOW_ACTIVATE_DELAY_MILLIS").toString());
 
 			int red, green, blue;
+			red = Integer.parseInt(properties.get("CharacterHpColor_red").toString());
+			green = Integer.parseInt(properties.get("CharacterHpColor_green").toString());
+			blue = Integer.parseInt(properties.get("CharacterHpColor_blue").toString());
+			CHARACTER_HP_COLOR = new Color(red, green, blue);
+
+			red = Integer.parseInt(properties.get("CharacterMpColor_red").toString());
+			green = Integer.parseInt(properties.get("CharacterMpColor_green").toString());
+			blue = Integer.parseInt(properties.get("CharacterMpColor_blue").toString());
+			CHARACTER_MP_COLOR = new Color(red, green, blue);
+
 			red = Integer.parseInt(properties.get("PetTargetPartyHpColor_red").toString());
 			green = Integer.parseInt(properties.get("PetTargetPartyHpColor_green").toString());
 			blue = Integer.parseInt(properties.get("PetTargetPartyHpColor_blue").toString());

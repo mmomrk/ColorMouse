@@ -10,6 +10,8 @@ import java.awt.event.KeyEvent;
 import java.util.*;
 import java.util.List;
 
+import static PixelHunter.GroupedVariables.*;
+import static PixelHunter.GroupedVariables.ProjectConstants.*;
 import static java.lang.Math.pow;
 
 /**
@@ -25,12 +27,10 @@ public abstract class Character extends LivingCreature
 
 	private static final int maxChatStartExpectation = 130;
 
-	private static final int[] homesToRun        =
-	{
-	GroupedVariables.ProjectConstants.ID_Prophet,
-	GroupedVariables.ProjectConstants.ID_Warcryer,
-	GroupedVariables.ProjectConstants.ID_Templeknight
-	};
+	private static final int[] homesToRun        = {
+												   ID_Elvenelder,
+												   ID_Swordsinger,
+												   ID_Bladedancer};
 	private              int   homerunQueueDepth = 3;
 
 
@@ -40,7 +40,8 @@ public abstract class Character extends LivingCreature
 	isBDSWS          = false,        //funny buffs
 	isTank           = false,        //comments?
 	isPhysicAttacker = false,    //everything else
-	isHomeRunner,
+	isNuker          = false,	//almost everything
+	isHomeRunner     = true,
 
 	modeFarm    = false,
 	modeBuff    = false,
@@ -59,10 +60,12 @@ public abstract class Character extends LivingCreature
 
 	protected Pet    pet;    //remove public after tests are done
 	protected Target target;
+	protected HpConstants hpConstants;
+	protected HpConstants mpConstants;
 	protected List<PartyMember> partyStack = new LinkedList<PartyMember>();
 
 	private static Comparator            actionComparator = new PixelHunter.Action.ActionPriorityComparator();
-	private        PriorityQueue<Action> toDoList         = new PriorityQueue<Action>(GroupedVariables.ProjectConstants.CHAT_TASK_LIST_LENGTH, actionComparator);
+	private        PriorityQueue<Action> toDoList         = new PriorityQueue<Action>(ProjectConstants.CHAT_TASK_LIST_LENGTH, actionComparator);
 
 	protected final Timer        //discuss think of those protected after chars are done
 	macroLockTimer,
@@ -73,8 +76,9 @@ public abstract class Character extends LivingCreature
 	protected Map<ActionAbstractBuff, Timer> buffTimerMap = new HashMap<ActionAbstractBuff, Timer>();
 
 	protected int homeRunNumber = 0;
-	protected int homeRunDelay  = GroupedVariables.ProjectConstants.HOMERUN_TIME * 1000;    //can be set individually btw
+	protected int homeRunDelay  = ProjectConstants.HOMERUN_TIME * 1000;    //can be set individually btw
 	private long iStartedToKillTargetAt;
+
 
 //	public void classSpecificDeed();//think of it twice
 
@@ -112,7 +116,7 @@ public abstract class Character extends LivingCreature
 	protected boolean iThinkIAmFacingAChampion()
 	{
 		logger.trace(".iThinkIAmFacingAChampion()");
-		if (System.currentTimeMillis() - this.iStartedToKillTargetAt > GroupedVariables.ProjectConstants.CHAMPION_SUSPICION_TIME_SECONDS * 1000) {
+		if (System.currentTimeMillis() - this.iStartedToKillTargetAt > ProjectConstants.CHAMPION_SUSPICION_TIME_SECONDS * 1000) {
 			if (this.targetWasAlive) {
 				return true;
 			}
@@ -355,13 +359,13 @@ public abstract class Character extends LivingCreature
 		for (i = 50; i < this.maxChatStartExpectation; i += 3) {
 			currentPoint.x = i;
 			currentColor = l2Window.getRelPixelColor(currentPoint);
-			if (l2Window.colorsAreClose(currentColor, GroupedVariables.ProjectConstants.CHAT_COLOR_PARTY)) {
-				messageColor = GroupedVariables.ProjectConstants.CHAT_COLOR_PARTY;
+			if (l2Window.colorsAreClose(currentColor, ProjectConstants.CHAT_COLOR_PARTY)) {
+				messageColor = ProjectConstants.CHAT_COLOR_PARTY;
 				modeColor = 0;
 				break;
 			}
-			if (l2Window.colorsAreClose(currentColor, GroupedVariables.ProjectConstants.CHAT_COLOR_PRIVATE)) {
-				messageColor = GroupedVariables.ProjectConstants.CHAT_COLOR_PRIVATE;
+			if (l2Window.colorsAreClose(currentColor, ProjectConstants.CHAT_COLOR_PRIVATE)) {
+				messageColor = ProjectConstants.CHAT_COLOR_PRIVATE;
 				modeColor = 1;
 				break;
 			}
@@ -424,19 +428,21 @@ public abstract class Character extends LivingCreature
 		logger.info("Finished setChat. Now chatStartingPoint is " + this.chatStartingPoint);
 	}
 
-	public void setHP()    //todo if needed
+	public void setHP()    //not tested
 	{
-
+		this.hpConstants=new HpConstants(ProjectConstants.CHARACTER_HP_COLOR,new Point(0,0),new Point(0,0),this.id);
+		this.mpConstants=new HpConstants(ProjectConstants.CHARACTER_MP_COLOR,new Point(0,0),new Point(0,0),this.id);
+		this.l2Window.setCharacterHP(hpConstants,mpConstants);
 	}
 
-	public int getHP()   //todo when time comes don't forget to do this
+	public int getHP()	//not tested
 	{
-		return 100;
+		return this.l2Window.getCharacterHPMP(this.hpConstants,true);
 	}
 
-	protected int getMP()//todo: implement
+	protected int getMP()//test it
 	{
-		return 100;
+		return this.l2Window.getCharacterHPMP(this.mpConstants,false);
 	}
 
 	public String toString()
@@ -502,7 +508,7 @@ public abstract class Character extends LivingCreature
 	{
 		if (id != this.id) {
 			logger.trace(".selectPartyMemberByID: " + id);
-			this.l2Window.keyClick(48 + GroupedVariables.ProjectConstants.partyPanelMatch.get(id));    //VK_0 is 48
+			this.l2Window.keyClick(48 + ProjectConstants.partyPanelMatch.get(id));    //VK_0 is 48
 		} else {
 			logger.warn("attempt to select self through selectPartyMemberByID");
 		}
@@ -518,13 +524,13 @@ public abstract class Character extends LivingCreature
 	protected void assistTarget()
 	{
 		logger.trace(".assistTarget");
-		this.l2Window.keyClick(48 + GroupedVariables.ProjectConstants.partyPanelMatch.get(this.id));    //assi button in the right spot
+		this.l2Window.keyClick(48 + ProjectConstants.partyPanelMatch.get(this.id));    //assi button in the right spot
 	}
 
 	protected void attack()
 	{
 		logger.trace(".attack");
-		if (GroupedVariables.Mediator.noPetMode || !this.petUseIsAllowed) {
+		if (Mediator.noPetMode || !this.petUseIsAllowed) {
 			logger.trace(".attack without pet redirect");
 			attackWithoutPet();
 		}
@@ -539,7 +545,7 @@ public abstract class Character extends LivingCreature
 
 	protected void petAttack()
 	{
-		if (!GroupedVariables.Mediator.noPetMode && this.petUseIsAllowed) {
+		if (!Mediator.noPetMode && this.petUseIsAllowed) {
 			logger.trace(".petAttack");
 			this.l2Window.keyClick(KeyEvent.VK_F2);
 		}
@@ -587,7 +593,7 @@ public abstract class Character extends LivingCreature
 			message5(callerID);    //active aggro-mode on his target by assist
 			return;
 		}
-		if (this.id == GroupedVariables.ProjectConstants.ID_Spoiler) {
+		if (this.id == ProjectConstants.ID_Spoiler) {
 			message5(callerID);    //spoilMyChamp
 			return;
 		}
@@ -616,6 +622,8 @@ public abstract class Character extends LivingCreature
 
 		pet = new Pet(l2Window);//including setHP
 		target = new Target(l2Window);
+
+		setHP();
 
 		setChat();
 
@@ -699,11 +707,11 @@ public abstract class Character extends LivingCreature
 			}
 			logger.trace("ActionHomeRun.perform");
 
-			int id = Character.this.homeRunNumber++ % Character.this.homerunQueueDepth;
+			int homeToRunTo = Character.this.homeRunNumber++ % Character.homesToRun.length;
 
-			Character.this.selectPartyMemberByID(Character.homesToRun[id]);        //test this
-			Character.this.selectPartyMemberByID(Character.homesToRun[id]);
-			if (this.isHomeRun) {
+			Character.this.selectPartyMemberByID(Character.homesToRun[homeToRunTo]);        //test this
+			Character.this.selectPartyMemberByID(Character.homesToRun[homeToRunTo]);
+			if (Character.this.isHomeRunner) {
 				timerHomeRunAdd.schedule(new HomeRunTask(), Character.this.homeRunDelay);
 			}
 		}

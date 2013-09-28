@@ -37,7 +37,7 @@ public abstract class SecondaryLivingCreature extends LivingCreature
 	@Override
 	public void setHP()
 	{
-		this.l2Window.setHP(this.hpConstants, this.id);
+		this.l2Window.setHP(this.hpConstants);
 	}
 
 	protected SecondaryLivingCreature(int thisid, L2Window l2Window)

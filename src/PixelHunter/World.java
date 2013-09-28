@@ -55,11 +55,6 @@ public class World
 			GroupedVariables.Mediator.noPetMode=true;
 		}
 
-
-
-		{
-			System.out.println("World found quantity of proper windows: " + hwnds.size());
-		}
 		int id = 0;
 		if (hwnds.size() == 1) {
 			singleWindowMode = true;
@@ -74,19 +69,19 @@ public class World
 			L2Window.initiateSize(0, hwnds.get(0));    //yes, static method access, not the class representative
 			//0=fully on the screen
 			WinAPIAPI.setActiveWindow(hwnds.get(0));
-			id = WinAPIAPI.dialogWindow("You can resize the window now in case you are not satisfied with its dimensions.\nEnter Character ID in the only window");
+			id = WinAPIAPI.dialogWindow(0);
 			characters[0] = CharacterFactory.getCharacter(id, hwnds.get(0));
 
 		} else {    //todo change hwnds order: first is left. if one can do
 
 			WinAPIAPI.setActiveWindow(hwnds.get(0));        //not implemented yet
 			L2Window.initiateSize(1, hwnds.get(0));    //1=left on the screen
-			id = WinAPIAPI.dialogWindow("You can resize the window now in case you are not satisfied with its dimensions.\nEnter Character ID in the left window");
+			id = WinAPIAPI.dialogWindow(1);
 			characters[0] = CharacterFactory.getCharacter(id, hwnds.get(0));
 
 			WinAPIAPI.setActiveWindow(hwnds.get(1));
 			L2Window.initiateSize(2, hwnds.get(1));    //2=right on the screen
-			id = WinAPIAPI.dialogWindow("You can resize the window now in case you are not satisfied with its dimensions.\nEnter Character ID in the right window");
+			id = WinAPIAPI.dialogWindow(2);
 			characters[1] = CharacterFactory.getCharacter(id, hwnds.get(1));
 		}
 

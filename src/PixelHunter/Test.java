@@ -15,18 +15,8 @@ public class Test
 	public static void main(String args[])
 	{
 
-		System.out.println(new HotKey(KeyStroke.getKeyStroke("shift PAUSE"), null));
-
-		HotKeyHandler hotKeyHandler = new HotKeyHandler();
-		for (int i = 0; i < 20; i++) {
-			System.out.println(i);
-			try {
-				Thread.sleep(2000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-			}
-		}
-
+		int a = WinAPIAPI.dialogWindow(0);
+		System.out.println(a);
 	}
 
 }

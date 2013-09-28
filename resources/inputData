@@ -41,6 +41,14 @@ ID_PartyMembersPet  =   103
 
 #INGAME COLORS
 
+CharacterHpColor_red   =   121
+CharacterHpColor_green   =   28
+CharacterHpColor_blue   =   17
+
+CharacterMpColor_red   =   5
+CharacterMpColor_green   =   57
+CharacterMpColor_blue   =   134
+
 PetTargetPartyHpColor_red   =   111
 PetTargetPartyHpColor_green   =   23
 PetTargetPartyHpColor_blue   =   19

@@ -1,5 +1,7 @@
 package PixelHunter;
 import com.sun.jna.platform.win32.WinDef;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * User: mrk
@@ -7,6 +9,8 @@ import com.sun.jna.platform.win32.WinDef;
  */
 public class Necromancer extends Character
 {
+	private static final Logger logger = LoggerFactory.getLogger(Necromancer.class);
+
 	@Override
 	protected void setupBuffTimerMap()
 	{
@@ -28,5 +32,9 @@ public class Necromancer extends Character
 	public Necromancer(int hisID, WinDef.HWND hwnd)
 	{
 		super(hisID, hwnd);
+		logger.trace("Necromancer constructor");
+		this.isNuker=true;
+		this.isHomeRunner=true;
+		this.petUseIsAllowed=false;
 	}
 }

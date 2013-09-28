@@ -209,20 +209,146 @@ public class L2Window
 
 	}
 
-	public void setHP(HpConstants hpConstants, int id)    //warning designed to work only with pet, target and party member (not party pet or character)
+
+	private boolean characterHPMPColorIsPositive(Color color, boolean checkHP)
+	{
+		if (checkHP) {
+			if (color.getRed() < 55) {
+				return false;
+			}
+		} else {
+			if (color.getBlue() < 120) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private int checkNextPixelsToTheHorizon(boolean toTheLeft, Point checkedCoordinate, Color neededColor)    //to be used with hp only
+	{
+		int
+		x = checkedCoordinate.x,
+		y = checkedCoordinate.y;
+
+		if (toTheLeft) {
+			for (int i = 0; i < 100; i++) {
+				if (colorsAreClose(getRelPixelColor(new Point(x - i, y)), neededColor)) {
+					return i + 1;
+				}
+				if (i <= 0) {
+					return i + 1;
+				}
+			}
+		} else {
+			for (int i = 0; i < 100; i++) {
+				if (colorsAreClose(getRelPixelColor(new Point(x + i, y)), neededColor)) {
+					return i + 1;
+				}
+			}
+		}
+		return 0;
+	}
+
+	public int getCharacterHPMP(HpConstants hpConstants, boolean gettingHP)
+	{
+		int overallLength = hpConstants.coordinateRight.x - hpConstants.coordinateLeft.x;
+		if (overallLength==0){
+			logger.warn("got invalid hpConstatns in getCharacterHPMP");
+			return 100;	//discuss.. but with whom?
+		}
+		Point currentCoordinate = hpConstants.coordinateRight;
+		while (!characterHPMPColorIsPositive(getRelPixelColor(currentCoordinate), gettingHP)) {
+			currentCoordinate.x--;
+		}
+
+		return 100 * (currentCoordinate.x - hpConstants.coordinateLeft.x) / overallLength;
+
+	}
+
+	public void setCharacterHP(HpConstants hpConstants, HpConstants mpConstants)    //not tested
+	{
+		logger.trace("setting Character HP");
+		WinAPIAPI.showMessage("Setting HP for character. place mouse under fully healed hp bar and press ok");
+		Point currentCoordinate = absoluteToRelativeCoordinates(getMousePos());
+		logger.debug("got mouse position " + currentCoordinate);
+		int i = 0, yLimit = 100;
+		while (!colorsAreClose(getRelPixelColor(currentCoordinate), hpConstants.color)) {
+			if (i >= yLimit) {   //overflow
+				logger.error("Failed to find y");
+				hpConstants.coordinateRight.setLocation(-1, -1);
+				hpConstants.coordinateLeft.setLocation(-1, -1);
+				return;
+			}
+			currentCoordinate.y--;
+			i++;
+		}
+		logger.debug("Successfully found y" + currentCoordinate.y);
+		if (debugMode == 2) {
+			advancedMouseMove(currentCoordinate);
+			WinAPIAPI.showMessage("Successfully found y");
+		}
+
+		hpConstants.coordinateLeft.y = currentCoordinate.y;
+		hpConstants.coordinateRight.y = currentCoordinate.y;
+		mpConstants.coordinateLeft.y = currentCoordinate.y + 13;    //magic numbers
+		mpConstants.coordinateRight.y = currentCoordinate.y + 13;
+
+		int temporaryX = currentCoordinate.x;
+
+		boolean stop = false;
+		int step;
+		while (!stop) {
+			step = checkNextPixelsToTheHorizon(true, currentCoordinate, hpConstants.color);
+			if (step <= 0) {
+				stop = true;
+			} else {
+				currentCoordinate.x -= step;
+			}
+		}
+		hpConstants.coordinateLeft.x = currentCoordinate.x;
+		mpConstants.coordinateLeft.x = currentCoordinate.x;
+		logger.debug("Successfully found x left " + currentCoordinate.x);
+		if (debugMode == 2) {
+			advancedMouseMove(currentCoordinate);
+			WinAPIAPI.showMessage("Successfully found x left ");
+		}
+
+
+		currentCoordinate.x = temporaryX;
+		stop = false;
+		while (!stop) {
+			step = checkNextPixelsToTheHorizon(false, currentCoordinate, hpConstants.color);
+			if (step <= 0) {
+				stop = true;
+			} else {
+				currentCoordinate.x += step;
+			}
+		}
+		hpConstants.coordinateRight.x = currentCoordinate.x;
+		mpConstants.coordinateRight.x = currentCoordinate.x;
+		logger.debug("Successfully found x right" + currentCoordinate.x);
+		if (debugMode == 2) {
+			advancedMouseMove(currentCoordinate);
+			WinAPIAPI.showMessage("Successfully found x right");
+		}
+		logger.info("successfully found HP");
+
+		return;
+	}
+
+	public void setHP(HpConstants hpConstants)    //warning designed to work only with pet, target and party member (not party pet or character)
 	{
 		logger.trace(".setHP");
-		if (id == GroupedVariables.ProjectConstants.ID_PET) {
+		if (hpConstants.id == GroupedVariables.ProjectConstants.ID_PET) {
 			WinAPIAPI.showMessage("Set HP bar for the pet. Place mouse under fully healed HP bar and press OK");
-
-		} else if (id == GroupedVariables.ProjectConstants.ID_TARGET) {
+		} else if (hpConstants.id == GroupedVariables.ProjectConstants.ID_TARGET) {
 			WinAPIAPI.showMessage("Set HP bar for the target. Place mouse under fully healed HP bar and press OK");
-		} else if (id == GroupedVariables.ProjectConstants.ID_PartyMember) {
+		} else if (hpConstants.id == GroupedVariables.ProjectConstants.ID_PartyMember) {
 			WinAPIAPI.showMessage("Set HP bar for the party member. Place mouse under highest fully healed HP bar and press OK");
-		} else if (id == GroupedVariables.ProjectConstants.ID_PartyMembersPet) {
+		} else if (hpConstants.id == GroupedVariables.ProjectConstants.ID_PartyMembersPet) {
 			WinAPIAPI.showMessage("Set HP bar for the party member's pet. Place mouse under highest fully healed HP bar and press OK");
-		}   else {
-			logger.error("wrong id passed to setHP: " + id);
+		} else {
+			logger.error("wrong id passed to setHP: " + hpConstants.id);
 			return;
 		}
 
@@ -340,7 +466,7 @@ public class L2Window
 
 	public void advancedMouseMove(Point point)
 	{
-		if (debugMode==3){
+		if (debugMode == 3) {
 			logger.trace(".advancedMouseMove to " + point);
 		}
 		point = relativeToAbsoluteCoordinates(point);

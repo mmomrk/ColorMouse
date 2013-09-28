@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.TimerTask;
 
@@ -21,6 +20,7 @@ public class WinAPIAPI
 {
 
 	private static final Logger logger = LoggerFactory.getLogger(WinAPIAPI.class);
+
 
 	private static class Psapi
 	{
@@ -42,7 +42,8 @@ public class WinAPIAPI
 		public static int PROCESS_VM_READ           = 0x0010;
 
 		public static native int GetLastError();
-		public static native boolean Beep(double freq,double duration);
+
+		public static native boolean Beep(double freq, double duration);
 
 		public static native Pointer OpenProcess(int dwDesiredAccess, boolean bInheritHandle, Pointer pointer);
 	}
@@ -54,20 +55,19 @@ public class WinAPIAPI
 	}
 
 
-	public static class User32DLL		//used for both hotkeys and window management
+	public static class User32DLL        //used for both hotkeys and window management
 	{
-		public static final int MOD_ALT = 0x0001;
-		public static final int MOD_CONTROL = 0x0002;
-		public static final int MOD_NOREPEAT = 0x4000;
-		public static final int MOD_SHIFT = 0x0004;
-		public static final int MOD_WIN = 0x0008;
-		public static final int WM_HOTKEY = 0x0312;
+		public static final int MOD_ALT             = 0x0001;
+		public static final int MOD_CONTROL         = 0x0002;
+		public static final int MOD_NOREPEAT        = 0x4000;
+		public static final int MOD_SHIFT           = 0x0004;
+		public static final int MOD_WIN             = 0x0008;
+		public static final int WM_HOTKEY           = 0x0312;
 		public static final int VK_MEDIA_NEXT_TRACK = 0xB0;
 		public static final int VK_MEDIA_PREV_TRACK = 0xB1;
-		public static final int VK_MEDIA_STOP = 0xB2;
+		public static final int VK_MEDIA_STOP       = 0xB2;
 		public static final int VK_MEDIA_PLAY_PAUSE = 0xB3;
-		public static final int PM_REMOVE = 0x0001;
-
+		public static final int PM_REMOVE           = 0x0001;
 
 		static {
 			Native.register(NativeLibrary.getInstance("user32", W32APIOptions.DEFAULT_OPTIONS));
@@ -91,34 +91,39 @@ public class WinAPIAPI
 
 		public static native WinDef.HWND ShowWindow(WinDef.HWND hwnd, int cmdShow);  //not as wanted
 
-		public static native boolean BringWindowToTop(WinDef.HWND hwnd);	//invalid
+		public static native boolean BringWindowToTop(WinDef.HWND hwnd);    //invalid
 
-		public static native boolean  SetForegroundWindow(WinDef.HWND hwnd);
+		public static native boolean SetForegroundWindow(WinDef.HWND hwnd);
 
 		@SuppressWarnings({"UnusedDeclaration"})
 		public static class MSG extends Structure
 		{
-			public Pointer hWnd;
-			public int message;
+			public Pointer   hWnd;
+			public int       message;
 			public Parameter wParam;
 			public Parameter lParam;
-			public int time;
-			public int x;
-			public int y;
+			public int       time;
+			public int       x;
+			public int       y;
 
 			@Override
-			protected java.util.List getFieldOrder() {
+			protected java.util.List getFieldOrder()
+			{
 				return Arrays.asList("hWnd", "message", "wParam", "lParam", "time", "x", "y");
 			}
 		}
+
+
 		public static class Parameter extends IntegerType
 		{
 			@SuppressWarnings("UnusedDeclaration")
-			public Parameter() {
+			public Parameter()
+			{
 				this(0);
 			}
 
-			public Parameter(long value) {
+			public Parameter(long value)
+			{
 				super(Pointer.SIZE, value);
 			}
 		}
@@ -133,7 +138,7 @@ public class WinAPIAPI
 //		User32.INSTANCE.SetFocus(hwnd);
 //		User32.INSTANCE.ShowWindow(hwnd,1);
 //		User32.INSTANCE.BringWindowToTop ();	//invalid
-		User32.INSTANCE.SetForegroundWindow(hwnd);	//after a long struggle
+		User32.INSTANCE.SetForegroundWindow(hwnd);    //after a long struggle
 //		logger.debug("User32.INSTANCE.UpdateWindow(hwnd);");
 		User32.INSTANCE.UpdateWindow(hwnd);
 //		logger.debug("User32.INSTANCE... finished");
@@ -151,22 +156,26 @@ public class WinAPIAPI
 		return returnRectangle;
 	}
 
-	public static void bringToFront(WinDef.HWND hwnd)	//todo delete it. is obsolete
+	public static void bringToFront(WinDef.HWND hwnd)    //todo delete it. is obsolete
 	{    //todo. needs to todo
 		return;
 	}
 
-	public static int dialogWindow(String s)
+
+	public static int dialogWindow(int useCase)
 	{//todo: very much todo
-		System.out.println(s);
-		int answer;
-		try {
-			answer = System.in.read();
-		} catch (IOException e) {
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-			answer = -1;
-		}
-		return answer;
+//		System.out.println(s);
+//		int answer;
+//		try {
+//			answer = System.in.read();
+//		} catch (IOException e) {
+//			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//			answer = -1;
+//		}
+		DialogWindow dialog = new DialogWindow(useCase);
+
+
+		return dialog.whatIsTheAnswer();
 	}
 
 	public static void setWindowPos(WinDef.HWND hwnd, int x, int y, int w, int h)
@@ -175,15 +184,15 @@ public class WinAPIAPI
 	}
 
 
-	static boolean frameExists=false;
+	static boolean frameExists = false;
 
 	public static void showMessage(String s)
 	{
-       InfoFrame frame= new InfoFrame(s);
-       frame.setVisible(true);
-       frame.pack();
-		frameExists=true;
-		while (frameExists){
+		InfoFrame frame = new InfoFrame(s);
+		frame.setVisible(true);
+		frame.pack();
+		frameExists = true;
+		while (frameExists) {
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
@@ -213,7 +222,7 @@ public class WinAPIAPI
 		final InfoFrame frame = new InfoFrame(s);
 		frame.setVisible(true);
 		frame.pack();
-		while (frameExists){
+		while (frameExists) {
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
@@ -230,7 +239,7 @@ public class WinAPIAPI
 			public void run()
 			{
 				frame.dispose();
-				frameExists=false;
+				frameExists = false;
 			}
 		}, t * 1000);
 

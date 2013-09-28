@@ -156,7 +156,7 @@ public class ProcessIdentifier
 				user32.GetWindowText(hWnd, windowText, 512);
 				String wText = Native.toString(windowText);
 				wText = (wText.isEmpty()) ? "" : "; text: " + wText;
-				System.out.println("Found window " + hWnd + ", total " + ++count + wText);
+				logger.debug("Found window " + hWnd + ", total " + ++count + wText);
 				return true;
 			}
 		}, null);
