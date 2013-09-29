@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Timer;
 
+import static PixelHunter.GroupedVariables.Mediator.noPetMode;
 import static java.awt.event.KeyEvent.*;
 
 /**
@@ -38,11 +39,11 @@ public class Warlock extends Character
 	public void classSpecificLifeCycle()
 	{
 		logger.trace(".classSpecificLifeCycle");
-		if (pet.isDead()) {
+		if (!noPetMode && pet.isDead()) {
 			useSkill(summonCat);
 			return;
 		}
-		if (pet.getHP() < 70) {
+		if (!noPetMode && pet.getHP() < 70) {
 			useSkill(healPet);
 		}
 

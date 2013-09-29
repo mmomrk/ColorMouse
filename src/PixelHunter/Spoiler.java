@@ -14,11 +14,11 @@ public class Spoiler extends Character
 {
 	private static final Logger logger = LoggerFactory.getLogger(Spoiler.class);
 
-	private final ActionSelfBuff buffStub  = new ActionSelfBuff(null, 0, 0, 0);
+	private final ActionSelfBuff buffStub  = new ActionSelfBuff("", 0, 0, 0);
 	private       boolean
-									 modeSpoil = false,
-	temporarySpoil                             = false,
-	iSpoiledTheMob                             = false;
+								 modeSpoil = false,
+	temporarySpoil                         = false,
+	iSpoiledTheMob                         = false;
 
 	protected void message5(int caller)    //spoil my mob
 	{
@@ -44,9 +44,10 @@ public class Spoiler extends Character
 	}
 
 	@Override
-	protected void toggleBuffMode(){
-		this.modeSpoil	=	!this.modeSpoil;
-		logger.info("toggling Spoil mode. now it is "+this.modeSpoil);
+	protected void toggleBuffMode()
+	{
+		this.modeSpoil = !this.modeSpoil;
+		logger.info("toggling Spoil mode. now it is " + this.modeSpoil);
 	}
 
 	@Override
@@ -62,7 +63,11 @@ public class Spoiler extends Character
 	@Override
 	public void classSpecificLifeCycle()
 	{
-		if (!this.iSpoiledTheMob
+		if (this.modeSpoil
+			&&
+			this.modeFarm
+			&&
+			!this.iSpoiledTheMob
 			&&
 			(!this.target.isDead() || this.target.getHP() < 99))
 		{
@@ -76,8 +81,8 @@ public class Spoiler extends Character
 	{
 		logger.trace(".onKill");
 
-		if (this.temporarySpoil){
-			this.temporarySpoil	=	false;
+		if (this.temporarySpoil) {
+			this.temporarySpoil = false;
 		}
 
 		if (this.iSpoiledTheMob) {
@@ -104,8 +109,8 @@ public class Spoiler extends Character
 	public Spoiler(WinDef.HWND hwnd)
 	{
 		super(GroupedVariables.ProjectConstants.ID_Spoiler, hwnd);
-		this.buffTimerMap.put(this.buffStub, new Timer());
+//		this.buffTimerMap.put(this.buffStub, new Timer());
 		this.isHomeRunner = true;
-		this.isPhysicAttacker	=	true;
+		this.isPhysicAttacker = true;
 	}
 }

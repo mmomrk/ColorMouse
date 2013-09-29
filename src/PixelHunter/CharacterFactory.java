@@ -31,6 +31,8 @@ public class CharacterFactory
 			return new BladeDancer(hwnd);
 		} else if (id == ID_Swordsinger) {
 			return new SwordSinger(hwnd);
+		}	else if (id ==ID_Necromancer){
+			return new Necromancer(hwnd);
 		}
 
 

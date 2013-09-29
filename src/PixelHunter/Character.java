@@ -65,8 +65,8 @@ public abstract class Character extends LivingCreature
 	protected HpConstants mpConstants;
 	protected List<PartyMember> partyStack = new LinkedList<PartyMember>();
 
-	private static Comparator            actionComparator = new PixelHunter.Action.ActionPriorityComparator();
-	private        PriorityQueue<Action> toDoList         = new PriorityQueue<Action>(ProjectConstants.CHAT_TASK_LIST_LENGTH, actionComparator);
+	private static Action.ActionPriorityComparator actionComparator = new PixelHunter.Action.ActionPriorityComparator();
+	private        PriorityQueue<Action>           toDoList         = new PriorityQueue<Action>(ProjectConstants.CHAT_TASK_LIST_LENGTH, actionComparator);
 
 	protected final Timer        //discuss think of those protected after chars are done
 	macroLockTimer,
@@ -174,12 +174,13 @@ public abstract class Character extends LivingCreature
 	{
 		logger.trace("Character's " + this.id + " lifecycle");
 		this.l2Window.activate();
+		boolean targetIsDeadInThisLifecycle = this.target.isDead();
 		if (this.l2Window.isChatMode()) {
 			readChatAndOfferToDo();
 		}
 		//checkToDoSanity()	//hope i dont need this
 		if (this.isMacroFree) {
-			if (this.targetWasAlive && this.target.isDead()) {
+			if (this.targetWasAlive && targetIsDeadInThisLifecycle) {
 				everyonesOnKill();    //also checks for isDead
 			}
 		}
@@ -191,7 +192,7 @@ public abstract class Character extends LivingCreature
 
 		if (this.isMacroFree) {
 			if (this.modeFarm) {
-				if (this.target.isDead()) {        //i am farming and i see a dead target after i've done onkill
+				if (targetIsDeadInThisLifecycle) {        //i am farming and i see a dead target after i've done onkill
 					todoOffer(new ActionPvE());
 				} else {
 					if (!this.isSupport) {        //no killing for supports. only attackers attack
@@ -206,7 +207,7 @@ public abstract class Character extends LivingCreature
 			}
 		}
 
-		if (!this.target.isDead()) {        //targ is alive
+		if (!targetIsDeadInThisLifecycle) {        //targ is alive
 			if (!this.targetWasAlive) {      //and targ was not alive
 				this.iStartedToKillTargetAt = System.currentTimeMillis();
 			}
@@ -214,7 +215,7 @@ public abstract class Character extends LivingCreature
 		}
 	}
 
-	private void onChampion()
+	protected void onChampion()    //overriden for necr
 	{
 		logger.trace(".onChampion();");
 		if (this.isTank) {
@@ -373,7 +374,7 @@ public abstract class Character extends LivingCreature
 		}
 		if (i > this.maxChatStartExpectation
 			||
-			i < this.minChatStartExpectation )
+			i < this.minChatStartExpectation)
 		{
 			logger.info("Chat is empty");
 			return null;
@@ -507,13 +508,13 @@ public abstract class Character extends LivingCreature
 	protected void selectClickPartyMembersPetByPartyStackPlace(PartyMember partyMember)
 	{
 		logger.trace("selectClickPartyMembers__Pet__ByPartyStackPlace");
-		this.l2Window.mouseClick_Relative(this.partyStack.get(id).petHpConstants.coordinateLeft);//not tested
+		this.l2Window.mouseClick_Relative(partyMember.petHpConstants.coordinateLeft);//not tested
 	}
 
 	protected void selectClickPartyMemberByPartyStackPlace(PartyMember partyMember)
 	{
 		logger.trace(".selectClickPartyMemberByPartyStackPlace(); --partyMember access");
-		this.l2Window.mouseClick_Relative(this.partyStack.get(id).hpConstants.coordinateLeft);//not tested
+		this.l2Window.mouseClick_Relative(partyMember.hpConstants.coordinateLeft);//not tested
 	}
 
 
@@ -540,7 +541,7 @@ public abstract class Character extends LivingCreature
 		this.l2Window.keyClick(48 + ProjectConstants.partyPanelMatch.get(this.id));    //assi button in the right spot
 	}
 
-	protected void attack()
+	protected void attack()        //is overriden for necr
 	{
 		logger.trace(".attack");
 		if (Mediator.noPetMode || !this.petUseIsAllowed) {
@@ -590,12 +591,12 @@ public abstract class Character extends LivingCreature
 	protected void championCallReaction(int callerID)
 	{
 		logger.trace(".championCallReaction();--default");
-		if (this.isSupport) {
+		if (this.isSupport) {    //sad but true
 			return;
 		}
 		selectPartyMemberByID(callerID);
 		assistTarget();
-		if (this.isHomeRunner) {        //can't move. go and help him
+		if (!this.isHomeRunner) {        //can't move. go and help him
 			petAttack();
 			this.petUseIsAllowed = false;
 			this.timerPetUseIsAllowed.schedule(new SetPetUseIsAllowedToTrue(), 30 * 1000);
@@ -608,6 +609,10 @@ public abstract class Character extends LivingCreature
 		}
 		if (this.id == ProjectConstants.ID_Spoiler) {
 			message5(callerID);    //spoilMyChamp
+			return;
+		}
+		if (this.isNuker) {
+			message5(callerID);
 			return;
 		}
 
@@ -632,8 +637,9 @@ public abstract class Character extends LivingCreature
 
 		l2Window.acceptWindowPosition();
 		logger.debug(".Character after acceptWindowPos. now it is h " + l2Window.h + " w " + l2Window.w + " top-left " + l2Window.windowPosition);
-
-		pet = new Pet(l2Window);//including setHP
+		if (!Mediator.noPetMode) {
+			pet = new Pet(l2Window);//including setHP
+		}
 		target = new Target(l2Window);
 
 		setHP();
@@ -661,9 +667,8 @@ public abstract class Character extends LivingCreature
 	protected class Skill extends Action
 	{
 
-		protected final int
-		key,
-		reuseTimeMillis;
+		protected final int key;
+		public final    int reuseTimeMillis;
 
 		protected boolean isReady = true;
 
@@ -678,6 +683,7 @@ public abstract class Character extends LivingCreature
 								   public void run()
 								   {
 									   Skill.this.isReady = true;
+									   cancel();
 								   }
 							   }, this.reuseTimeMillis);
 		}
@@ -696,12 +702,12 @@ public abstract class Character extends LivingCreature
 
 		}
 
-		public Skill(int key, int reuseTimeSecs)
+		public Skill(int keyInNumpadLine, int reuseTimeSecs)
 		{
 			super();
 			this.isSkill = true;
 //			this.priority	=	//skill has no priority. it is not to be used in queue
-			this.key = key;
+			this.key = KeyEvent.VK_NUMPAD0 + keyInNumpadLine;
 			this.reuseTimeMillis = reuseTimeSecs * 1000;
 
 		}
@@ -810,9 +816,13 @@ public abstract class Character extends LivingCreature
 					if (Character.this.isSummoner) {
 						petAttack();
 						break;
-					} else {
-						attack();
 					}
+					if (Character.this.isNuker) {
+						message6(this.message.getSenderID());
+						break;
+					}
+					attack();
+
 					break;
 				case 4:    //attack current target --use for peace purpose only
 					attack();
@@ -859,6 +869,10 @@ public abstract class Character extends LivingCreature
 				case 14:    //champion Detected
 					championCallReaction(message.getSenderID());
 					break;
+				case 15:    //trust me and talk to this npc
+					selectPartyMemberByID(this.message.getSenderID());
+					assistTarget();
+					Character.this.l2Window.keyClick(KeyEvent.VK_MINUS);    //maybe to separate function. discuss
 				default:
 					break;
 				//each command can ask macroLocksActions
@@ -895,7 +909,7 @@ public abstract class Character extends LivingCreature
 				return;
 			}
 			Action.logger.trace("ActionAbstractBuff.perform" + this.toString());
-			Character.this.l2Window.keyClick(96 + this.buttonNumber); //96 is num pad 0. increments lineary
+			Character.this.l2Window.keyClick(KeyEvent.VK_NUMPAD0 + this.buttonNumber); //96 is num pad 0. increments lineary
 			macroLocksActions(this.macroDelayMillis);    //locks any action because macro is executed
 			if (Character.this.modeBuff) {
 				Action.logger.debug(".perform: making a hard task of adding new buff. watch it. watch it!");

@@ -4,6 +4,7 @@ package PixelHunter;
 import PixelHunter.HotKeysByTulskiy.HotKeyHandler;
 import com.sun.jna.platform.win32.WinDef.HWND;
 
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -62,7 +63,7 @@ public class World
 			singleWindowMode = false;
 		}
 
-		singleWindowMode = true;//remove this after any tests are over
+//		singleWindowMode = true;//remove this after any tests are over
 
 		if (singleWindowMode) {
 
@@ -104,6 +105,7 @@ public class World
 					easySleep(400);
 				} else {
 					characters[0].lifeCycle();
+					characters[1].lifeCycle();
 				}
 			}
 		}
