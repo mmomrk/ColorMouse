@@ -1,0 +1,9 @@
+out/
+
+.idea/libraries/*
+.idea/vcs.xml
+.idea/workspace.xml
+.idea/.name
+.idea/dictionaries
+.idea/artifacts
+src/META-INF/
