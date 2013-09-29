@@ -1,4 +1,6 @@
 package PixelHunter;
+import static PixelHunter.GroupedVariables.ProjectConstants.*;
+
 /**
  * User: mrk
  * Date: 9/4/13; Time: 1:18 PM
@@ -42,11 +44,49 @@ public class ChatMessage
 		this.command = command;
 		this.modeColor = modeColor;
 		switch (senderSignature) {
-			case 83:    //todo after can get these values first-hand 83 is resdead
-				this.senderID = GroupedVariables.ProjectConstants.ID_Elvenelder;
+			case 87:
+			case 85:
+			case 86:
+				this.senderID=	ID_Warcryer;
+				break;
+			case 73:
+			case 71:
+			case 72:
+				this.senderID=	ID_Spoiler;
+				break;
+			case 79:
+			case 77:
+			case 78:
+				this.senderID=	ID_Swordsinger;
+				break;
+			case 97:
+			case 95:
+			case 96:
+				this.senderID=	ID_Bladedancer;
+				break;
+			case 64:
+			case 62:
+			case 63:
+				this.senderID=	ID_Warlock;
+				break;
+			case 83:
+			case 81:
+			case 82:
+				this.senderID=	ID_Templeknight;
+				break;
+			case 92:
+			case 90:
+			case 91:
+				this.senderID=	ID_Necromancer;
+				break;
+			case 69:
+			case 67:
+			case 68:
+				this.senderID=	ID_Elvenelder;
 				break;
 			default:
-				this.senderID = GroupedVariables.ProjectConstants.ID_Elvenelder;	//because it is 1
+				WinAPIAPI.showMessage("Unknown signature: "+senderSignature);
+				this.senderID=0;
 				break;
 		}
 

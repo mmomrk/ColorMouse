@@ -17,13 +17,50 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.TimerTask;
 
-public class InfoFrame extends JFrame	implements WindowListener
+public class InfoFrame extends JFrame implements WindowListener
 {
 	private static final Logger logger = LoggerFactory.getLogger(InfoFrame.class);
 
 	private JLabel  label;
 	private JButton okButton;
+
+	private boolean frameExists = false;
+
+	java.util.Timer timer = new java.util.Timer();
+
+	public void display(String newLabel, int delaySeconds)
+	{
+		logger.trace(".display timed-out frame");
+		this.timer.schedule(new TimerTask()
+		{
+			@Override
+			public void run()
+			{
+				InfoFrame.this.frameExists = false;
+			}
+		}, delaySeconds * 1000);
+		display(newLabel);
+	}
+
+	public void display(String newLabel)
+	{
+
+		this.label.setText(newLabel);    //questioned
+		this.pack();
+		this.setVisible(true);
+		this.frameExists = true;
+		while (frameExists) {
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+				logger.warn("exception in infoFrame sleep");
+			}
+		}
+	}
+
 
 	@Override
 	public void windowOpened(WindowEvent e)
@@ -33,7 +70,8 @@ public class InfoFrame extends JFrame	implements WindowListener
 
 	public void windowClosing(WindowEvent e)
 	{
-
+		logger.trace("window Closed is called. set frame exists to false");
+		WinAPIAPI.frameExists = false;
 	}
 
 	@Override
@@ -78,6 +116,9 @@ public class InfoFrame extends JFrame	implements WindowListener
 		add(okButton, BorderLayout.SOUTH);
 
 		this.setLocationRelativeTo(null);
+		display(text);
+
+		WinAPIAPI.frameExists = true;
 	}
 
 	class ActionOKButton implements ActionListener
@@ -86,23 +127,13 @@ public class InfoFrame extends JFrame	implements WindowListener
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
-			logger.trace("OK button press performed");
-			WinAPIAPI.frameExists = false;
-			InfoFrame.this.dispose();
+//			logger.trace("OK button press performed");
+			InfoFrame.this.frameExists = false;
+			GroupedVariables.Mediator.sleepRegime=false;
+			InfoFrame.this.setVisible(false);
+//			dispose();
 
 		}
 	}
-//    public static void main(String[] args) {
-//        final InfoFrame frame= new InfoFrame("T est Run");
-//        frame.setVisible(true);
-//        frame.pack();
-//        Timer timer = new Timer();
-//        timer.schedule(new TimerTask() {
-//            @Override
-//            public void run() {
-//                frame.dispose();
-//            }
-//        }, 5*1000);
-//
-//    }
+
 }

@@ -14,7 +14,7 @@ public class Test
 
 	public static void main(String args[])
 	{
-
+		WinAPIAPI.showMessage("waagh");
 		int a = WinAPIAPI.dialogWindow(0);
 		System.out.println(a);
 	}

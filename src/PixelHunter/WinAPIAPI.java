@@ -184,22 +184,30 @@ public class WinAPIAPI
 	}
 
 
-	static boolean frameExists = false;
+	public static boolean frameExists             = false;
+	private static boolean isFirtsRunOfShowMessage = true;
+	private static InfoFrame frame;
 
 	public static void showMessage(String s)
 	{
-		InfoFrame frame = new InfoFrame(s);
-		frame.setVisible(true);
-		frame.pack();
-		frameExists = true;
-		while (frameExists) {
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-				logger.warn("exception in infoframe sleep");
-			}
+		if (isFirtsRunOfShowMessage) {
+			frame = new InfoFrame(s);
+			isFirtsRunOfShowMessage = false;
+		} else {
+			frame.display(s);
 		}
+
+//		frameExists = true;
+//		while (frameExists) {
+//			try {
+//				Thread.sleep(500);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//				logger.warn("exception in infoframe sleep");
+//			}
+//		}
+
+
 //		System.out.println("Non-timed-out info frame. Text:\n" + s);
 //
 //		try {        //todo remove this after showmessage is fixed
@@ -219,29 +227,16 @@ public class WinAPIAPI
 //			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 //			WinAPIAPI.showMessage("WARNING: some stupid caused interruption of sleeping. you should find out about the cause!!");
 //		}
-		final InfoFrame frame = new InfoFrame(s);
-		frame.setVisible(true);
-		frame.pack();
-		while (frameExists) {
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-				logger.warn("exception in infoframe sleep");
-			}
 
+		if (isFirtsRunOfShowMessage) {
+			frame = new InfoFrame(s);
+			frame.display(s,t);
+			isFirtsRunOfShowMessage = false;
+		} else {
+			frame.display(s,t);
 		}
 
-		java.util.Timer timer = new java.util.Timer();
-		timer.schedule(new TimerTask()
-		{
-			@Override
-			public void run()
-			{
-				frame.dispose();
-				frameExists = false;
-			}
-		}, t * 1000);
+
 
 //		try {        //todo remove this after showmessage is fixed
 //			System.in.read();

@@ -25,6 +25,7 @@ public abstract class Character extends LivingCreature
 
 	private static final Logger logger = LoggerFactory.getLogger(Character.class);
 
+	private static final int minChatStartExpectation = 50;
 	private static final int maxChatStartExpectation = 130;
 
 	private static final int[] homesToRun        = {
@@ -40,7 +41,7 @@ public abstract class Character extends LivingCreature
 	isBDSWS          = false,        //funny buffs
 	isTank           = false,        //comments?
 	isPhysicAttacker = false,    //everything else
-	isNuker          = false,	//almost everything
+	isNuker          = false,    //almost everything
 	isHomeRunner     = true,
 
 	modeFarm    = false,
@@ -58,8 +59,8 @@ public abstract class Character extends LivingCreature
 
 	private Point chatStartingPoint;
 
-	protected Pet    pet;    //remove public after tests are done
-	protected Target target;
+	protected Pet         pet;    //remove public after tests are done
+	protected Target      target;
 	protected HpConstants hpConstants;
 	protected HpConstants mpConstants;
 	protected List<PartyMember> partyStack = new LinkedList<PartyMember>();
@@ -356,7 +357,7 @@ public abstract class Character extends LivingCreature
 		Point currentPoint = new Point(0, this.chatStartingPoint.y);//lower command pixel is 3 px under ':'
 		Color currentColor;
 		logger.debug("now searching first pixel in signature");
-		for (i = 50; i < this.maxChatStartExpectation; i += 3) {
+		for (i = maxChatStartExpectation; i >= minChatStartExpectation; i -= 3) {
 			currentPoint.x = i;
 			currentColor = l2Window.getRelPixelColor(currentPoint);
 			if (l2Window.colorsAreClose(currentColor, ProjectConstants.CHAT_COLOR_PARTY)) {
@@ -370,7 +371,10 @@ public abstract class Character extends LivingCreature
 				break;
 			}
 		}
-		if (i >= this.maxChatStartExpectation - 1) {
+		if (i > this.maxChatStartExpectation
+			||
+			i < this.minChatStartExpectation )
+		{
 			logger.info("Chat is empty");
 			return null;
 		} else {
@@ -379,6 +383,13 @@ public abstract class Character extends LivingCreature
 			}
 			while (L2Window.colorsAreClose(l2Window.getRelPixelColor(currentPoint), messageColor));
 			currentPoint.x++;
+			//now we are at first pixel of lower horizontal thingy
+			do {
+				currentPoint.x -= 5;
+			}
+			while (L2Window.colorsAreClose(l2Window.getRelPixelColor(currentPoint), messageColor));
+			currentPoint.x += 5;
+			//now we are at first pixel of the first pseudo-bit. congrats?
 		}
 		//probably found first pixel
 
@@ -430,19 +441,21 @@ public abstract class Character extends LivingCreature
 
 	public void setHP()    //not tested
 	{
-		this.hpConstants=new HpConstants(ProjectConstants.CHARACTER_HP_COLOR,new Point(0,0),new Point(0,0),this.id);
-		this.mpConstants=new HpConstants(ProjectConstants.CHARACTER_MP_COLOR,new Point(0,0),new Point(0,0),this.id);
-		this.l2Window.setCharacterHP(hpConstants,mpConstants);
+		logger.trace(".setHP(); for character");
+
+		this.hpConstants = new HpConstants(ProjectConstants.CHARACTER_HP_COLOR, new Point(0, 0), new Point(0, 0), this.id);
+		this.mpConstants = new HpConstants(ProjectConstants.CHARACTER_MP_COLOR, new Point(0, 0), new Point(0, 0), this.id);
+		this.l2Window.setCharacterHP(hpConstants, mpConstants);
 	}
 
-	public int getHP()	//not tested
+	public int getHP()    //not tested
 	{
-		return this.l2Window.getCharacterHPMP(this.hpConstants,true);
+		return this.l2Window.getCharacterHPMP(this.hpConstants, true);
 	}
 
 	protected int getMP()//test it
 	{
-		return this.l2Window.getCharacterHPMP(this.mpConstants,false);
+		return this.l2Window.getCharacterHPMP(this.mpConstants, false);
 	}
 
 	public String toString()

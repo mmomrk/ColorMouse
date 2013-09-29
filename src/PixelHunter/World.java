@@ -101,11 +101,7 @@ public class World
 		{
 			while (characters.length > 0) {    //for the pure debug purpose
 				if (GroupedVariables.Mediator.sleepRegime) {
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-					}
+					easySleep(400);
 				} else {
 					characters[0].lifeCycle();
 				}
@@ -115,6 +111,20 @@ public class World
 
 
 		return;
+	}
+
+	public static void easySleep(int timeMillis){
+		try {
+			Thread.sleep(timeMillis);
+		} catch (InterruptedException e) {
+
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		}
+	}
+
+	public static void pauseWorld(){
+		GroupedVariables.Mediator.sleepRegime=true;
+		WinAPIAPI.showMessage("You have pressed pause. press OK to unpause. do not press close");
 	}
 
 	public static void BDSWSBuff()    //implement todo

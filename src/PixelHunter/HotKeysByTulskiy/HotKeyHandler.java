@@ -76,7 +76,7 @@ public class HotKeyHandler implements HotKeyListener
 			System.exit(0);
 		} else if (hotKey.keyStroke == KeyStroke.getKeyStroke("PAUSE")) {
 			logger.debug("Got hotKey PAUSE. Executing");
-			WinAPIAPI.showMessage("You have pressed pause. press OK to unpause. do not press close");
+			World.pauseWorld();
 //			sleep();
 		} else if (hotKey.keyStroke == KeyStroke.getKeyStroke("shift PAUSE")) {
 			logger.debug("Got hotKey shift PAUSE. Executing");

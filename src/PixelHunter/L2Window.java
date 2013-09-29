@@ -226,6 +226,8 @@ public class L2Window
 
 	private int checkNextPixelsToTheHorizon(boolean toTheLeft, Point checkedCoordinate, Color neededColor)    //to be used with hp only
 	{
+		logger.trace(".checkNextPixelsToTheHorizon()");
+
 		int
 		x = checkedCoordinate.x,
 		y = checkedCoordinate.y;
@@ -233,19 +235,22 @@ public class L2Window
 		if (toTheLeft) {
 			for (int i = 0; i < 100; i++) {
 				if (colorsAreClose(getRelPixelColor(new Point(x - i, y)), neededColor)) {
+					logger.debug("checkNextPixelsToTheHorizon() returning "+ (i+1));
 					return i + 1;
 				}
-				if (i <= 0) {
-					return i + 1;
+				if (x-i <= 0) {
+					break;
 				}
 			}
 		} else {
 			for (int i = 0; i < 100; i++) {
 				if (colorsAreClose(getRelPixelColor(new Point(x + i, y)), neededColor)) {
+					logger.debug("checkNextPixelsToTheHorizon() returning "+ (i+1));
 					return i + 1;
 				}
 			}
 		}
+		logger.debug("checkNextPixelsToTheHorizon() returning zero. nothing red in this direction");
 		return 0;
 	}
 
@@ -274,7 +279,7 @@ public class L2Window
 		int i = 0, yLimit = 100;
 		while (!colorsAreClose(getRelPixelColor(currentCoordinate), hpConstants.color)) {
 			if (i >= yLimit) {   //overflow
-				logger.error("Failed to find y");
+				logger.error("Failed to find y ");
 				hpConstants.coordinateRight.setLocation(-1, -1);
 				hpConstants.coordinateLeft.setLocation(-1, -1);
 				return;
@@ -282,10 +287,10 @@ public class L2Window
 			currentCoordinate.y--;
 			i++;
 		}
-		logger.debug("Successfully found y" + currentCoordinate.y);
+		logger.debug("Successfully found y " + currentCoordinate.y);
 		if (debugMode == 2) {
 			advancedMouseMove(currentCoordinate);
-			WinAPIAPI.showMessage("Successfully found y");
+			WinAPIAPI.showMessage("Successfully found y ");
 		}
 
 		hpConstants.coordinateLeft.y = currentCoordinate.y;
@@ -357,7 +362,7 @@ public class L2Window
 		int i = 0, yLimit = 100;
 		while (!colorsAreClose(getRelPixelColor(currentCoordinate), hpConstants.color)) {
 			if (i >= yLimit) {   //overflow
-				logger.error("Failed to find y");
+				logger.error("Failed to find y ");
 				hpConstants.coordinateRight.setLocation(-1, -1);
 				hpConstants.coordinateLeft.setLocation(-1, -1);
 				return;
@@ -365,10 +370,10 @@ public class L2Window
 			currentCoordinate.y--;
 			i++;
 		}
-		logger.debug("Successfully found y" + currentCoordinate.y);
+		logger.debug("Successfully found y " + currentCoordinate.y);
 		if (debugMode == 2) {
 			advancedMouseMove(currentCoordinate);
-			WinAPIAPI.showMessage("Successfully found y");
+			WinAPIAPI.showMessage("Successfully found y ");
 		}
 
 		hpConstants.coordinateLeft.y = currentCoordinate.y;
