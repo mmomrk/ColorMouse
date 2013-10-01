@@ -21,9 +21,9 @@ public class Warlock extends Character
 	buffSummonBindingCubic             = new ActionSelfBuff("Summon Binding Cubic", 4, (15 * 60 - 15) * 1000, 5 * 1000);
 
 	private final Skill
-	healPet   = new Skill(VK_NUMPAD1, 1),    //watch it. not checked
-	summonCat = new Skill(VK_NUMPAD5, 1),
-	pickup    = new Skill(VK_NUMPAD6, 4);
+	healPet   = new Skill(1, 1),    //watch it. not checked
+	summonCat = new Skill(5, 1),
+	pickup    = new Skill(6, 4);
 
 
 	@Override
@@ -39,15 +39,19 @@ public class Warlock extends Character
 	public void classSpecificLifeCycle()
 	{
 		logger.trace(".classSpecificLifeCycle");
-		if (!noPetMode && pet.isDead()) {
-			useSkill(summonCat);
-			return;
-		}
-		if (!noPetMode && pet.getHP() < 70) {
-			useSkill(healPet);
-		}
 
-		useSkill(pickup);
+		if (this.modeFarm || this.modeRB) {
+			if (!noPetMode && pet.isDead()) {
+				useSkill(summonCat);
+				return;
+			}
+			if (!noPetMode && pet.getHP() < 70) {
+				useSkill(healPet);
+			}
+		}
+		if (this.modeFarm) {
+			useSkill(pickup);
+		}
 	}
 
 	@Override

@@ -870,8 +870,9 @@ public abstract class Character extends LivingCreature
 					championCallReaction(message.getSenderID());
 					break;
 				case 15:    //trust me and talk to this npc
-					selectPartyMemberByID(this.message.getSenderID());
+//					selectPartyMemberByID(this.message.getSenderID());
 					assistTarget();
+					Character.this.l2Window.keyClick(KeyEvent.VK_MINUS);    //maybe to separate function. discuss
 					Character.this.l2Window.keyClick(KeyEvent.VK_MINUS);    //maybe to separate function. discuss
 				default:
 					break;

@@ -1,11 +1,4 @@
 package PixelHunter;
-import PixelHunter.HotKeysByTulskiy.Common.HotKey;
-import PixelHunter.HotKeysByTulskiy.HotKeyHandler;
-
-import javax.swing.*;
-import java.lang.*;
-import java.lang.Character;
-
 public class Test
 {
 	static {
@@ -14,6 +7,7 @@ public class Test
 
 	public static void main(String args[])
 	{
+
 		WinAPIAPI.showMessage("waagh");
 		int a = WinAPIAPI.dialogWindow(0);
 		System.out.println(a);

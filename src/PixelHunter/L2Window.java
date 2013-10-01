@@ -58,19 +58,13 @@ public class L2Window
 
 //		WinAPIAPI.setActiveWindow(this.hwnd);    //watch it: this should not decrease productivity
 
+		World.easySleep(150);
+
 		robot.keyPress(key);
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-		}
+		World.easySleep(50);
 
 		robot.keyRelease(key);
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-		}
+		World.easySleep(150);
 
 		return;
 
