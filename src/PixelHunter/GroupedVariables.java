@@ -77,6 +77,8 @@ public class GroupedVariables
 		public static final int CHAT_TASK_LIST_LENGTH;
 		public static final int INITIAL_DEBUG_MODE;
 		public static final int WINDOW_ACTIVATE_DELAY_MILLIS;
+		public static final int TIME_SLEEP_KEYPRESS_MILLIS_BEFORE;
+		public static final int TIME_SLEEP_KEYPRESS_MILLIS_AFTER;
 
 		private void main()
 		{
@@ -131,6 +133,8 @@ public class GroupedVariables
 			CHAT_TASK_LIST_LENGTH = Integer.parseInt(properties.get("CHAT_TASK_LIST_LENGTH").toString());
 			INITIAL_DEBUG_MODE = Integer.parseInt(properties.get("INITIAL_DEBUG_MODE").toString());
 			WINDOW_ACTIVATE_DELAY_MILLIS = Integer.parseInt(properties.get("WINDOW_ACTIVATE_DELAY_MILLIS").toString());
+			TIME_SLEEP_KEYPRESS_MILLIS_BEFORE =	Integer.parseInt(properties.get("TIME_SLEEP_KEYPRESS_MILLIS_BEFORE").toString());
+			TIME_SLEEP_KEYPRESS_MILLIS_AFTER	=	Integer.parseInt(properties.get("TIME_SLEEP_KEYPRESS_MILLIS_AFTER").toString());
 
 			int red, green, blue;
 			red = Integer.parseInt(properties.get("CharacterHpColor_red").toString());

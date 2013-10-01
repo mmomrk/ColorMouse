@@ -523,8 +523,9 @@ public abstract class Character extends LivingCreature
 		if (id != this.id) {
 			logger.trace(".selectPartyMemberByID: " + id);
 			this.l2Window.keyClick(48 + ProjectConstants.partyPanelMatch.get(id));    //VK_0 is 48
+			World.easySleep(300);
 		} else {
-			logger.warn("attempt to select self through selectPartyMemberByID");
+			logger.warn("attempt to select self through selectPartyMemberByID: id "+id);
 		}
 
 	}

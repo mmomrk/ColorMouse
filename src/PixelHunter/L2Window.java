@@ -44,12 +44,7 @@ public class L2Window
 	{
 		logger.trace(".activate");
 		WinAPIAPI.setActiveWindow(this.hwnd);
-		try {
-			Thread.sleep(activateDelay);
-		} catch (InterruptedException e) {
-			logger.error("error while sleeping in activate");
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-		}
+		World.easySleep(activateDelay);
 	}
 
 	public void keyClick(int key)
@@ -58,13 +53,13 @@ public class L2Window
 
 //		WinAPIAPI.setActiveWindow(this.hwnd);    //watch it: this should not decrease productivity
 
-		World.easySleep(150);
+		World.easySleep(GroupedVariables.ProjectConstants.TIME_SLEEP_KEYPRESS_MILLIS_BEFORE);
 
 		robot.keyPress(key);
 		World.easySleep(50);
 
 		robot.keyRelease(key);
-		World.easySleep(150);
+		World.easySleep(GroupedVariables.ProjectConstants.TIME_SLEEP_KEYPRESS_MILLIS_AFTER);
 
 		return;
 

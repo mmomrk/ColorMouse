@@ -145,7 +145,6 @@ public class WinAPIAPI
 //		if (User32.INSTANCE.SetFocus(hwnd)==null){
 //			logger.error(".setActiveWindow failed to activate window");
 //		}
-		World.easySleep(200);
 
 	}
 
