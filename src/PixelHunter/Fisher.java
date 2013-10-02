@@ -133,11 +133,19 @@ public class Fisher    //todo finished making this class super cool
 				return;
 			}
 		}
-		while (!(colorsAreClose(getAbsPixelColor(this.blinkControlPoint), this.colorControlBlue, threshold)
-				 ||
-				 colorsAreClose(getAbsPixelColor(this.blinkControlPoint), this.colorControlOrange, threshold))
-			   &&
-			   timePassed > 10000);
+		while (!(timePassed > 10000
+				 &&
+				 (colorsAreClose(getAbsPixelColor(this.blinkControlPoint), this.colorControlBlue, threshold)
+				  ||
+				  colorsAreClose(getAbsPixelColor(this.blinkControlPoint), this.colorControlOrange, threshold))));
+
+
+
+//		while (!(colorsAreClose(getAbsPixelColor(this.blinkControlPoint), this.colorControlBlue, threshold)
+//				 ||
+//				 colorsAreClose(getAbsPixelColor(this.blinkControlPoint), this.colorControlOrange, threshold))
+//			   &&
+//			   timePassed > 10000);
 		logger.info("Fish HP bar finally appeared");
 	}
 

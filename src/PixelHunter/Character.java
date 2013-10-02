@@ -204,6 +204,15 @@ public abstract class Character extends LivingCreature
 						onChampion();
 					}
 				}
+			} else if (this.modeRB) {
+
+				if (!this.isSupport) {        //no killing for supports. only attackers attack
+					if (!targetIsDeadInThisLifecycle) {
+						attack();
+					}	else {
+						todoOffer(new ActionPvE());	//watch it
+					}
+				}
 			}
 		}
 
@@ -525,7 +534,7 @@ public abstract class Character extends LivingCreature
 			this.l2Window.keyClick(48 + ProjectConstants.partyPanelMatch.get(id));    //VK_0 is 48
 			World.easySleep(300);
 		} else {
-			logger.warn("attempt to select self through selectPartyMemberByID: id "+id);
+			logger.warn("attempt to select self through selectPartyMemberByID: id " + id);
 		}
 
 	}
@@ -540,6 +549,7 @@ public abstract class Character extends LivingCreature
 	{
 		logger.trace(".assistTarget");
 		this.l2Window.keyClick(48 + ProjectConstants.partyPanelMatch.get(this.id));    //assi button in the right spot
+		World.easySleep(300);
 	}
 
 	protected void attack()        //is overriden for necr
@@ -797,11 +807,12 @@ public abstract class Character extends LivingCreature
 					break;
 				case 1:    //follow
 					selectPartyMemberByID(this.message.getSenderID());
-					easySleep(500);
+					easySleep(400);
 					selectPartyMemberByID(this.message.getSenderID());
 					Character.this.modeFarm = false;
 					Character.this.modeBuff = false;
 					Character.this.modeHomeRun = false;
+					Character.this.modeRB	=	false;
 					Character.this.followFlag = true;
 					break;
 				case 2:    //assi
@@ -875,6 +886,8 @@ public abstract class Character extends LivingCreature
 					assistTarget();
 					Character.this.l2Window.keyClick(KeyEvent.VK_MINUS);    //maybe to separate function. discuss
 					Character.this.l2Window.keyClick(KeyEvent.VK_MINUS);    //maybe to separate function. discuss
+				case 16:
+					Character.this.modeRB=true;
 				default:
 					break;
 				//each command can ask macroLocksActions

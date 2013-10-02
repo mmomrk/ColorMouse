@@ -145,6 +145,8 @@ public class ElvenElder extends PixelHunter.Character
 			if (healWoundedPartyMembers() < 70) {          //watch it
 				this.l2Window.keyClick(KeyEvent.VK_MULTIPLY);//panic   .
 			}
+		}	else if (this.modeRB){
+			healWoundedPartyMembers();
 		}
 	}
 
