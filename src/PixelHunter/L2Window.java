@@ -527,7 +527,6 @@ public class L2Window
 	public static Color getAbsPixelColor(Point absolutePoint)
 	{
 
-
 		Color color;
 		color = robot.getPixelColor(absolutePoint.x, absolutePoint.y);
 		switch (debugMode) {

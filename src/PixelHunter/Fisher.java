@@ -23,8 +23,8 @@ public class Fisher    //todo finished making this class super cool
 	colorHpBlue           = new Color(4, 103, 159),//(12, 104, 156),
 	colorHpOrange         = new Color(144, 36, 7),
 	colorControlFrame     = new Color(178, 163, 141),
-	colorControlOrange    = new Color(196, 153, 20),
-	colorControlBlue      = new Color(0, 179, 252);
+	colorControlOrange    = new Color(195, 155, 20),
+	colorControlBlue      = new Color(0, 179, 251);
 
 	private static boolean nightMode = false;
 	private final Point blinkControlPoint;
@@ -36,14 +36,15 @@ public class Fisher    //todo finished making this class super cool
 
 
 	private static final int
-	timeToWaitMillis  = 1000,//how much time  to wait before act
-	timeToSleepMillis = 300;//passed to sleep method
+	timeToWaitMillis  = 850,//how much time  to wait before act
+	timeToSleepMillis = 300,//passed to sleep method
+	timeInLoopDelayInAnalyze=20;
 
 	private final Point
 	leftmostBluePixelCoordinate,
 	controlFrameCoordinate;
 
-	private final int threshold = 4;    //default is 4
+	private final int threshold = 6;    //default is 4
 
 	public void infiniteFish()
 	{
@@ -55,14 +56,10 @@ public class Fisher    //todo finished making this class super cool
 	public void fish()
 	{
 		logger.trace(".fish");
-//		keyClickStatic(KeyEvent.VK_NUMPAD1);    //not safe but anyway
-		try {
-			Thread.sleep(timeToSleepMillis);
-		} catch (InterruptedException e) {
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-		}
+
 		if (!isFishingFrameExist()) {    //we killed the frame. correcting the mistake
-			keyClickStatic(KeyEvent.VK_NUMPAD1);
+			keyClickStatic(KeyEvent.VK_F2);
+			logger.info("Throwing a bait");
 		}
 
 		this.firstAnalysis = true;
@@ -128,7 +125,7 @@ public class Fisher    //todo finished making this class super cool
 				logger.error("sleep in waitForFishHP was interrupted for some reason");
 				e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 			}
-			logger.debug("conditions for exit: time(10s)" + (timePassed < 10000));
+//			logger.debug("conditions for exit: time(10s)" + (timePassed < 10000));
 			if (!isFishingFrameExist()) {
 				return;
 			}
@@ -138,37 +135,29 @@ public class Fisher    //todo finished making this class super cool
 				 (colorsAreClose(getAbsPixelColor(this.blinkControlPoint), this.colorControlBlue, threshold)
 				  ||
 				  colorsAreClose(getAbsPixelColor(this.blinkControlPoint), this.colorControlOrange, threshold))));
-
-
-
-//		while (!(colorsAreClose(getAbsPixelColor(this.blinkControlPoint), this.colorControlBlue, threshold)
-//				 ||
-//				 colorsAreClose(getAbsPixelColor(this.blinkControlPoint), this.colorControlOrange, threshold))
-//			   &&
-//			   timePassed > 10000);
 		logger.info("Fish HP bar finally appeared");
 	}
 
 	private boolean isFishingFrameExist()
 	{
-		logger.trace(".isFishingFrameExist");
+//		logger.trace(".isFishingFrameExist");
 		if (colorsAreClose(getAbsPixelColor(this.controlFrameCoordinate), this.colorControlFrame, threshold)) {
-			logger.debug("yes. exists");
+//			logger.debug("yes. exists");
 			return true;
 		} else {
-			logger.debug("no. not exists");
+//			logger.debug("no. not exists");
 			return false;
 		}
 	}
 
 	private void act(boolean reel)
 	{
-		logger.trace(".act " + reel);
 		if (reel) {
-			keyClickStatic(KeyEvent.VK_NUMPAD3);
+			keyClickStatic(KeyEvent.VK_F4);
 		} else {
-			keyClickStatic(KeyEvent.VK_NUMPAD2);
+			keyClickStatic(KeyEvent.VK_F3);
 		}
+		logger.info(".act " + reel);
 
 	}
 
@@ -227,6 +216,7 @@ public class Fisher    //todo finished making this class super cool
 			}
 
 		}
+
 		int timePassed = 0;
 		while (timePassed < this.timeToWaitMillis) {
 			if (colorsAreClose(getAbsPixelColor(workingPoint), this.colorHpBlue, threshold) ||
@@ -234,13 +224,9 @@ public class Fisher    //todo finished making this class super cool
 			{
 				return true;    //do the reeling
 			}
-			timePassed += this.timeToSleepMillis;
-			logger.debug("now performing sleep for ms: " + timeToSleepMillis);
-			try {
-				Thread.sleep(timeToSleepMillis);
-			} catch (InterruptedException e) {
-				e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-			}
+			timePassed += timeInLoopDelayInAnalyze;
+			logger.debug("now performing sleep for ms: " + timeInLoopDelayInAnalyze);
+			World.easySleep(timeInLoopDelayInAnalyze);
 		}
 
 		return false;//pumping
@@ -252,6 +238,7 @@ public class Fisher    //todo finished making this class super cool
 		logger.trace(".findBar");
 		WinAPIAPI.showMessage("Wlcome to fishing. Move mouse UNDER fish hp bar");
 		Point currentPoint = WinAPIAPI.getMousePos();
+		logger.debug("got mouse position at "+currentPoint);
 		while (!(colorsAreClose(getAbsPixelColor(currentPoint), this.colorHpBlue, threshold)
 				 ||
 				 colorsAreClose(getAbsPixelColor(currentPoint), this.colorHpOrange, threshold)))
@@ -273,9 +260,9 @@ public class Fisher    //todo finished making this class super cool
 	}
 
 
-	public Fisher(L2Window l2Window)
+	public Fisher()
 	{
-		this.l2Window = l2Window;
+
 		this.leftmostBluePixelCoordinate = findBar();
 		this.controlFrameCoordinate = new Point(this.leftmostBluePixelCoordinate.x, this.leftmostBluePixelCoordinate.y + 40);
 		this.blinkControlPoint = new Point(this.leftmostBluePixelCoordinate.x + 1, this.leftmostBluePixelCoordinate.y + 3);

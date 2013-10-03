@@ -3,8 +3,8 @@ package PixelHunter;
 
 import PixelHunter.HotKeysByTulskiy.HotKeyHandler;
 import com.sun.jna.platform.win32.WinDef.HWND;
+import org.slf4j.impl.SimpleLogger;
 
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -26,22 +26,27 @@ public class World
 
 	public static void main(String[] args)
 	{
-		System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "TRACE");
-
-		HotKeyHandler hotKeyHandler = new HotKeyHandler();
-
 		//WELCOME MESSAGE TODO would suit here. also, gui would be just nice
 		ArrayList<String> argumentsList = new ArrayList<String>(Arrays.asList(args));
-		GroupedVariables groupedVariables = new GroupedVariables();
+		System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "trace");
+
+
+		GroupedVariables.ProjectConstants initializingConstants = new GroupedVariables.ProjectConstants();
+		HotKeyHandler hotKeyHandler = new HotKeyHandler();
 		processIdentifier = new ProcessIdentifier();
 		hwnds = ProcessIdentifier.getL2HwndArray();
 
 		if (argumentsList.contains("-f")
 			||
-			argumentsList.contains("--fishing"))
+			argumentsList.contains("--fishing")
+			||
+			argumentsList.contains("--fish")
+			||
+			argumentsList.contains("--fisher"))
 		{    //fishing
-			Fisher fisher = new Fisher(new L2Window(hwnds.get(0)));
-			fisher.infiniteFish();
+			L2Window initializingL2Window = new L2Window();
+			Fisher fisher = new Fisher();
+			fisher.infiniteFish();           //uses L2window static methods
 			return;
 		}
 		if (argumentsList.contains("-t")
@@ -52,11 +57,13 @@ public class World
 		}
 		if (argumentsList.contains("-np")
 			||
-			argumentsList.contains("--nopetmode")){
-			GroupedVariables.Mediator.noPetMode=true;
+			argumentsList.contains("--nopetmode"))
+		{
+			GroupedVariables.Mediator.noPetMode = true;
 		}
 
-		int id = 0;
+
+
 		if (hwnds.size() == 1) {
 			singleWindowMode = true;
 		} else {
@@ -64,7 +71,7 @@ public class World
 		}
 
 //		singleWindowMode = true;//remove this after any tests are over
-
+		int id = 0;
 		if (singleWindowMode) {
 
 			L2Window.initiateSize(0, hwnds.get(0));    //yes, static method access, not the class representative
@@ -115,7 +122,8 @@ public class World
 		return;
 	}
 
-	public static void easySleep(int timeMillis){
+	public static void easySleep(int timeMillis)
+	{
 		try {
 			Thread.sleep(timeMillis);
 		} catch (InterruptedException e) {
@@ -124,8 +132,9 @@ public class World
 		}
 	}
 
-	public static void pauseWorld(){
-		GroupedVariables.Mediator.sleepRegime=true;
+	public static void pauseWorld()
+	{
+		GroupedVariables.Mediator.sleepRegime = true;
 		WinAPIAPI.showMessage("You have pressed pause. press OK to unpause. do not press close");
 	}
 

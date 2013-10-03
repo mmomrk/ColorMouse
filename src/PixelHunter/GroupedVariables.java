@@ -40,12 +40,13 @@ public class GroupedVariables
 	{
 		private static final Logger logger = LoggerFactory.getLogger(GroupedVariables.ProjectConstants.class);
 		//refactor all these were static.note this
-		public static final int  HOMERUN_TIME;
-		public static final int  HEAL_FROM;
-		public static final int  HEAL_TO;
-		public static final int  MAJOR_HEAL_FROM;
-		public static final int  MAJOR_HEAL_TO;
-		public static final long CHAMPION_SUSPICION_TIME_SECONDS;
+		public static final int    HOMERUN_TIME;
+		public static final int    HEAL_FROM;
+		public static final int    HEAL_TO;
+		public static final int    MAJOR_HEAL_FROM;
+		public static final int    MAJOR_HEAL_TO;
+		public static final long   CHAMPION_SUSPICION_TIME_SECONDS;
+		public static final double SS_TO_LOOT_MASS_CONVERSION_SPOILER;
 
 		public static final int ID_PET;
 		public static final int ID_TARGET;
@@ -102,6 +103,7 @@ public class GroupedVariables
 			MAJOR_HEAL_FROM = Integer.parseInt(properties.get("MAJOR_HEAL_FROM").toString());
 			MAJOR_HEAL_TO = Integer.parseInt(properties.get("MAJOR_HEAL_TO").toString());
 			CHAMPION_SUSPICION_TIME_SECONDS = Long.parseLong(properties.get("CHAMPION_SUSPICION_TIME_SECONDS").toString());
+			SS_TO_LOOT_MASS_CONVERSION_SPOILER	= Double.parseDouble(properties.get("SS_TO_LOOT_MASS_CONVERSION_SPOILER").toString());
 
 			ID_PET = Integer.parseInt(properties.get("ID_pet").toString());
 			ID_TARGET = Integer.parseInt(properties.get("ID_target").toString());

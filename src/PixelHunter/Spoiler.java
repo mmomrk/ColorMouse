@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import java.awt.event.KeyEvent;
 import java.util.Timer;
 
+import static java.lang.Math.random;
+
 /**
  * User: mrk
  * Date: 9/21/13; Time: 5:36 AM
@@ -19,6 +21,7 @@ public class Spoiler extends Character
 								 modeSpoil = false,
 	temporarySpoil                         = false,
 	iSpoiledTheMob                         = false;
+	private Skill pickUp = new Skill(4, 10);
 
 	protected void message5(int caller)    //spoil my mob
 	{
@@ -87,6 +90,12 @@ public class Spoiler extends Character
 
 		if (this.iSpoiledTheMob) {
 			sweep();
+		}
+
+		if (this.modeFarm) {
+			if (random() < GroupedVariables.ProjectConstants.SS_TO_LOOT_MASS_CONVERSION_SPOILER) {	//watch it
+				useSkill(pickUp);
+			}
 		}
 	}
 
