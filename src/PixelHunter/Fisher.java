@@ -7,6 +7,7 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 
 import static PixelHunter.L2Window.*;
+import static java.lang.System.exit;
 
 /**
  * User: mrk
@@ -23,8 +24,8 @@ public class Fisher    //todo finished making this class super cool
 	colorHpBlue           = new Color(4, 103, 159),//(12, 104, 156),
 	colorHpOrange         = new Color(144, 36, 7),
 	colorControlFrame     = new Color(178, 163, 141),
-	colorControlOrange    = new Color(195, 155, 20),
-	colorControlBlue      = new Color(0, 179, 251);
+	colorControlOrange    = new Color(195, 55, 20),
+	colorControlBlue      = new Color(0, 175, 246);
 
 	private static boolean nightMode = false;
 	private final Point blinkControlPoint;
@@ -33,6 +34,7 @@ public class Fisher    //todo finished making this class super cool
 	private boolean
 	firstFish     = true,
 	firstAnalysis = true;
+
 
 
 	private static final int
@@ -44,13 +46,34 @@ public class Fisher    //todo finished making this class super cool
 	leftmostBluePixelCoordinate,
 	controlFrameCoordinate;
 
-	private final int threshold = 6;    //default is 4
+	private final int threshold = 10;    //default is 4
+
+	private int numberOfFAilsInARow = 0,
+	lastKeyPressed=0;
+	private long failTime;
+
+	private void checkForDisconnect(){
+		if (this.lastKeyPressed==KeyEvent.VK_NUMPAD2){
+			numberOfFAilsInARow++;
+		}	else {
+			numberOfFAilsInARow=0;
+		}
+		if (numberOfFAilsInARow>=40){
+
+			exit(1);
+		}
+
+	}
 
 	public void infiniteFish()
 	{
 		while (true) {
 			fish();
+			checkForDisconnect();
 		}
+
+
+
 	}
 
 	public void fish()
@@ -58,7 +81,8 @@ public class Fisher    //todo finished making this class super cool
 		logger.trace(".fish");
 
 		if (!isFishingFrameExist()) {    //we killed the frame. correcting the mistake
-			keyClickStatic(KeyEvent.VK_F2);
+			keyClickStatic(KeyEvent.VK_NUMPAD2);
+			this.lastKeyPressed=KeyEvent.VK_NUMPAD2;
 			logger.info("Throwing a bait");
 		}
 
@@ -153,9 +177,11 @@ public class Fisher    //todo finished making this class super cool
 	private void act(boolean reel)
 	{
 		if (reel) {
-			keyClickStatic(KeyEvent.VK_F4);
+			keyClickStatic(KeyEvent.VK_NUMPAD4);
+			lastKeyPressed=KeyEvent.VK_NUMPAD4;
 		} else {
-			keyClickStatic(KeyEvent.VK_F3);
+			keyClickStatic(KeyEvent.VK_NUMPAD3);
+			lastKeyPressed=KeyEvent.VK_NUMPAD3;
 		}
 		logger.info(".act " + reel);
 
@@ -266,6 +292,7 @@ public class Fisher    //todo finished making this class super cool
 		this.leftmostBluePixelCoordinate = findBar();
 		this.controlFrameCoordinate = new Point(this.leftmostBluePixelCoordinate.x, this.leftmostBluePixelCoordinate.y + 40);
 		this.blinkControlPoint = new Point(this.leftmostBluePixelCoordinate.x + 1, this.leftmostBluePixelCoordinate.y + 3);
+		this.failTime=System.currentTimeMillis();
 	}
 
 }

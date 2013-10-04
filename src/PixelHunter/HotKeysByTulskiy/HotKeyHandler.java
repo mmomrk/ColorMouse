@@ -150,6 +150,7 @@ public class HotKeyHandler implements HotKeyListener
 	private void registerHotKeys()
 	{
 		logger.trace(".registerHotKeys");
+		provider.reset();
 		provider.register(KeyStroke.getKeyStroke("PAUSE"), this);
 		provider.register(KeyStroke.getKeyStroke("alt PAUSE"), this);
 		provider.register(KeyStroke.getKeyStroke("shift PAUSE"), this);
