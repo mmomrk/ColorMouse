@@ -56,6 +56,7 @@ public class L2Window
 		World.easySleep(GroupedVariables.ProjectConstants.TIME_SLEEP_KEYPRESS_MILLIS_BEFORE);
 
 		robot.keyPress(key);
+
 		World.easySleep(50);
 
 		robot.keyRelease(key);

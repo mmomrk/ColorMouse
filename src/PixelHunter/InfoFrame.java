@@ -38,7 +38,10 @@ public class InfoFrame extends JFrame implements WindowListener
 			@Override
 			public void run()
 			{
+				logger.trace(".run schedule timed-out frame");
 				InfoFrame.this.frameExists = false;
+				GroupedVariables.Mediator.sleepRegime=false;
+				InfoFrame.this.setVisible(false);
 			}
 		}, delaySeconds * 1000);
 		display(newLabel);
@@ -116,7 +119,7 @@ public class InfoFrame extends JFrame implements WindowListener
 		add(okButton, BorderLayout.SOUTH);
 
 		this.setLocationRelativeTo(null);
-		display(text);
+
 
 		WinAPIAPI.frameExists = true;
 	}

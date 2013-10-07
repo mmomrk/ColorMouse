@@ -117,7 +117,7 @@ public abstract class Character extends LivingCreature
 	protected boolean iThinkIAmFacingAChampion()
 	{
 		logger.trace(".iThinkIAmFacingAChampion()");
-		if (System.currentTimeMillis() - this.iStartedToKillTargetAt > ProjectConstants.CHAMPION_SUSPICION_TIME_SECONDS * 1000) {
+		if (this.modeFarm && System.currentTimeMillis() - this.iStartedToKillTargetAt > ProjectConstants.CHAMPION_SUSPICION_TIME_SECONDS * 1000) {
 			if (this.targetWasAlive) {
 				return true;
 			}
@@ -836,7 +836,7 @@ public abstract class Character extends LivingCreature
 					attack();
 
 					break;
-				case 4:    //attack current target --use for peace purpose only
+				case 4:    //attack current target, RB-adopted
 					attack();
 					break;
 				case 5:    //class-specific, reserved
@@ -1005,7 +1005,7 @@ public abstract class Character extends LivingCreature
 
 	protected class ActionPvE extends Action
 	{
-
+		private int iNeedSomeVAriableToGenerateEquals;
 		@Override
 		public void perform()
 		{
@@ -1024,22 +1024,23 @@ public abstract class Character extends LivingCreature
 			if (this == o) {
 				return true;
 			}
-			if (o == null || getClass() != o.getClass()) {    //todo find a bug. this case does not return false
+			if (o == null || getClass() != o.getClass()) {
 				return false;
 			}
 
-			try {
-				ActionChatCommand that = (ActionChatCommand) o;
-			} catch (Exception e) {
-				return false;
-			}
+			ActionPvE actionPvE = (ActionPvE) o;
 
-			ActionChatCommand that = (ActionChatCommand) o;    //very bad.. very bad.. discuss
-			if (this.isPvE() != that.isPvE()) {
+			if (iNeedSomeVAriableToGenerateEquals != actionPvE.iNeedSomeVAriableToGenerateEquals) {
 				return false;
 			}
 
 			return true;
+		}
+
+		@Override
+		public int hashCode()
+		{
+			return iNeedSomeVAriableToGenerateEquals;
 		}
 
 		public ActionPvE()
@@ -1047,7 +1048,9 @@ public abstract class Character extends LivingCreature
 			super();
 			this.isPvE = true;
 			this.priority = 100;
+			this.iNeedSomeVAriableToGenerateEquals=0;
 			logger.trace("Created ActionPvE. ID " + this.getID());
+
 		}
 	}
 

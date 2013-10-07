@@ -38,7 +38,7 @@ public class Fisher    //todo finished making this class super cool
 
 
 	private static final int
-	timeToWaitMillis  = 850,//how much time  to wait before act
+	timeToWaitMillis  = 950,//how much time  to wait before act
 	timeToSleepMillis = 300,//passed to sleep method
 	timeInLoopDelayInAnalyze=20;
 
@@ -114,11 +114,7 @@ public class Fisher    //todo finished making this class super cool
 	{
 		logger.trace(".waitForBlink");
 		int timePassed = 0;
-		try {
-			Thread.sleep(300);    //yes.. my bot is too fast fot this game
-		} catch (InterruptedException e) {
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-		}
+		World.easySleep(700);
 		while (!(colorsAreClose(getAbsPixelColor(this.blinkControlPoint), this.colorControlBlue, threshold)
 				 ||
 				 colorsAreClose(getAbsPixelColor(this.blinkControlPoint), this.colorControlOrange, threshold)))
@@ -251,7 +247,7 @@ public class Fisher    //todo finished making this class super cool
 				return true;    //do the reeling
 			}
 			timePassed += timeInLoopDelayInAnalyze;
-			logger.debug("now performing sleep for ms: " + timeInLoopDelayInAnalyze);
+//			logger.debug("now performing sleep for ms: " + timeInLoopDelayInAnalyze);
 			World.easySleep(timeInLoopDelayInAnalyze);
 		}
 

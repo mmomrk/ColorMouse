@@ -192,42 +192,17 @@ public class WinAPIAPI
 	{
 		if (isFirtsRunOfShowMessage) {
 			frame = new InfoFrame(s);
+			frame.display(s);
 			isFirtsRunOfShowMessage = false;
 		} else {
 			frame.display(s);
 		}
 
-//		frameExists = true;
-//		while (frameExists) {
-//			try {
-//				Thread.sleep(500);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-//				logger.warn("exception in infoframe sleep");
-//			}
-//		}
-
-
-//		System.out.println("Non-timed-out info frame. Text:\n" + s);
-//
-//		try {        //todo remove this after showmessage is fixed
-//			System.in.read();
-//		} catch (IOException e) {
-//			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-//		}
 
 	}
 
 	public static void showMessage(String s, int t)
-	{//REDO todo
-//		System.out.println("Timed out message window: " + s);
-//		try {
-//			TimeUnit.SECONDS.sleep(t);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-//			WinAPIAPI.showMessage("WARNING: some stupid caused interruption of sleeping. you should find out about the cause!!");
-//		}
-
+	{
 		if (isFirtsRunOfShowMessage) {
 			frame = new InfoFrame(s);
 			frame.display(s,t);
@@ -235,14 +210,6 @@ public class WinAPIAPI
 		} else {
 			frame.display(s,t);
 		}
-
-
-
-//		try {        //todo remove this after showmessage is fixed
-//			System.in.read();
-//		} catch (IOException e) {
-//			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-//		}
 	}
 
 	public static void toolTip(String s, int x, int y)
