@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static PixelHunter.L2Window.*;
 import static java.lang.System.exit;
@@ -32,15 +34,17 @@ public class Fisher    //todo finished making this class super cool
 	private       Point workingPoint;
 
 	private boolean
-	firstFish     = true,
-	firstAnalysis = true;
+	firstFish                         = true,
+	firstAnalysis                     = true,
+	finishedWaitingForPumpingDecision = false;
 
-
+	private Timer timerWaitForPumpingSolution = new Timer();
 
 	private static final int
-	timeToWaitMillis  = 950,//how much time  to wait before act
-	timeToSleepMillis = 300,//passed to sleep method
-	timeInLoopDelayInAnalyze=20;
+	timeToWaitMillis         = 950,//how much time  to wait before act
+	timeToSleepMillis        = 300,//passed to sleep method
+	timeInLoopDelayInAnalyze = 20,
+	timeSkillsReuse          = 1800;    //watch it
 
 	private final Point
 	leftmostBluePixelCoordinate,
@@ -48,17 +52,23 @@ public class Fisher    //todo finished making this class super cool
 
 	private final int threshold = 10;    //default is 4
 
-	private int numberOfFAilsInARow = 0,
-	lastKeyPressed=0;
-	private long failTime;
+	private int
+	numberOfFAilsInARow = 0,
+	lastKeyPressed      = 0;
 
-	private void checkForDisconnect(){
-		if (this.lastKeyPressed==KeyEvent.VK_NUMPAD2){
+	private long
+	lastPumpingTime = System.currentTimeMillis(),
+	lastReelingTime = System.currentTimeMillis();
+
+
+	private void checkForDisconnect()
+	{
+		if (this.lastKeyPressed == KeyEvent.VK_NUMPAD2) {
 			numberOfFAilsInARow++;
-		}	else {
-			numberOfFAilsInARow=0;
+		} else {
+			numberOfFAilsInARow = 0;
 		}
-		if (numberOfFAilsInARow>=40){
+		if (numberOfFAilsInARow >= 40) {
 
 			exit(1);
 		}
@@ -72,8 +82,6 @@ public class Fisher    //todo finished making this class super cool
 			checkForDisconnect();
 		}
 
-
-
 	}
 
 	public void fish()
@@ -82,7 +90,7 @@ public class Fisher    //todo finished making this class super cool
 
 		if (!isFishingFrameExist()) {    //we killed the frame. correcting the mistake
 			keyClickStatic(KeyEvent.VK_NUMPAD2);
-			this.lastKeyPressed=KeyEvent.VK_NUMPAD2;
+			this.lastKeyPressed = KeyEvent.VK_NUMPAD2;
 			logger.info("Throwing a bait");
 		}
 
@@ -92,10 +100,31 @@ public class Fisher    //todo finished making this class super cool
 		} else {
 			waitForFishHp();
 		}
+		boolean analyzeResult;
+		long timeSkillsReuseLeft;
 		while (isFishingFrameExist()) {
+//			logger.trace("frame exists. next analyze after wait for blink");
 			waitForBlink();
-			act(analyze());
+			analyzeResult = analyze();
+
+			if (analyzeResult) {    //reeling
+				timeSkillsReuseLeft=System.currentTimeMillis() - this.lastReelingTime;
+				if (timeSkillsReuseLeft < timeSkillsReuse){
+					timerWaitForPumpingSolution.cancel();
+					timerWaitForPumpingSolution=new Timer();
+				}
+			} else {    //pumping
+				timeSkillsReuseLeft = System.currentTimeMillis() - this.lastPumpingTime;
+				if (timeSkillsReuseLeft < timeSkillsReuse) {
+					timerWaitForPumpingSolution.cancel();
+					timerWaitForPumpingSolution=new Timer();
+					analyzeResult = analyze(timeSkillsReuseLeft*2);
+				}
+			}
+			act(analyzeResult);
+
 		}
+
 		logger.info("finished fishing");
 	}
 
@@ -112,22 +141,19 @@ public class Fisher    //todo finished making this class super cool
 
 	private void waitForBlink()
 	{
-		logger.trace(".waitForBlink");
+//		logger.trace(".waitForBlink");
 		int timePassed = 0;
-		World.easySleep(700);
+//		World.easySleep(800);
 		while (!(colorsAreClose(getAbsPixelColor(this.blinkControlPoint), this.colorControlBlue, threshold)
 				 ||
 				 colorsAreClose(getAbsPixelColor(this.blinkControlPoint), this.colorControlOrange, threshold)))
 		{
 
-			try {
-				timePassed += timeToSleepMillis;
-				Thread.sleep(timeToSleepMillis);
-			} catch (InterruptedException e) {
-				logger.error("sleep in waitForBlink was interrupted for some reason");
-				e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-			}
-			if (timePassed > 3000 || !isFishingFrameExist()) {
+
+			timePassed += timeToSleepMillis;
+			World.easySleep(timeToSleepMillis);
+
+			if (timePassed > 2500 || !isFishingFrameExist()) {
 				return;
 			}
 		}
@@ -174,24 +200,30 @@ public class Fisher    //todo finished making this class super cool
 	{
 		if (reel) {
 			keyClickStatic(KeyEvent.VK_NUMPAD4);
-			lastKeyPressed=KeyEvent.VK_NUMPAD4;
+			lastKeyPressed = KeyEvent.VK_NUMPAD4;
+			this.lastReelingTime = System.currentTimeMillis();
 		} else {
 			keyClickStatic(KeyEvent.VK_NUMPAD3);
-			lastKeyPressed=KeyEvent.VK_NUMPAD3;
+			lastKeyPressed = KeyEvent.VK_NUMPAD3;
+			this.lastPumpingTime = System.currentTimeMillis();
 		}
 		logger.info(".act " + reel);
 
 	}
 
-
 	private boolean analyze()
+	{
+		return analyze(this.timeToWaitMillis);
+	}
+
+	private boolean analyze(long timeToWaitForPumping)
 	{
 		logger.trace(".analyze");
 		if (this.firstAnalysis) {
 			workingPoint = new Point(this.leftmostBluePixelCoordinate);
 			firstAnalysis = false;
 		}
-
+		int deltaX = 3;
 
 		boolean stayingOnPositive;
 		Color gotColor = getAbsPixelColor(workingPoint);
@@ -212,43 +244,80 @@ public class Fisher    //todo finished making this class super cool
 			stayingOnPositive = false; //not very kind-hearted to let it go
 		}
 
+		Color currentColor = getAbsPixelColor(workingPoint),
+		blinkControlColor = getAbsPixelColor(blinkControlPoint);
 		if (stayingOnPositive) {
-			while (colorsAreClose(getAbsPixelColor(workingPoint), this.colorHpBlue, threshold)
+			while (colorsAreClose(currentColor, this.colorHpBlue, threshold)
 				   ||
-				   colorsAreClose(getAbsPixelColor(workingPoint), this.colorHpOrange, threshold))
+				   colorsAreClose(currentColor, this.colorHpOrange, threshold))
 			{
-				workingPoint.x++;
+
+				if (colorsAreClose(blinkControlColor, this.colorControlBlue, threshold) || colorsAreClose(blinkControlColor, this.colorControlOrange, threshold)) {
+					workingPoint.x += deltaX;
+				} else {
+					if (isFishingFrameExist()) {
+						waitForBlink();
+					}
+				}
+				currentColor = getAbsPixelColor(workingPoint);
+				blinkControlColor = getAbsPixelColor(blinkControlPoint);
+
 			}
 		} else {
+
 			boolean movedLeft = false;
 			while (!
-				   (colorsAreClose(getAbsPixelColor(workingPoint), this.colorHpBlue, threshold)
+				   (colorsAreClose(currentColor, this.colorHpBlue, threshold)
 					||
-					colorsAreClose(getAbsPixelColor(workingPoint), this.colorHpOrange, threshold)))
+					colorsAreClose(currentColor, this.colorHpOrange, threshold)))
 			{
-				workingPoint.x--;
-				if (workingPoint.x <= this.leftmostBluePixelCoordinate.x) {
+				if (colorsAreClose(blinkControlColor, this.colorControlBlue, threshold) || colorsAreClose(blinkControlColor, this.colorControlOrange, threshold)) {
+					workingPoint.x -= deltaX;
+				} else {
+					if (isFishingFrameExist()) {
+						waitForBlink();
+					}
+				}
+				if (!isFishingFrameExist()) {
+					return false;
+				}
+				if (workingPoint.x <= this.leftmostBluePixelCoordinate.x+deltaX) {
 					workingPoint.x = this.leftmostBluePixelCoordinate.x;
 					break;
 				}
+				currentColor = getAbsPixelColor(workingPoint);
+				blinkControlColor = getAbsPixelColor(blinkControlPoint);
 				movedLeft = true;
 			}
 			if (movedLeft) {
-				workingPoint.x++;
+				workingPoint.x += deltaX;
 			}
 
 		}
 
 		int timePassed = 0;
-		while (timePassed < this.timeToWaitMillis) {
-			if (colorsAreClose(getAbsPixelColor(workingPoint), this.colorHpBlue, threshold) ||
+		this.finishedWaitingForPumpingDecision = false;
+		this.timerWaitForPumpingSolution.schedule(new TimerTask()
+		{
+			@Override
+			public void run()
+			{
+				Fisher.this.finishedWaitingForPumpingDecision = true;
+//				logger.debug("Timer task: setting finished for pumping to true");
+			}
+		}, timeToWaitForPumping);
+//		while (timePassed < this.timeToWaitMillis) {
+		while (!this.finishedWaitingForPumpingDecision) {
+			waitForBlink();
+			if (colorsAreClose(getAbsPixelColor(workingPoint), this.colorHpBlue, threshold)
+				||
 				colorsAreClose(getAbsPixelColor(workingPoint), this.colorHpOrange, threshold))
 			{
 				return true;    //do the reeling
 			}
-			timePassed += timeInLoopDelayInAnalyze;
-//			logger.debug("now performing sleep for ms: " + timeInLoopDelayInAnalyze);
-			World.easySleep(timeInLoopDelayInAnalyze);
+//			timePassed += timeInLoopDelayInAnalyze;
+//			logger.debug("checking for pumping decision");
+//			World.easySleep(timeInLoopDelayInAnalyze);
 		}
 
 		return false;//pumping
@@ -260,7 +329,7 @@ public class Fisher    //todo finished making this class super cool
 		logger.trace(".findBar");
 		WinAPIAPI.showMessage("Wlcome to fishing. Move mouse UNDER fish hp bar");
 		Point currentPoint = WinAPIAPI.getMousePos();
-		logger.debug("got mouse position at "+currentPoint);
+		logger.debug("got mouse position at " + currentPoint);
 		while (!(colorsAreClose(getAbsPixelColor(currentPoint), this.colorHpBlue, threshold)
 				 ||
 				 colorsAreClose(getAbsPixelColor(currentPoint), this.colorHpOrange, threshold)))
@@ -288,7 +357,7 @@ public class Fisher    //todo finished making this class super cool
 		this.leftmostBluePixelCoordinate = findBar();
 		this.controlFrameCoordinate = new Point(this.leftmostBluePixelCoordinate.x, this.leftmostBluePixelCoordinate.y + 40);
 		this.blinkControlPoint = new Point(this.leftmostBluePixelCoordinate.x + 1, this.leftmostBluePixelCoordinate.y + 3);
-		this.failTime=System.currentTimeMillis();
+//		this.failTime=System.currentTimeMillis();
 	}
 
 }

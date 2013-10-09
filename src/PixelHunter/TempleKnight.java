@@ -24,12 +24,12 @@ public class TempleKnight extends Character
 	temporaryAggroMode = false;
 
 	private Skill
-	ultimateDefence      = new Skill(VK_NUMPAD5, 30),
-	attackSkill          = new Skill(VK_NUMPAD6, 3),
-	aggro                = new Skill(VK_NUMPAD7, 15 * 60),
-	massAggro            = new Skill(VK_NUMPAD8, 40),
-	shieldFortressToggle = new Skill(VK_NUMPAD9, 1),
-	guardStanceToggle    = new Skill(VK_NUMPAD0, 1);
+	ultimateDefence      = new Skill(5, 30),
+	attackSkill          = new Skill(6, 3),
+	aggro                = new Skill(7, 15 * 60),
+	massAggro            = new Skill(8, 40),
+	shieldFortressToggle = new Skill(9, 1),
+	guardStanceToggle    = new Skill(0, 1);
 
 
 	@Override
