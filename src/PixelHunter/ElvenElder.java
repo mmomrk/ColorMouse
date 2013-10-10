@@ -22,12 +22,12 @@ public class ElvenElder extends PixelHunter.Character
 	private static final Logger logger = LoggerFactory.getLogger(ElvenElder.class);
 
 	private final ActionBuff    //second parameter is numpad key number
-	buff1 = new ActionBuff("20-minute buff for pAttackers", 1, (20 * 60 - 30), 20, 0, false),    //todo: very much todo: set all macro times
-	buff2 = new ActionBuff("20-minute buff for pAttackers' PETS", 1, (20 * 60 - 30), 20, 0, true),    //i mean watch them
-	buff3 = new ActionBuff("20-minute buff for nukers", 2, (20 * 60 - 30), 20, 0, false),
-	buff4 = new ActionBuff("20-minute buff for supports and summoners", 3, (20 * 60 - 30), 15, 0, false),
-	buff5 = new ActionBuff("20-minute buff for my hen", 3, (20 * 60 - 30), 15, 0, true),
-	buff6 = new ActionBuff("20-minute buff for shielded party members", 4, (20 * 60 - 30), 5, 0, false);
+	buff1_pAtt    = new ActionBuff("20-minute buff for pAttackers", 1, (20 * 60 - 30), 20, 0, false),    //todo: very much todo: set all macro times
+	buff2_pAttPet = new ActionBuff("20-minute buff for pAttackers' PETS", 1, (20 * 60 - 30), 20, 0, true),    //i mean watch them
+	buff3_mAtt    = new ActionBuff("20-minute buff for nukers", 2, (20 * 60 - 30), 20, 0, false),
+	buff4_support = new ActionBuff("20-minute buff for supports and summoners", 3, (20 * 60 - 30), 15, 0, false),
+	buff5_chicken = new ActionBuff("20-minute buff for my hen", 3, (20 * 60 - 30), 15, 0, true),
+	buff6_shield  = new ActionBuff("20-minute buff for shielded party members", 4, (20 * 60 - 30), 5, 0, false);
 
 
 	private boolean iAmHealing  = false;
@@ -97,10 +97,10 @@ public class ElvenElder extends PixelHunter.Character
 			useSkill(this.partyRecall);
 //			System.exit(1);	//discuss. don't think this should be changed
 		}
-		if (maxHP==0){
+		if (maxHP == 0) {
 			return 0;
 		}
-		return 100 *  currentTotalHP/maxHP ;
+		return 100 * currentTotalHP / maxHP;
 	}
 
 	@Override
@@ -115,29 +115,29 @@ public class ElvenElder extends PixelHunter.Character
 	protected void setupBuffTimerMap()    //not tested	//implemented.finished here
 	{
 		logger.trace(".setupBuffTimerMap");
-		buffTimerMap.put(new ActionBuff(buff1, ID_Spoiler), new Timer());
-		buffTimerMap.put(new ActionBuff(buff1, ID_Warcryer), new Timer());
-		buffTimerMap.put(new ActionBuff(buff1, ID_Templeknight), new Timer());
-		buffTimerMap.put(new ActionBuff(buff1, ID_Swordsinger), new Timer());
-		buffTimerMap.put(new ActionBuff(buff1, ID_Bladedancer), new Timer());
+		buffTimerMap.put(new ActionBuff(buff1_pAtt, ID_Spoiler), new Timer());
+		buffTimerMap.put(new ActionBuff(buff1_pAtt, ID_Warcryer), new Timer());
+		buffTimerMap.put(new ActionBuff(buff1_pAtt, ID_Templeknight), new Timer());
+		buffTimerMap.put(new ActionBuff(buff1_pAtt, ID_Swordsinger), new Timer());
+		buffTimerMap.put(new ActionBuff(buff1_pAtt, ID_Bladedancer), new Timer());
 
-		buffTimerMap.put(new ActionBuff(buff3, ID_Necromancer), new Timer());     //nuke
+		buffTimerMap.put(new ActionBuff(buff3_mAtt, ID_Necromancer), new Timer());     //nuke
 
-		buffTimerMap.put(new ActionBuff(buff4, ID_Warlock), new Timer());        //support protective
-		buffTimerMap.put(new ActionBuff(buff4, this.id), new Timer());
+		buffTimerMap.put(new ActionBuff(buff4_support, ID_Warlock), new Timer());        //support protective
+		buffTimerMap.put(new ActionBuff(buff4_support, this.id), new Timer());
 
-		buffTimerMap.put(new ActionBuff(buff5, this.id), new Timer());       //for the chicken hen
+		buffTimerMap.put(new ActionBuff(buff5_chicken, this.id), new Timer());       //for the chicken hen
 
-		buffTimerMap.put(new ActionBuff(buff6, ID_Templeknight), new Timer());    //++shield
-		buffTimerMap.put(new ActionBuff(buff6, ID_Swordsinger), new Timer());
-		buffTimerMap.put(new ActionBuff(buff6, ID_Spoiler), new Timer());
-		buffTimerMap.put(new ActionBuff(buff6, ID_Warlock), new Timer());
+		buffTimerMap.put(new ActionBuff(buff6_shield, ID_Templeknight), new Timer());    //++shield
+		buffTimerMap.put(new ActionBuff(buff6_shield, ID_Swordsinger), new Timer());
+		buffTimerMap.put(new ActionBuff(buff6_shield, ID_Spoiler), new Timer());
+		buffTimerMap.put(new ActionBuff(buff6_shield, ID_Warlock), new Timer());
 
 		int t = 0;
 		for (PartyMember member : partyStack) {    //for all party members' pets
-			buffTimerMap.put(new ActionBuff(buff2, t++), new Timer());
+			buffTimerMap.put(new ActionBuff(buff2_pAttPet, t++), new Timer());
 		}
-		buffTimerMap.put(new ActionBuff(buff4, 10), new Timer());  //plus self pet
+		buffTimerMap.put(new ActionBuff(buff4_support, 10), new Timer());  //plus self pet
 	}
 
 	@Override
@@ -392,7 +392,8 @@ public class ElvenElder extends PixelHunter.Character
 		@Override
 		public Action getNewCopy()
 		{
-			return new ActionBuff(this, this.targetID);
+//			return new ActionBuff(this, this.targetID);	//refactor minus new
+			return this;
 		}
 	}
 

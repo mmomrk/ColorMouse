@@ -37,6 +37,9 @@ public class L2Window
 	private static Robot robot;
 
 	private Point chatStartingPoint;
+	private Point absolutePoint = new Point();
+
+	private Color color;	//for not creating a new one every time
 
 	private boolean noChatMode = false;    //++getter
 
@@ -471,9 +474,9 @@ public class L2Window
 	public Point relativeToAbsoluteCoordinates(Point relativePoint)
 	{
 
-		Point absolutePoint = new Point();
-		absolutePoint.x = (int) relativePoint.getX();
-		absolutePoint.y = (int) relativePoint.getY();
+
+		absolutePoint.x = relativePoint.x;
+		absolutePoint.y = relativePoint.y;
 		if ((absolutePoint.x > this.windowPosition.x + this.w) || (absolutePoint.y > this.windowPosition.y + this.h)) {
 			logger.error("RelativeToAbsolute Coordinate out of range, >0; rel point is" + relativePoint);
 			WinAPIAPI.showMessage("RelativeToAbsolute Coordinate out of range, >0", 3);
@@ -528,7 +531,7 @@ public class L2Window
 	public static Color getAbsPixelColor(Point absolutePoint)
 	{
 
-		Color color;
+		Color color; //static color. different variable
 		color = robot.getPixelColor(absolutePoint.x, absolutePoint.y);
 		switch (debugMode) {
 			case 1:
@@ -545,9 +548,10 @@ public class L2Window
 
 	public Color getRelPixelColor(Point relativePoint)
 	{
-		Point absolutePoint = relativeToAbsoluteCoordinates(relativePoint);
+//		Point absolutePoint = relativeToAbsoluteCoordinates(relativePoint);	//refactor minus new
+		absolutePoint = relativeToAbsoluteCoordinates(relativePoint);
 
-		Color color;
+//		Color color;     //refactor minus new
 		color = robot.getPixelColor(absolutePoint.x, absolutePoint.y);
 		switch (debugMode) {
 			case 1:

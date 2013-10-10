@@ -201,14 +201,14 @@ public class WinAPIAPI
 
 	}
 
-	public static void showMessage(String s, int t)
+	public static void showMessage(String s, int timeSeconds)
 	{
 		if (isFirtsRunOfShowMessage) {
 			frame = new InfoFrame(s);
-			frame.display(s,t);
+			frame.display(s,timeSeconds);
 			isFirtsRunOfShowMessage = false;
 		} else {
-			frame.display(s,t);
+			frame.display(s,timeSeconds);
 		}
 	}
 

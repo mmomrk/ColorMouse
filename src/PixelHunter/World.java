@@ -53,7 +53,7 @@ public class World
 			||
 			argumentsList.contains("--talktome"))
 		{    //talk to me mode
-			GroupedVariables.Mediator.talkToMeMode = true;
+			GroupedVariables.Mediator.talkToMeMode = true;     //needs implementation
 		}
 		if (argumentsList.contains("-np")
 			||
@@ -64,7 +64,7 @@ public class World
 
 
 
-		if (hwnds.size() == 1) {
+		if (hwnds.size() == 1 || argumentsList.contains("-s") || argumentsList.contains("--single")) {
 			singleWindowMode = true;
 		} else {
 			singleWindowMode = false;
@@ -93,13 +93,13 @@ public class World
 			characters[1] = CharacterFactory.getCharacter(id, hwnds.get(1));
 		}
 
-		if ((characters[0].id == GroupedVariables.ProjectConstants.ID_Swordsinger
-			 ||
-			 characters[0].id == GroupedVariables.ProjectConstants.ID_Bladedancer)
-			&&
-			(characters[1].id == GroupedVariables.ProjectConstants.ID_Swordsinger
-			 ||
-			 characters[1].id == GroupedVariables.ProjectConstants.ID_Bladedancer))
+		if (!singleWindowMode && ((characters[0].id == GroupedVariables.ProjectConstants.ID_Swordsinger
+								   ||
+								   characters[0].id == GroupedVariables.ProjectConstants.ID_Bladedancer)
+								  &&
+								  (characters[1].id == GroupedVariables.ProjectConstants.ID_Swordsinger
+								   ||
+								   characters[1].id == GroupedVariables.ProjectConstants.ID_Bladedancer)))
 		{
 			GroupedVariables.Mediator.BDSWSInDaHouse = true;
 		} else {
@@ -112,7 +112,9 @@ public class World
 					easySleep(400);
 				} else {
 					characters[0].lifeCycle();
-					characters[1].lifeCycle();
+					if (!singleWindowMode) {
+						characters[1].lifeCycle();
+					}
 				}
 			}
 		}
@@ -191,6 +193,7 @@ public class World
 
 	public static void forceRebuff()
 	{
+		WinAPIAPI.showMessage("Force Rebuff", 3);
 		characters[0].forceRebuff();
 		if (!singleWindowMode) {
 			characters[1].forceRebuff();
@@ -199,6 +202,7 @@ public class World
 
 	public static void deactivateFarm()
 	{
+		WinAPIAPI.showMessage("Deactivate Farm", 3);
 		characters[(0)].deactivateModeFarm();
 		if (!singleWindowMode) {
 			characters[(1)].deactivateModeFarm();
@@ -207,6 +211,7 @@ public class World
 
 	public static void activateFarm()
 	{
+		WinAPIAPI.showMessage("Activate Farm", 3);
 		characters[(0)].activateModeFarm();
 		if (!singleWindowMode) {
 			characters[(1)].activateModeFarm();
@@ -215,6 +220,7 @@ public class World
 
 	public static void deactivateBuff()
 	{
+		WinAPIAPI.showMessage("Deactivate Buff", 3);
 		characters[(0)].deactivateModeBuff();
 		if (!singleWindowMode) {
 			characters[(1)].deactivateModeBuff();
@@ -223,6 +229,7 @@ public class World
 
 	public static void activateBuff()
 	{
+		WinAPIAPI.showMessage("Activate Buff", 3);
 		characters[(0)].activateModeBuff();
 		if (!singleWindowMode) {
 			characters[(1)].activateModeBuff();
@@ -231,6 +238,7 @@ public class World
 
 	public static void deactivateHomeRun()
 	{
+		WinAPIAPI.showMessage("Deactivate HomeRun", 3);
 		characters[(0)].deactivateModeHomeRun();
 		if (!singleWindowMode) {
 			characters[(1)].deactivateModeHomeRun();
@@ -239,6 +247,7 @@ public class World
 
 	public static void activateHomeRun()
 	{
+		WinAPIAPI.showMessage("Activate HomeRun", 3);
 		characters[(0)].activateModeHomeRun();
 		if (!singleWindowMode) {
 			characters[(1)].activateModeHomeRun();
@@ -252,7 +261,7 @@ public class World
 	}
 
 	static {
-		System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "TRACE");
+//		System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "TRACE");
 	}
 
 }

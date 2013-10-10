@@ -12,8 +12,8 @@ abstract class Action
 {
 	protected static final Logger logger = LoggerFactory.getLogger(Action.class);
 
-	private static int currentID = 1;
-	protected final int iD;
+	protected static int currentID = 1;
+	protected int iD;
 
 	protected boolean
 	isBuff,

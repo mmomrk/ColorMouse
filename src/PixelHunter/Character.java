@@ -80,6 +80,10 @@ public abstract class Character extends LivingCreature
 	protected int homeRunDelay  = ProjectConstants.HOMERUN_TIME * 1000;    //can be set individually btw
 	private long iStartedToKillTargetAt;
 
+	protected ActionPvE     actionPvE     = new ActionPvE();
+	protected ActionHomeRun actionHomeRun = new ActionHomeRun();
+
+
 
 //	public void classSpecificDeed();//think of it twice
 
@@ -193,7 +197,7 @@ public abstract class Character extends LivingCreature
 		if (this.isMacroFree) {
 			if (this.modeFarm) {
 				if (targetIsDeadInThisLifecycle) {        //i am farming and i see a dead target after i've done onkill
-					todoOffer(new ActionPvE());
+					todoOffer(this.actionPvE);
 				} else {
 					if (!this.isSupport) {        //no killing for supports. only attackers attack
 						attack();
@@ -209,8 +213,8 @@ public abstract class Character extends LivingCreature
 				if (!this.isSupport) {        //no killing for supports. only attackers attack
 					if (!targetIsDeadInThisLifecycle) {
 						attack();
-					}	else {
-						todoOffer(new ActionPvE());	//watch it
+					} else {
+						todoOffer(this.actionPvE);    //watch it
 					}
 				}
 			}
@@ -299,7 +303,7 @@ public abstract class Character extends LivingCreature
 	{
 		logger.trace(".activateModeFarm");
 		this.modeFarm = true;
-		this.todoOffer(new ActionPvE());
+		this.todoOffer(this.actionPvE);
 	}
 
 	public void deactivateModeBuff()                    //not tested
@@ -430,12 +434,12 @@ public abstract class Character extends LivingCreature
 		for (i = 0; i <= 5; i++) {//command binary capacity sits in this hardcoded 5, means n+1 bits
 			currentPoint.x = senderSignature + i * 5;
 			if (!l2Window.colorsAreClose(l2Window.getRelPixelColor(currentPoint), messageColor)) {//found bit true
-				if (l2Window.colorsAreClose(l2Window.getRelPixelColor(new Point(currentPoint.x + 2, currentPoint.y)), messageColor)) {
-					receivedCode += pow(2, i);
-				} else {
-					logger.warn(".ReadChat: Warning while decoding message: both left and right pivot points are empty. this should not be");
-					break;
-				}
+//				if (l2Window.colorsAreClose(l2Window.getRelPixelColor(new Point(currentPoint.x + 2, currentPoint.y)), messageColor)) {
+				receivedCode += pow(2, i);
+//				} else {
+//					logger.warn(".ReadChat: Warning while decoding message: both left and right pivot points are empty. this should not be");
+//					break;
+//				}
 			}
 			logger.debug(".getChatMessage: decode. current val is " + receivedCode);
 		}
@@ -726,7 +730,7 @@ public abstract class Character extends LivingCreature
 	}
 
 
-	protected class ActionHomeRun extends Action    //todo!!!
+	protected class ActionHomeRun extends Action
 	{
 
 		@Override
@@ -739,9 +743,9 @@ public abstract class Character extends LivingCreature
 
 			int homeToRunTo = Character.this.homeRunNumber++ % Character.homesToRun.length;
 
-			Character.this.selectPartyMemberByID(Character.homesToRun[homeToRunTo]);        //test this
 			Character.this.selectPartyMemberByID(Character.homesToRun[homeToRunTo]);
-			if (Character.this.isHomeRunner) {
+			Character.this.selectPartyMemberByID(Character.homesToRun[homeToRunTo]);
+			if (Character.this.isHomeRunner && Character.this.modeHomeRun) {
 				timerHomeRunAdd.schedule(new HomeRunTask(), Character.this.homeRunDelay);
 			}
 		}
@@ -812,7 +816,7 @@ public abstract class Character extends LivingCreature
 					Character.this.modeFarm = false;
 					Character.this.modeBuff = false;
 					Character.this.modeHomeRun = false;
-					Character.this.modeRB	=	false;
+					Character.this.modeRB = false;
 					Character.this.followFlag = true;
 					break;
 				case 2:    //assi
@@ -875,7 +879,7 @@ public abstract class Character extends LivingCreature
 						Character.this.selectPartyMemberByID(message.getSenderID());
 						Character.this.selectPartyMemberByID(message.getSenderID());
 						Character.this.easySleep(4000);
-						new ActionPvE().perform();
+						Character.this.actionPvE.perform();
 					}
 					break;
 				case 14:    //champion Detected
@@ -887,7 +891,18 @@ public abstract class Character extends LivingCreature
 					Character.this.l2Window.keyClick(KeyEvent.VK_MINUS);    //maybe to separate function. discuss
 					Character.this.l2Window.keyClick(KeyEvent.VK_MINUS);    //maybe to separate function. discuss
 				case 16:
-					Character.this.modeRB=true;
+					if (!Character.this.modeRB) {
+						Character.this.modeRB = true;
+					} else {
+						if (Character.this.isTank) {
+							Character.this.message6(Character.this.id);    //mass aggro, be prepared for UD
+						} else if (!Character.this.isSupport) {
+							Character.this.l2Window.keyClick(KeyEvent.VK_F5);    //non-tanks attack minions
+						} else {
+							//supports-no reaction
+						}
+					}
+
 				default:
 					break;
 				//each command can ask macroLocksActions
@@ -998,7 +1013,8 @@ public abstract class Character extends LivingCreature
 		@Override
 		public Action getNewCopy()
 		{
-			return new ActionSelfBuff(this);
+//			return new ActionSelfBuff(this);
+			return this;    //refactor minus new
 		}
 	}
 
@@ -1006,6 +1022,7 @@ public abstract class Character extends LivingCreature
 	protected class ActionPvE extends Action
 	{
 		private int iNeedSomeVAriableToGenerateEquals;
+
 		@Override
 		public void perform()
 		{
@@ -1048,7 +1065,7 @@ public abstract class Character extends LivingCreature
 			super();
 			this.isPvE = true;
 			this.priority = 100;
-			this.iNeedSomeVAriableToGenerateEquals=0;
+			this.iNeedSomeVAriableToGenerateEquals = 255;
 			logger.trace("Created ActionPvE. ID " + this.getID());
 
 		}
@@ -1105,7 +1122,7 @@ public abstract class Character extends LivingCreature
 		public void run()
 		{
 			logger.trace("PvETask: adding Action PvE to todolist");
-			todoOffer(new ActionPvE());
+			todoOffer(actionPvE);
 			cancel();
 		}
 	}
@@ -1118,7 +1135,7 @@ public abstract class Character extends LivingCreature
 		public void run()
 		{
 			logger.trace("HomeRunTask: adding ActionHomeRun to todolist");
-			todoOffer(new ActionHomeRun());
+			todoOffer(Character.this.actionHomeRun);   //refactor minus new
 			cancel();    //watch it. the correct behaviour is cancelling this very task, not the timer
 		}
 	}

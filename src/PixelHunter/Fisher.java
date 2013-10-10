@@ -41,10 +41,11 @@ public class Fisher    //todo finished making this class super cool
 	private Timer timerWaitForPumpingSolution = new Timer();
 
 	private static final int
-	timeToWaitMillis         = 950,//how much time  to wait before act
-	timeToSleepMillis        = 300,//passed to sleep method
+	timeToWaitMillis         = 750,//how much time  to wait before act
+	timeToSleepMillis        = 200,//passed to sleep method
 	timeInLoopDelayInAnalyze = 20,
-	timeSkillsReuse          = 1800;    //watch it
+	timeSkillsReuse          = 1700,    //watch it
+	deltaX	=	3;
 
 	private final Point
 	leftmostBluePixelCoordinate,
@@ -92,6 +93,7 @@ public class Fisher    //todo finished making this class super cool
 			keyClickStatic(KeyEvent.VK_NUMPAD2);
 			this.lastKeyPressed = KeyEvent.VK_NUMPAD2;
 			logger.info("Throwing a bait");
+			World.easySleep(400);	//or he may cancel it immediately
 		}
 
 		this.firstAnalysis = true;
@@ -122,7 +124,8 @@ public class Fisher    //todo finished making this class super cool
 				}
 			}
 			act(analyzeResult);
-
+			timerWaitForPumpingSolution.cancel();
+			timerWaitForPumpingSolution=new Timer();
 		}
 
 		logger.info("finished fishing");
@@ -208,6 +211,7 @@ public class Fisher    //todo finished making this class super cool
 			this.lastPumpingTime = System.currentTimeMillis();
 		}
 		logger.info(".act " + reel);
+		World.easySleep(160); //at least ping-sleep. or it becomes too fast
 
 	}
 
@@ -223,7 +227,6 @@ public class Fisher    //todo finished making this class super cool
 			workingPoint = new Point(this.leftmostBluePixelCoordinate);
 			firstAnalysis = false;
 		}
-		int deltaX = 3;
 
 		boolean stayingOnPositive;
 		Color gotColor = getAbsPixelColor(workingPoint);
@@ -244,12 +247,12 @@ public class Fisher    //todo finished making this class super cool
 			stayingOnPositive = false; //not very kind-hearted to let it go
 		}
 
-		Color currentColor = getAbsPixelColor(workingPoint),
-		blinkControlColor = getAbsPixelColor(blinkControlPoint);
+		gotColor = getAbsPixelColor(workingPoint);
+		Color blinkControlColor = getAbsPixelColor(blinkControlPoint);
 		if (stayingOnPositive) {
-			while (colorsAreClose(currentColor, this.colorHpBlue, threshold)
+			while (colorsAreClose(gotColor, this.colorHpBlue, threshold)
 				   ||
-				   colorsAreClose(currentColor, this.colorHpOrange, threshold))
+				   colorsAreClose(gotColor, this.colorHpOrange, threshold))
 			{
 
 				if (colorsAreClose(blinkControlColor, this.colorControlBlue, threshold) || colorsAreClose(blinkControlColor, this.colorControlOrange, threshold)) {
@@ -259,7 +262,7 @@ public class Fisher    //todo finished making this class super cool
 						waitForBlink();
 					}
 				}
-				currentColor = getAbsPixelColor(workingPoint);
+				gotColor = getAbsPixelColor(workingPoint);
 				blinkControlColor = getAbsPixelColor(blinkControlPoint);
 
 			}
@@ -267,9 +270,9 @@ public class Fisher    //todo finished making this class super cool
 
 			boolean movedLeft = false;
 			while (!
-				   (colorsAreClose(currentColor, this.colorHpBlue, threshold)
+				   (colorsAreClose(gotColor, this.colorHpBlue, threshold)
 					||
-					colorsAreClose(currentColor, this.colorHpOrange, threshold)))
+					colorsAreClose(gotColor, this.colorHpOrange, threshold)))
 			{
 				if (colorsAreClose(blinkControlColor, this.colorControlBlue, threshold) || colorsAreClose(blinkControlColor, this.colorControlOrange, threshold)) {
 					workingPoint.x -= deltaX;
@@ -282,10 +285,10 @@ public class Fisher    //todo finished making this class super cool
 					return false;
 				}
 				if (workingPoint.x <= this.leftmostBluePixelCoordinate.x+deltaX) {
-					workingPoint.x = this.leftmostBluePixelCoordinate.x;
+//					workingPoint.x += deltaX;
 					break;
 				}
-				currentColor = getAbsPixelColor(workingPoint);
+				gotColor = getAbsPixelColor(workingPoint);
 				blinkControlColor = getAbsPixelColor(blinkControlPoint);
 				movedLeft = true;
 			}
@@ -295,7 +298,7 @@ public class Fisher    //todo finished making this class super cool
 
 		}
 
-		int timePassed = 0;
+//		int timePassed = 0;
 		this.finishedWaitingForPumpingDecision = false;
 		this.timerWaitForPumpingSolution.schedule(new TimerTask()
 		{
