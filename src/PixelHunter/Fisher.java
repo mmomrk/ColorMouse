@@ -36,16 +36,30 @@ public class Fisher    //todo finished making this class super cool
 	private boolean
 	firstFish                         = true,
 	firstAnalysis                     = true,
-	finishedWaitingForPumpingDecision = false;
+	finishedWaitingForPumpingDecision = false,
+	needToChangeLure = false;
 
 	private Timer timerWaitForPumpingSolution = new Timer();
+
+	private static final Timer timerNightReminder = new Timer();
+
+	private final TimerTask taskTryNighMode = new TimerTask()
+	{
+		@Override
+		public void run()
+		{
+			if (!nightMode) {
+				Fisher.this.needToChangeLure = true;
+			}
+		}
+	};
 
 	private static final int
 	timeToWaitMillis         = 1250,//how much time  to wait before act
 	timeToSleepMillis        = 200,//passed to sleep method
 	timeInLoopDelayInAnalyze = 20,
 	timeSkillsReuse          = 1700,    //watch it
-	deltaX	=	3;
+	deltaX                   = 3;
 
 	private final Point
 	leftmostBluePixelCoordinate,
@@ -69,9 +83,13 @@ public class Fisher    //todo finished making this class super cool
 		} else {
 			numberOfFAilsInARow = 0;
 		}
-		if (numberOfFAilsInARow >= 40) {
-
-			exit(1);
+		if (numberOfFAilsInARow >= 20) {
+			if (nightMode) {
+				needToChangeLure = true;
+				numberOfFAilsInARow = 0;    //it's not night now
+			} else {
+				exit(1);
+			}
 		}
 
 	}
@@ -81,6 +99,21 @@ public class Fisher    //todo finished making this class super cool
 		while (true) {
 			fish();
 			checkForDisconnect();
+
+			if (needToChangeLure) {
+				needToChangeLure = false;
+				if (nightMode) {
+					L2Window.keyClickStatic(KeyEvent.VK_NUMPAD7);    //day lure
+					logger.info("changing back to day mode");
+					nightMode = false;
+
+				} else {
+					Fisher.logger.info("trying to switch to nightmode");
+					L2Window.keyClickStatic(KeyEvent.VK_NUMPAD8);    //night lure
+					nightMode = true;
+				}
+				World.easySleep(600);
+			}
 		}
 
 	}
@@ -93,7 +126,7 @@ public class Fisher    //todo finished making this class super cool
 			keyClickStatic(KeyEvent.VK_NUMPAD2);
 			this.lastKeyPressed = KeyEvent.VK_NUMPAD2;
 			logger.info("Throwing a bait");
-			World.easySleep(400);	//or he may cancel it immediately
+			World.easySleep(500);    //or he may cancel it immediately
 		}
 
 		this.firstAnalysis = true;
@@ -110,22 +143,22 @@ public class Fisher    //todo finished making this class super cool
 			analyzeResult = analyze();
 
 			if (analyzeResult) {    //reeling
-				timeSkillsReuseLeft=System.currentTimeMillis() - this.lastReelingTime;
-				if (timeSkillsReuseLeft < timeSkillsReuse){
+				timeSkillsReuseLeft = System.currentTimeMillis() - this.lastReelingTime;
+				if (timeSkillsReuseLeft < timeSkillsReuse) {
 					timerWaitForPumpingSolution.cancel();
-					timerWaitForPumpingSolution=new Timer();
+					timerWaitForPumpingSolution = new Timer();
 				}
 			} else {    //pumping
 				timeSkillsReuseLeft = System.currentTimeMillis() - this.lastPumpingTime;
 				if (timeSkillsReuseLeft < timeSkillsReuse) {
 					timerWaitForPumpingSolution.cancel();
-					timerWaitForPumpingSolution=new Timer();
-					analyzeResult = analyze(timeSkillsReuseLeft*2);
+					timerWaitForPumpingSolution = new Timer();
+					analyzeResult = analyze(timeSkillsReuseLeft * 2);
 				}
 			}
 			act(analyzeResult);
 			timerWaitForPumpingSolution.cancel();
-			timerWaitForPumpingSolution=new Timer();
+			timerWaitForPumpingSolution = new Timer();
 		}
 
 		logger.info("finished fishing");
@@ -284,7 +317,7 @@ public class Fisher    //todo finished making this class super cool
 				if (!isFishingFrameExist()) {
 					return false;
 				}
-				if (workingPoint.x <= this.leftmostBluePixelCoordinate.x+deltaX) {
+				if (workingPoint.x <= this.leftmostBluePixelCoordinate.x + deltaX) {
 //					workingPoint.x += deltaX;
 					break;
 				}
@@ -361,6 +394,7 @@ public class Fisher    //todo finished making this class super cool
 		this.controlFrameCoordinate = new Point(this.leftmostBluePixelCoordinate.x, this.leftmostBluePixelCoordinate.y + 40);
 		this.blinkControlPoint = new Point(this.leftmostBluePixelCoordinate.x + 1, this.leftmostBluePixelCoordinate.y + 3);
 //		this.failTime=System.currentTimeMillis();
+		timerNightReminder.schedule(taskTryNighMode, 1 * 60 * 1000, 10 * 60 * 1000);//once every ten minutes, first try in one minute after start
 	}
 
 }
