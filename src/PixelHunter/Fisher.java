@@ -41,7 +41,7 @@ public class Fisher    //todo finished making this class super cool
 	private Timer timerWaitForPumpingSolution = new Timer();
 
 	private static final int
-	timeToWaitMillis         = 750,//how much time  to wait before act
+	timeToWaitMillis         = 1250,//how much time  to wait before act
 	timeToSleepMillis        = 200,//passed to sleep method
 	timeInLoopDelayInAnalyze = 20,
 	timeSkillsReuse          = 1700,    //watch it

@@ -898,6 +898,7 @@ public abstract class Character extends LivingCreature
 							Character.this.message6(Character.this.id);    //mass aggro, be prepared for UD
 						} else if (!Character.this.isSupport) {
 							Character.this.l2Window.keyClick(KeyEvent.VK_F5);    //non-tanks attack minions
+							World.easySleep(400);//or else prev target will be selected
 						} else {
 							//supports-no reaction
 						}
