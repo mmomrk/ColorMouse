@@ -46,33 +46,49 @@ public class World
 		{    //fishing
 			L2Window initializingL2Window = new L2Window();
 			Fisher fisher = new Fisher();
+			if (argumentsList.contains("-t") || argumentsList.contains("--time")) {
+				try {
+					fisher.setSchedule(argumentsList.get(argumentsList.indexOf("-t")+1));
+				}catch (Exception e){	//yes. this is generally not good, but this happens only once in the world
+					fisher.setSchedule(argumentsList.get(argumentsList.indexOf("--time")+1));
+				}
+			}
 			fisher.infiniteFish();           //uses L2window static methods
 			return;
 		}
-		if (argumentsList.contains("-t")
+
+		if (argumentsList.contains("-T")
 			||
 			argumentsList.contains("--talktome"))
+
 		{    //talk to me mode
 			GroupedVariables.Mediator.talkToMeMode = true;     //needs implementation
 		}
+
 		if (argumentsList.contains("-np")
 			||
 			argumentsList.contains("--nopetmode"))
+
 		{
 			GroupedVariables.Mediator.noPetMode = true;
 		}
 
 
+		if (hwnds.size() == 1 || argumentsList.contains("-s") || argumentsList.contains("--single"))
 
-		if (hwnds.size() == 1 || argumentsList.contains("-s") || argumentsList.contains("--single")) {
+		{
 			singleWindowMode = true;
-		} else {
+		} else
+
+		{
 			singleWindowMode = false;
 		}
 
-//		singleWindowMode = true;//remove this after any tests are over
+		//		singleWindowMode = true;//remove this after any tests are over
 		int id = 0;
-		if (singleWindowMode) {
+		if (singleWindowMode)
+
+		{
 
 			L2Window.initiateSize(0, hwnds.get(0));    //yes, static method access, not the class representative
 			//0=fully on the screen
@@ -80,7 +96,9 @@ public class World
 			id = WinAPIAPI.dialogWindow(0);
 			characters[0] = CharacterFactory.getCharacter(id, hwnds.get(0));
 
-		} else {    //todo change hwnds order: first is left. if one can do
+		} else
+
+		{    //todo change hwnds order: first is left. if one can do
 
 			WinAPIAPI.setActiveWindow(hwnds.get(0));        //not implemented yet
 			L2Window.initiateSize(1, hwnds.get(0));    //1=left on the screen
@@ -100,9 +118,12 @@ public class World
 								  (characters[1].id == GroupedVariables.ProjectConstants.ID_Swordsinger
 								   ||
 								   characters[1].id == GroupedVariables.ProjectConstants.ID_Bladedancer)))
+
 		{
 			GroupedVariables.Mediator.BDSWSInDaHouse = true;
-		} else {
+		} else
+
+		{
 			GroupedVariables.Mediator.BDSWSInDaHouse = false;
 		}
 
@@ -118,7 +139,6 @@ public class World
 				}
 			}
 		}
-
 
 
 		return;

@@ -397,4 +397,9 @@ public class Fisher    //todo finished making this class super cool
 		timerNightReminder.schedule(taskTryNighMode, 1 * 60 * 1000, 10 * 60 * 1000);//once every ten minutes, first try in one minute after start
 	}
 
+	public void setSchedule(String time)
+	{
+		sdfc
+
+	}
 }
