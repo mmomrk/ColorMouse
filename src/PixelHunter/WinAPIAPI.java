@@ -134,7 +134,7 @@ public class WinAPIAPI
 
 	public static void setActiveWindow(WinDef.HWND hwnd)
 	{
-		logger.info("User32.INSTANCE.SetForegroundWindow(hwnd);");
+		logger.trace("User32.INSTANCE.SetForegroundWindow(hwnd);"+hwnd);
 //		User32.INSTANCE.SetFocus(hwnd);
 //		User32.INSTANCE.ShowWindow(hwnd,1);
 //		User32.INSTANCE.BringWindowToTop ();	//invalid

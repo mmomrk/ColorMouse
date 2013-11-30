@@ -84,20 +84,16 @@ public class World
 			singleWindowMode = false;
 		}
 
-		//		singleWindowMode = true;//remove this after any tests are over
+
 		int id = 0;
 		if (singleWindowMode)
-
 		{
-
 			L2Window.initiateSize(0, hwnds.get(0));    //yes, static method access, not the class representative
 			//0=fully on the screen
 			WinAPIAPI.setActiveWindow(hwnds.get(0));
 			id = WinAPIAPI.dialogWindow(0);
 			characters[0] = CharacterFactory.getCharacter(id, hwnds.get(0));
-
 		} else
-
 		{    //todo change hwnds order: first is left. if one can do
 
 			WinAPIAPI.setActiveWindow(hwnds.get(0));        //not implemented yet
@@ -118,14 +114,14 @@ public class World
 								  (characters[1].id == GroupedVariables.ProjectConstants.ID_Swordsinger
 								   ||
 								   characters[1].id == GroupedVariables.ProjectConstants.ID_Bladedancer)))
-
 		{
 			GroupedVariables.Mediator.BDSWSInDaHouse = true;
 		} else
-
 		{
 			GroupedVariables.Mediator.BDSWSInDaHouse = false;
 		}
+
+
 
 		{
 			while (characters.length > 0) {    //for the pure debug purpose

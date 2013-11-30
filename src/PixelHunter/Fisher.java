@@ -9,6 +9,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import static PixelHunter.L2Window.*;
+import static java.lang.System.currentTimeMillis;
 import static java.lang.System.exit;
 
 /**
@@ -25,9 +26,11 @@ public class Fisher    //todo finished making this class super cool
 	colorHpOrangeNegative = new Color(36, 14, 12),
 	colorHpBlue           = new Color(4, 103, 159),//(12, 104, 156),
 	colorHpOrange         = new Color(144, 36, 7),
-	colorControlFrame     = new Color(178, 163, 141),
+	colorControlFrame1    = new Color(178, 163, 141),
+	colorControlFrame2    = new Color(97, 77, 59),
 	colorControlOrange    = new Color(195, 55, 20),
 	colorControlBlue      = new Color(0, 175, 246);
+	private static Color colorControlFrame;
 
 	private static boolean nightMode = false;
 	private final Point blinkControlPoint;
@@ -37,7 +40,7 @@ public class Fisher    //todo finished making this class super cool
 	firstFish                         = true,
 	firstAnalysis                     = true,
 	finishedWaitingForPumpingDecision = false,
-	needToChangeLure = false;
+	needToChangeLure                  = false;
 
 	private Timer timerWaitForPumpingSolution = new Timer();
 
@@ -69,21 +72,33 @@ public class Fisher    //todo finished making this class super cool
 
 	private int
 	numberOfFAilsInARow = 0,
-	lastKeyPressed      = 0;
+	lastKeyPressed      = 0,
+	currentFailLimit    = 0;
+
+	private int[] numberOfFailsAllowed = new int[] {3, 20};
 
 	private long
 	lastPumpingTime = System.currentTimeMillis(),
 	lastReelingTime = System.currentTimeMillis();
+	private final Point manaControlPoint;
+	private final Color manaControlColor;
 
 
 	private void checkForDisconnect()
 	{
+		if (nightMode) {
+			currentFailLimit = numberOfFailsAllowed[0];
+		} else {
+			currentFailLimit = numberOfFailsAllowed[1];
+		}
+
 		if (this.lastKeyPressed == KeyEvent.VK_NUMPAD2) {
 			numberOfFAilsInARow++;
 		} else {
 			numberOfFAilsInARow = 0;
 		}
-		if (numberOfFAilsInARow >= 20) {
+
+		if (numberOfFAilsInARow >= currentFailLimit) {
 			if (nightMode) {
 				needToChangeLure = true;
 				numberOfFAilsInARow = 0;    //it's not night now
@@ -99,7 +114,7 @@ public class Fisher    //todo finished making this class super cool
 		while (true) {
 			fish();
 			checkForDisconnect();
-
+			waitForMana();
 			if (needToChangeLure) {
 				needToChangeLure = false;
 				if (nightMode) {
@@ -114,6 +129,15 @@ public class Fisher    //todo finished making this class super cool
 				}
 				World.easySleep(600);
 			}
+		}
+
+	}
+
+	private void waitForMana()
+	{
+		logger.trace(".waitForMana");
+		while (!colorsAreClose(manaControlColor, getAbsPixelColor(manaControlPoint))) {
+			WinAPIAPI.showMessage("Waiting for mana regeneration", 5);
 		}
 
 	}
@@ -223,7 +247,7 @@ public class Fisher    //todo finished making this class super cool
 	private boolean isFishingFrameExist()
 	{
 //		logger.trace(".isFishingFrameExist");
-		if (colorsAreClose(getAbsPixelColor(this.controlFrameCoordinate), this.colorControlFrame, threshold)) {
+		if (colorsAreClose(getAbsPixelColor(this.controlFrameCoordinate), colorControlFrame, threshold)) {
 //			logger.debug("yes. exists");
 			return true;
 		} else {
@@ -293,6 +317,8 @@ public class Fisher    //todo finished making this class super cool
 				} else {
 					if (isFishingFrameExist()) {
 						waitForBlink();
+					} else {
+						return true;    //and go away
 					}
 				}
 				gotColor = getAbsPixelColor(workingPoint);
@@ -309,21 +335,25 @@ public class Fisher    //todo finished making this class super cool
 			{
 				if (colorsAreClose(blinkControlColor, this.colorControlBlue, threshold) || colorsAreClose(blinkControlColor, this.colorControlOrange, threshold)) {
 					workingPoint.x -= deltaX;
+					movedLeft = true;
 				} else {
 					if (isFishingFrameExist()) {
 						waitForBlink();
+						if (!(colorsAreClose(blinkControlColor, this.colorControlBlue, threshold) || colorsAreClose(blinkControlColor, this.colorControlOrange, threshold))) {//bar is empty, fish needs last shot
+							return false;//pump it and it's yours
+						}
+					} else {
+						return false;    //and go away again
 					}
 				}
-				if (!isFishingFrameExist()) {
-					return false;
-				}
+
 				if (workingPoint.x <= this.leftmostBluePixelCoordinate.x + deltaX) {
 //					workingPoint.x += deltaX;
 					break;
 				}
 				gotColor = getAbsPixelColor(workingPoint);
 				blinkControlColor = getAbsPixelColor(blinkControlPoint);
-				movedLeft = true;
+
 			}
 			if (movedLeft) {
 				workingPoint.x += deltaX;
@@ -363,7 +393,7 @@ public class Fisher    //todo finished making this class super cool
 	private Point findBar()
 	{
 		logger.trace(".findBar");
-		WinAPIAPI.showMessage("Wlcome to fishing. Move mouse UNDER fish hp bar");
+		WinAPIAPI.showMessage("Welcome to fishing. Move mouse UNDER fish hp bar");
 		Point currentPoint = WinAPIAPI.getMousePos();
 		logger.debug("got mouse position at " + currentPoint);
 		while (!(colorsAreClose(getAbsPixelColor(currentPoint), this.colorHpBlue, threshold)
@@ -392,14 +422,29 @@ public class Fisher    //todo finished making this class super cool
 
 		this.leftmostBluePixelCoordinate = findBar();
 		this.controlFrameCoordinate = new Point(this.leftmostBluePixelCoordinate.x, this.leftmostBluePixelCoordinate.y + 40);
+		if (colorsAreClose(getAbsPixelColor(this.controlFrameCoordinate), colorControlFrame1)) {
+			logger.debug("control frame pixel is light");
+			colorControlFrame = colorControlFrame1;
+		} else if (colorsAreClose(getAbsPixelColor(this.controlFrameCoordinate), colorControlFrame2)) {
+			logger.debug("control frame pixel is dark");
+			colorControlFrame = colorControlFrame2;
+		} else {
+
+			logger.error("failed to calibrate in find window border. exiting");
+			System.exit(1);
+		}
 		this.blinkControlPoint = new Point(this.leftmostBluePixelCoordinate.x + 1, this.leftmostBluePixelCoordinate.y + 3);
-//		this.failTime=System.currentTimeMillis();
+
+		WinAPIAPI.showMessage("Mouse at mana control point");
+		this.manaControlPoint = WinAPIAPI.getMousePos();
+		this.manaControlColor = L2Window.getAbsPixelColor(this.manaControlPoint);
+
 		timerNightReminder.schedule(taskTryNighMode, 1 * 60 * 1000, 10 * 60 * 1000);//once every ten minutes, first try in one minute after start
 	}
 
 	public void setSchedule(String time)
 	{
-		sdfc
+//		sdfc
 
 	}
 }

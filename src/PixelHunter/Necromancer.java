@@ -28,7 +28,7 @@ public class Necromancer extends Character
 		public void perform()
 		{
 			if (this.isReady) {
-				logger.trace("inside overriden .perform of skill Vampiric Claw");
+				logger.trace("inside overriden .perform of skill Vampiric Claw with gethp of " + Necromancer.this.getHP());
 				if (Necromancer.this.getHP() < HEAL_FROM) {
 					Necromancer.this.l2Window.keyClick(key);
 					this.isReady = false;
@@ -45,8 +45,8 @@ public class Necromancer extends Character
 	gloom        = new Skill(3, 13),    //watch it
 	chaos        = new Skill(4, 14),    //watch it
 	weakness     = new Skill(5, 15),    //watch it
-	forget       = new Skill(6, 4),    //watch it
-	bodyToMind = new Skill(7, 4);    //watch it
+	forget       = new Skill(6, 6),    //watch it
+	bodyToMind   = new Skill(7, 4);    //watch it
 
 	private ActionSelfBuff sitFor20Seconds = new ActionSelfBuff("Sitting for 20 seconds macro", 8, 0, 25 * 1000);
 
@@ -77,9 +77,17 @@ public class Necromancer extends Character
 	protected void onChampion()
 	{
 		logger.trace(".onChampion();");
-		this.l2Window.keyClick(KeyEvent.VK_F7);
-		activateHardAttack();
 
+		if (this.championCallIsAllowed) {
+			this.l2Window.keyClick(KeyEvent.VK_F7);
+			this.championCallIsAllowed = false;
+			this.timerChampionCallIsAllowed.schedule(new SetChampionCallIsAllowedToTrue(), 10 * 1000);
+
+		}
+		if (!isFightingChampion) {
+			activateHardAttack();
+		}
+		this.isFightingChampion = true;
 	}
 
 	@Override
@@ -121,7 +129,9 @@ public class Necromancer extends Character
 			&&
 			!this.target.isDead()
 			&&
-			getMP() > 50)
+			getMP() > 50
+			&&
+			getHP() < 90)
 		{
 			useSkill(vampiricClaw);
 		}
@@ -161,6 +171,7 @@ public class Necromancer extends Character
 		@Override
 		public void perform()
 		{
+			logger.trace("skillDeal action with skill " + this.skill);
 			if (condition.isSatisfied()) {
 				useSkill(skill);
 				Necromancer.this.skillDealTimer.schedule(new SkillDealTask(this), skill.reuseTimeMillis);
@@ -216,8 +227,10 @@ public class Necromancer extends Character
 		public boolean isSatisfied()
 		{
 			if (Necromancer.this.getHP() > threshold) {
+				logger.debug("HP is higher than" + threshold + " condition is satisfied");
 				return true;
 			}
+			logger.debug("HP is higher than" + threshold + " condition is not satisfied");
 			return false;
 		}
 
@@ -234,8 +247,10 @@ public class Necromancer extends Character
 		public boolean isSatisfied()
 		{
 			if (!Necromancer.this.target.isDead()) {
+				logger.debug("Target is alive condition is satisfied");
 				return true;
 			}
+			logger.debug("Target is alive condition is not satisfied");
 			return false;
 		}
 	}

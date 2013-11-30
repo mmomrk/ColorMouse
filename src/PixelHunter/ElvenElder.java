@@ -145,7 +145,7 @@ public class ElvenElder extends PixelHunter.Character
 	{
 		logger.trace(".classSpecificLifeCycle");
 		if (this.modeFarm) {
-			if (healWoundedPartyMembers() < 70) {          //watch it
+			if (healWoundedPartyMembers() < 30) {          //watch it
 				this.l2Window.keyClick(KeyEvent.VK_MULTIPLY);//panic   .
 			}
 		} else if (this.modeRB) {
@@ -190,11 +190,11 @@ public class ElvenElder extends PixelHunter.Character
 			} else {
 				selectClickPartyMemberByPartyStackPlace(this.partyMember);
 			}
-
+			logger.debug(".heal wounded: pressed-selected member. now doing 5 or 6:"+buttonNumber);
 			if (buttonNumber == 5) {    //grHeal
 				ElvenElder.this.iAmHealing = true;
 				int hP = ElvenElder.this.getPartyMemberHP(this.partyMember, this.targetIsPet);
-				while (!(hP < HEAL_TO || hP < 2)) {    //ID here is party stack position!!!
+				while (hP < HEAL_TO || hP < 2) {    //ID here is party stack position!
 					useSkill(ElvenElder.this.greaterHeal);
 					hP = ElvenElder.this.getPartyMemberHP(this.partyMember, this.targetIsPet);
 
@@ -205,7 +205,7 @@ public class ElvenElder extends PixelHunter.Character
 			} else if (buttonNumber == 6) {//majHeal
 				ElvenElder.this.iAmHealing = true;
 				int hP = ElvenElder.this.getPartyMemberHP(this.partyMember, this.targetIsPet);
-				while (!(hP < HEAL_TO || hP < 2)) {    //ID here is party stack position!!!
+				while (hP < HEAL_TO || hP < 2) {    //ID here is party stack position!!!     watch it!!!
 					useSkill(ElvenElder.this.majorHeal);
 					hP = ElvenElder.this.getPartyMemberHP(this.partyMember, this.targetIsPet);
 				}

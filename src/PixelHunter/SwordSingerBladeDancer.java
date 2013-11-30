@@ -69,7 +69,7 @@ public abstract class SwordSingerBladeDancer extends Character
 	}
 
 	@Override
-	public void classSpecificLifeCycle()        //implement
+	public void classSpecificLifeCycle()
 	{
 		logger.trace(".classSpecificLifeCycle");
 		if (this.iAmSitting){
@@ -83,7 +83,7 @@ public abstract class SwordSingerBladeDancer extends Character
 	}
 
 	@Override
-	public void onKill()    //implement
+	public void onKill()
 	{
 
 	}
@@ -129,7 +129,7 @@ public abstract class SwordSingerBladeDancer extends Character
 			{
 				@Override
 				public void run()
-				{
+				{	//error is here(todo,implement,remove after!!!
 					if (SwordSingerBladeDancer.this.isMaster) {
 						todoOffer(new ActionSongDance());
 					} else {

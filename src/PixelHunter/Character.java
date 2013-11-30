@@ -44,17 +44,19 @@ public abstract class Character extends LivingCreature
 	isNuker          = false,    //almost everything
 	isHomeRunner     = true,
 
-	modeFarm    = false,
-	modeBuff    = false,
-	modeHomeRun = false,     //is used, bit not tested
-	modeManor   = false,        //not yet implemented
-	modeRB      = false,    //lol. should only activate some additional skilluses in classspecific
+	modeFarm           = false,
+	modeBuff           = false,
+	modeHomeRun        = false,     //is used, bit not tested
+	modeManor          = false,        //not yet implemented
+	modeRB             = false,    //lol. should only activate some additional skilluses in classspecific
+	isFightingChampion = false,
 
 	followFlag  = false,
 	isMacroFree = true,
 
-	targetWasAlive  = false,
-	petUseIsAllowed = true;
+	targetWasAlive        = false,
+	petUseIsAllowed       = true,
+	championCallIsAllowed = true;
 
 
 	private Point chatStartingPoint;
@@ -72,7 +74,8 @@ public abstract class Character extends LivingCreature
 	macroLockTimer,
 	timerPvEAdd,
 	timerHomeRunAdd,
-	timerPetUseIsAllowed;
+	timerPetUseIsAllowed,
+	timerChampionCallIsAllowed;
 
 	protected Map<ActionAbstractBuff, Timer> buffTimerMap = new HashMap<ActionAbstractBuff, Timer>();
 
@@ -115,6 +118,7 @@ public abstract class Character extends LivingCreature
 	{
 		logger.trace(".everyonesOnKill");
 		this.targetWasAlive = false;
+		this.isFightingChampion = false;
 		onKill();    //each has it overriden
 	}
 
@@ -196,7 +200,7 @@ public abstract class Character extends LivingCreature
 
 		if (this.isMacroFree) {
 			if (this.modeFarm) {
-				if (targetIsDeadInThisLifecycle) {        //i am farming and i see a dead target after i've done onkill
+				if (targetIsDeadInThisLifecycle && !this.isSupport) {        //i am farming and i see a dead target after i've done onkill
 					todoOffer(this.actionPvE);
 				} else {
 					if (!this.isSupport) {        //no killing for supports. only attackers attack
@@ -228,34 +232,43 @@ public abstract class Character extends LivingCreature
 		}
 	}
 
-	protected void onChampion()    //overriden for necr
+	protected void onChampion()    //!overriden for necr
 	{
 		logger.trace(".onChampion();");
+		this.isFightingChampion=true;
 		if (this.isTank) {
 			message5(this.id);
 		}
 		if (this.isSupport) {
-			logger.warn("support is facing a champion. things are pretty bad");
+			logger.warn("support is facing a champion. things are pretty bad. but likely everything is fine");
 			return;
 		}
-		this.l2Window.keyClick(KeyEvent.VK_F7);
+		if (this.championCallIsAllowed) {
+			this.l2Window.keyClick(KeyEvent.VK_F7);
+			this.championCallIsAllowed = false;
+			this.timerChampionCallIsAllowed.schedule(new SetChampionCallIsAllowedToTrue(), 10 * 1000);
+
+		}
 
 	}
 
 	/*checks for allowness of tod o*/
 	private void doTheToDo()
 	{
-		logger.trace(".doTheToDo");
-		logger.debug(".doTheToDo: todolist: " + this.toDoList);
-		if ((this.target.isDead()
-			 ||
-			 this.target.getHP() >= 100)
-			&&
-			!toDoList.isEmpty()
+
+		logger.debug(".doTheToDo for character " + this.id + ". ToDoList: " + this.toDoList);
+		if (!toDoList.isEmpty()
 			&&
 			this.isMacroFree)
 		{
-			toDoList.poll().perform();
+			if ((this.target.isDead()
+				 ||
+				 this.target.getHP() >= 100)
+				||
+				this.isSupport)
+			{
+				toDoList.poll().perform();
+			}
 		}
 	}
 
@@ -611,6 +624,7 @@ public abstract class Character extends LivingCreature
 		}
 		selectPartyMemberByID(callerID);
 		assistTarget();
+		this.isFightingChampion = true;
 		if (!this.isHomeRunner) {        //can't move. go and help him
 			petAttack();
 			this.petUseIsAllowed = false;
@@ -667,6 +681,7 @@ public abstract class Character extends LivingCreature
 		this.timerHomeRunAdd = new Timer();
 		this.timerPvEAdd = new Timer();
 		this.timerPetUseIsAllowed = new Timer();
+		this.timerChampionCallIsAllowed = new Timer();
 	}
 
 
@@ -898,7 +913,7 @@ public abstract class Character extends LivingCreature
 							Character.this.message6(Character.this.id);    //mass aggro, be prepared for UD
 						} else if (!Character.this.isSupport) {
 							Character.this.l2Window.keyClick(KeyEvent.VK_F5);    //non-tanks attack minions
-							World.easySleep(400);//or else prev target will be selected
+							World.easySleep(800);//or else prev target will be selected
 						} else {
 							//supports-no reaction
 						}
@@ -1069,6 +1084,18 @@ public abstract class Character extends LivingCreature
 			this.iNeedSomeVAriableToGenerateEquals = 255;
 			logger.trace("Created ActionPvE. ID " + this.getID());
 
+		}
+	}
+
+
+	protected class SetChampionCallIsAllowedToTrue extends TimerTask
+	{
+		@Override
+		public void run()
+		{
+			logger.trace("SetChampionCallIsAllowedToTrue");
+			Character.this.championCallIsAllowed = true;
+			cancel();
 		}
 	}
 

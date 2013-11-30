@@ -39,7 +39,7 @@ public class L2Window
 	private Point chatStartingPoint;
 	private Point absolutePoint = new Point();
 
-	private Color color;	//for not creating a new one every time
+	private Color color;    //for not creating a new one every time
 
 	private boolean noChatMode = false;    //++getter
 
@@ -228,17 +228,17 @@ public class L2Window
 		if (toTheLeft) {
 			for (int i = 0; i < 100; i++) {
 				if (colorsAreClose(getRelPixelColor(new Point(x - i, y)), neededColor)) {
-					logger.debug("checkNextPixelsToTheHorizon() returning "+ (i+1));
+					logger.debug("checkNextPixelsToTheHorizon() returning " + (i + 1));
 					return i + 1;
 				}
-				if (x-i <= 0) {
+				if (x - i <= 0) {
 					break;
 				}
 			}
 		} else {
 			for (int i = 0; i < 100; i++) {
 				if (colorsAreClose(getRelPixelColor(new Point(x + i, y)), neededColor)) {
-					logger.debug("checkNextPixelsToTheHorizon() returning "+ (i+1));
+					logger.debug("checkNextPixelsToTheHorizon() returning " + (i + 1));
 					return i + 1;
 				}
 			}
@@ -249,10 +249,11 @@ public class L2Window
 
 	public int getCharacterHPMP(HpConstants hpConstants, boolean gettingHP)
 	{
+		logger.trace(".getCharacterHPMP with gettingHP flag "+gettingHP);
 		int overallLength = hpConstants.coordinateRight.x - hpConstants.coordinateLeft.x;
-		if (overallLength==0){
+		if (overallLength == 0) {
 			logger.warn("got invalid hpConstatns in getCharacterHPMP");
-			return 100;	//discuss.. but with whom?
+			return 100;    //discuss.. but with who?
 		}
 		Point currentCoordinate = hpConstants.coordinateRight;
 		while (!characterHPMPColorIsPositive(getRelPixelColor(currentCoordinate), gettingHP)) {
@@ -417,9 +418,13 @@ public class L2Window
 	{
 		logger.trace(".mouseClick Relative");
 
-		Point currentMousePosition = getMousePos();
+		Point currentMousePosition=new Point(500,500);
+		if (debugMode == 0) {
+			currentMousePosition = getMousePos();
+		}
 		advancedMouseMove(relativePoint);
 		robot.mousePress(InputEvent.BUTTON1_MASK);
+		World.easySleep(30);
 		robot.mouseRelease(InputEvent.BUTTON1_MASK);
 		if (debugMode == 0) {
 			robot.mouseMove(currentMousePosition.x, currentMousePosition.y);
@@ -445,6 +450,7 @@ public class L2Window
 		for (; i <= ticks; i++) {
 			currentPoint.x = (int) (hpConstants.coordinateRight.x - (float) deltaX * i / (float) ticks);
 			if (colorsAreClose(getRelPixelColor(currentPoint), hpConstants.color)) {
+				logger.debug(".getHP returning value of" + 100 * (ticks + 1 - i) / (ticks + 1));
 				return 100 * (ticks + 1 - i) / (ticks + 1);
 			}
 		}
