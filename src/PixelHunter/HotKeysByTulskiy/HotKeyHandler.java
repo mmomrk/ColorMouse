@@ -73,6 +73,9 @@ public class HotKeyHandler implements HotKeyListener
 			logger.info("Received alt+pause. Terminating");
 			provider.stop();
 //			cleanUp();
+			if (World.fishFlag){
+				World.fisher.finishFishing();
+			}
 			System.exit(0);
 		} else if (hotKey.keyStroke == KeyStroke.getKeyStroke("PAUSE")) {
 			logger.debug("Got hotKey PAUSE. Executing");

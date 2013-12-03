@@ -5,12 +5,15 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import static PixelHunter.L2Window.*;
-import static java.lang.System.currentTimeMillis;
 import static java.lang.System.exit;
+import static java.lang.System.in;
 
 /**
  * User: mrk
@@ -40,7 +43,8 @@ public class Fisher    //todo finished making this class super cool
 	firstFish                         = true,
 	firstAnalysis                     = true,
 	finishedWaitingForPumpingDecision = false,
-	needToChangeLure                  = false;
+	needToChangeLure                  = false,
+	loggerToTheRight                  = false;
 
 	private Timer timerWaitForPumpingSolution = new Timer();
 
@@ -61,7 +65,7 @@ public class Fisher    //todo finished making this class super cool
 	timeToWaitMillis         = 1250,//how much time  to wait before act
 	timeToSleepMillis        = 200,//passed to sleep method
 	timeInLoopDelayInAnalyze = 20,
-	timeSkillsReuse          = 1700,    //watch it
+	timeSkillsReuse          = 1500,    //watch it
 	deltaX                   = 3;
 
 	private final Point
@@ -83,6 +87,13 @@ public class Fisher    //todo finished making this class super cool
 	private final Point manaControlPoint;
 	private final Color manaControlColor;
 
+	PrintWriter fileHandle;
+
+	public void finishFishing(){
+		logger.info("Finishing fishing for some reason");
+		fileHandle.close();
+		exit(0);
+	}
 
 	private void checkForDisconnect()
 	{
@@ -103,7 +114,7 @@ public class Fisher    //todo finished making this class super cool
 				needToChangeLure = true;
 				numberOfFAilsInARow = 0;    //it's not night now
 			} else {
-				exit(1);
+				finishFishing();
 			}
 		}
 
@@ -135,9 +146,16 @@ public class Fisher    //todo finished making this class super cool
 
 	private void waitForMana()
 	{
+
 		logger.trace(".waitForMana");
+		int count=0;
 		while (!colorsAreClose(manaControlColor, getAbsPixelColor(manaControlPoint))) {
-			WinAPIAPI.showMessage("Waiting for mana regeneration", 5);
+			if (count>20){
+				finishFishing();
+			}
+			WinAPIAPI.showMessage("Waiting for mana regeneration(20 for exit): "+count, 10);
+			count++;
+
 		}
 
 	}
@@ -177,10 +195,11 @@ public class Fisher    //todo finished making this class super cool
 				if (timeSkillsReuseLeft < timeSkillsReuse) {
 					timerWaitForPumpingSolution.cancel();
 					timerWaitForPumpingSolution = new Timer();
-					analyzeResult = analyze(timeSkillsReuseLeft * 2);
+					analyzeResult = analyze(timeSkillsReuse-timeSkillsReuseLeft );	//watch it. not tested
 				}
 			}
 			act(analyzeResult);
+			fileHandle.print(this.loggerToTheRight+"\r\n"+System.currentTimeMillis() + "\t" + analyzeResult + "\t" + this.workingPoint.x+"\t");
 			timerWaitForPumpingSolution.cancel();
 			timerWaitForPumpingSolution = new Timer();
 		}
@@ -188,22 +207,10 @@ public class Fisher    //todo finished making this class super cool
 		logger.info("finished fishing");
 	}
 
-	private boolean isNightTime()    //test it when nighttime support is added
-	{
-		DateTime currentDateTime = DateTime.now();
-		int currentHour = currentDateTime.getHourOfDay();
-		if (currentHour % 4 == 2) {
-			return true;
-		} else {
-			return false;
-		}
-	}
 
 	private void waitForBlink()
 	{
-//		logger.trace(".waitForBlink");
 		int timePassed = 0;
-//		World.easySleep(800);
 		while (!(colorsAreClose(getAbsPixelColor(this.blinkControlPoint), this.colorControlBlue, threshold)
 				 ||
 				 colorsAreClose(getAbsPixelColor(this.blinkControlPoint), this.colorControlOrange, threshold)))
@@ -231,7 +238,7 @@ public class Fisher    //todo finished making this class super cool
 				logger.error("sleep in waitForFishHP was interrupted for some reason");
 				e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 			}
-//			logger.debug("conditions for exit: time(10s)" + (timePassed < 10000));
+
 			if (!isFishingFrameExist()) {
 				return;
 			}
@@ -246,12 +253,9 @@ public class Fisher    //todo finished making this class super cool
 
 	private boolean isFishingFrameExist()
 	{
-//		logger.trace(".isFishingFrameExist");
 		if (colorsAreClose(getAbsPixelColor(this.controlFrameCoordinate), colorControlFrame, threshold)) {
-//			logger.debug("yes. exists");
 			return true;
 		} else {
-//			logger.debug("no. not exists");
 			return false;
 		}
 	}
@@ -268,7 +272,7 @@ public class Fisher    //todo finished making this class super cool
 			this.lastPumpingTime = System.currentTimeMillis();
 		}
 		logger.info(".act " + reel);
-		World.easySleep(160); //at least ping-sleep. or it becomes too fast
+		World.easySleep(160); //at least double-ping-sleep. or it becomes too fast
 
 	}
 
@@ -292,12 +296,14 @@ public class Fisher    //todo finished making this class super cool
 			colorsAreClose(gotColor, this.colorHpOrange, threshold))
 		{
 			stayingOnPositive = true;
+			this.loggerToTheRight=true;
 			logger.debug("moving to the right");
 		} else if (colorsAreClose(gotColor, this.colorHpBlueNegative, threshold)
 				   ||
 				   colorsAreClose(gotColor, this.colorHpOrangeNegative, threshold))
 		{
 			stayingOnPositive = false;
+			this.loggerToTheRight=false;
 			logger.debug("moving to the left");
 		} else {
 			logger.error("Found invalid color in analyze: " + gotColor + " at point " + workingPoint);
@@ -343,11 +349,11 @@ public class Fisher    //todo finished making this class super cool
 							return false;//pump it and it's yours
 						}
 					} else {
-						return false;    //and go away again
+						return false;    //and go away again//watch it. probably a source of bad behav
 					}
 				}
 
-				if (workingPoint.x <= this.leftmostBluePixelCoordinate.x + deltaX) {
+				if (workingPoint.x <= this.leftmostBluePixelCoordinate.x) {
 //					workingPoint.x += deltaX;
 					break;
 				}
@@ -419,6 +425,18 @@ public class Fisher    //todo finished making this class super cool
 
 	public Fisher()
 	{
+		try {
+			fileHandle = new PrintWriter("resources\\"+String.valueOf(System.currentTimeMillis()), "UTF-8");
+			fileHandle.println("System time\tAnalyze result\tCoordinate\tMoving to the right");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		}
+
+		WinAPIAPI.showMessage("Mouse at mana control point");
+		this.manaControlPoint = WinAPIAPI.getMousePos();
+		this.manaControlColor = L2Window.getAbsPixelColor(this.manaControlPoint);
 
 		this.leftmostBluePixelCoordinate = findBar();
 		this.controlFrameCoordinate = new Point(this.leftmostBluePixelCoordinate.x, this.leftmostBluePixelCoordinate.y + 40);
@@ -431,13 +449,10 @@ public class Fisher    //todo finished making this class super cool
 		} else {
 
 			logger.error("failed to calibrate in find window border. exiting");
-			System.exit(1);
+			finishFishing();
 		}
 		this.blinkControlPoint = new Point(this.leftmostBluePixelCoordinate.x + 1, this.leftmostBluePixelCoordinate.y + 3);
 
-		WinAPIAPI.showMessage("Mouse at mana control point");
-		this.manaControlPoint = WinAPIAPI.getMousePos();
-		this.manaControlColor = L2Window.getAbsPixelColor(this.manaControlPoint);
 
 		timerNightReminder.schedule(taskTryNighMode, 1 * 60 * 1000, 10 * 60 * 1000);//once every ten minutes, first try in one minute after start
 	}
