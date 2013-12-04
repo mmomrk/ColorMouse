@@ -10,8 +10,10 @@ import java.awt.event.KeyEvent;
 import java.util.*;
 import java.util.List;
 
-import static PixelHunter.GroupedVariables.*;
+import static PixelHunter.GroupedVariables.Mediator;
+import static PixelHunter.GroupedVariables.ProjectConstants;
 import static PixelHunter.GroupedVariables.ProjectConstants.*;
+import static java.lang.Math.log;
 import static java.lang.Math.pow;
 
 /**
@@ -32,7 +34,9 @@ public abstract class Character extends LivingCreature
 												   ID_Elvenelder,
 												   ID_Swordsinger,
 												   ID_Bladedancer};
-	private              int   homerunQueueDepth = 3;
+	private              int
+							   homerunQueueDepth = 3,
+	macroParseCurrentPosition                    = 0;
 
 
 	protected boolean
@@ -61,7 +65,7 @@ public abstract class Character extends LivingCreature
 
 	private Point chatStartingPoint;
 
-	protected Pet         pet;    //remove public after tests are done
+	protected Pet         pet;
 	protected Target      target;
 	protected HpConstants hpConstants;
 	protected HpConstants mpConstants;
@@ -78,6 +82,7 @@ public abstract class Character extends LivingCreature
 	timerChampionCallIsAllowed;
 
 	protected Map<ActionAbstractBuff, Timer> buffTimerMap = new HashMap<ActionAbstractBuff, Timer>();
+	protected LinkedList<Action>             macroActions = new LinkedList<Action>();
 
 	protected int homeRunNumber = 0;
 	protected int homeRunDelay  = ProjectConstants.HOMERUN_TIME * 1000;    //can be set individually btw
@@ -235,7 +240,7 @@ public abstract class Character extends LivingCreature
 	protected void onChampion()    //!overriden for necr
 	{
 		logger.trace(".onChampion();");
-		this.isFightingChampion=true;
+		this.isFightingChampion = true;
 		if (this.isTank) {
 			message5(this.id);
 		}
@@ -684,8 +689,272 @@ public abstract class Character extends LivingCreature
 		this.timerChampionCallIsAllowed = new Timer();
 	}
 
+	public void macro()
+	{
+		for (Action action : this.macroActions) {
+			action.perform();
+		}
+
+	}
+
+	protected Action macroParseFirstCommand(String containsCommand)
+	{
+		Character.logger.trace("insidde macroParseFirstCommand " + containsCommand);
+
+		char[] prefix = new char[85];
+		prefix = containsCommand.toCharArray();
+
+		if (containsCommand.length() == 0) {
+			logger.warn("macroParseFirstCommand is empty");
+			this.macroParseCurrentPosition += 2;
+			return new MacroDelay(0);
+		}
+		if (prefix[0] == 'd') {
+			Character.this.logger.debug("parsed macroDelay");
+			this.macroParseCurrentPosition += 2;
+			return (new MacroDelay(Integer.parseInt(String.valueOf(prefix[1]))));
+
+		}
+		if (prefix[0] == 'k') {
+			Character.this.logger.debug("parsed macroKeyPress");
+			this.macroParseCurrentPosition += 3;
+			return (new MacroKeyPress(Integer.parseInt(containsCommand.substring(1, 3))));
+		}
+		if (prefix[0] == '?') {
+			Character.this.logger.debug("parsed macroCondition");
+			this.macroParseCurrentPosition += 4;
+			int digits = Integer.parseInt(containsCommand.substring(2, 4));
+			return (new MacroCondition(prefix[1] == 'h' ? new HPIsHigherCondition(digits) : new MPIsHigherCondition(digits),
+									   macroParseFirstCommand(containsCommand.substring(4)),
+									   macroParseFirstCommand(containsCommand.substring(6))));//so called hitriy plan
+		}
+		return macroParseFirstCommand(containsCommand.substring(1));
+
+	}
+
+
+	protected void macroParse(String commands)
+	{
+		while (this.macroParseCurrentPosition < commands.length() - 1) {
+			logger.debug("" + this.macroParseCurrentPosition + " " + commands.length());
+			this.macroActions.addLast(macroParseFirstCommand(commands.substring(this.macroParseCurrentPosition)));
+			this.logger.info("macroActions is now " + this.macroActions);
+		}
+	}
+
+
 
 	//CLASSES
+
+
+	protected class MacroCondition extends Action
+	{
+
+		private SkillDealCondition condition;
+		private Action             positive;
+		private Action             negative;
+
+		@Override
+		public void perform()
+		{
+			Character.this.logger.trace("macroCondition.perform");
+			if (condition.isSatisfied()) {
+				positive.perform();
+			} else {
+				negative.perform();
+			}
+		}
+
+		@Override
+		public String toString()
+		{
+			return "MacroConndition " + condition + " " + positive + " " + negative;
+		}
+
+		public MacroCondition(SkillDealCondition condition, Action positive, Action negative)
+		{
+			Character.this.logger.trace("macro condition constructor " + condition + " " + positive + " " + negative);
+			this.condition = condition;
+			this.positive = positive;
+			this.negative = negative;
+		}
+	}
+
+
+	protected class MacroDelay extends Action
+	{
+		int timeMillis;
+
+
+		@Override
+		public void perform()
+		{
+			World.easySleep(timeMillis);
+		}
+
+		@Override
+		public String toString()
+		{
+			return "MacroDelay,ms " + timeMillis;
+		}
+
+		public MacroDelay(int timeSecs)
+		{
+			this.timeMillis = timeSecs * 1000;
+		}
+	}
+
+
+	protected class MacroKeyPress extends Action
+	{
+
+		int keyCode;
+
+		@Override
+		public void perform()
+		{
+			Character.this.logger.trace("macroKeyPress perform " + keyCode);
+			switch (keyCode) {
+				case 0:
+					Character.this.l2Window.keyClick(KeyEvent.VK_0);
+					break;
+				case 1:
+					Character.this.l2Window.keyClick(KeyEvent.VK_1);
+					break;
+				case 2:
+					Character.this.l2Window.keyClick(KeyEvent.VK_2);
+					break;
+				case 3:
+					Character.this.l2Window.keyClick(KeyEvent.VK_3);
+					break;
+				case 4:
+					Character.this.l2Window.keyClick(KeyEvent.VK_4);
+					break;
+				case 5:
+					Character.this.l2Window.keyClick(KeyEvent.VK_5);
+					break;
+				case 6:
+					Character.this.l2Window.keyClick(KeyEvent.VK_6);
+					break;
+				case 7:
+					Character.this.l2Window.keyClick(KeyEvent.VK_7);
+					break;
+				case 8:
+					Character.this.l2Window.keyClick(KeyEvent.VK_8);
+					break;
+				case 9:
+					Character.this.l2Window.keyClick(KeyEvent.VK_9);
+					break;
+				case 10:
+					Character.this.l2Window.keyClick(KeyEvent.VK_F10);
+					break;
+				case 11:
+					Character.this.l2Window.keyClick(KeyEvent.VK_F1);
+					break;
+				case 12:
+					Character.this.l2Window.keyClick(KeyEvent.VK_F2);
+					break;
+				case 13:
+					Character.this.l2Window.keyClick(KeyEvent.VK_F3);
+					break;
+				case 14:
+					Character.this.l2Window.keyClick(KeyEvent.VK_F4);
+					break;
+				case 15:
+					Character.this.l2Window.keyClick(KeyEvent.VK_F5);
+					break;
+				case 16:
+					Character.this.l2Window.keyClick(KeyEvent.VK_F6);
+					break;
+				case 17:
+					Character.this.l2Window.keyClick(KeyEvent.VK_F7);
+					break;
+				case 18:
+					Character.this.l2Window.keyClick(KeyEvent.VK_F8);
+					break;
+				case 19:
+					Character.this.l2Window.keyClick(KeyEvent.VK_F9);
+					break;
+			}
+
+		}
+
+		public String toString()
+		{
+			return "MacroKeyPerss " + keyCode;
+		}
+
+		public MacroKeyPress(int keyCode)
+		{
+			Character.this.logger.trace("MacroKeyPress constuctor with code " + keyCode);
+			this.keyCode = keyCode;
+		}
+	}
+
+
+	protected class HPIsHigherCondition extends SkillDealCondition
+	{
+		private int threshold;
+
+		@Override
+		public boolean isSatisfied()
+		{
+			if (Character.this.getHP() > threshold) {
+				logger.debug("HP is higher than" + threshold + " condition is satisfied");
+				return true;
+			}
+			logger.debug("HP is higher than" + threshold + " condition is not satisfied");
+			return false;
+		}
+
+		public HPIsHigherCondition(int threshold)
+		{
+			this.threshold = threshold;
+		}
+	}
+
+
+	protected class MPIsHigherCondition extends SkillDealCondition
+	{
+		private int threshold;
+
+		@Override
+		public boolean isSatisfied()
+		{
+			if (Character.this.getMP() > threshold) {
+				logger.debug("MP is higher than" + threshold + " condition is satisfied");
+				return true;
+			}
+			logger.debug("MP is higher than" + threshold + " condition is not satisfied");
+			return false;
+		}
+
+		public MPIsHigherCondition(int threshold)
+		{
+			this.threshold = threshold;
+		}
+	}
+
+
+	protected class TargetIsAliveCondition extends SkillDealCondition
+	{
+		@Override
+		public boolean isSatisfied()
+		{
+			if (!Character.this.target.isDead()) {
+				logger.debug("Target is alive condition is satisfied");
+				return true;
+			}
+			logger.debug("Target is alive condition is not satisfied");
+			return false;
+		}
+	}
+
+
+	protected abstract class SkillDealCondition    //functional programming would suit here best
+	{
+		public abstract boolean isSatisfied();
+	}
 
 
 	public abstract class ActionAbstractBuff extends Action
@@ -905,6 +1174,7 @@ public abstract class Character extends LivingCreature
 					assistTarget();
 					Character.this.l2Window.keyClick(KeyEvent.VK_MINUS);    //maybe to separate function. discuss
 					Character.this.l2Window.keyClick(KeyEvent.VK_MINUS);    //maybe to separate function. discuss
+					break;
 				case 16:
 					if (!Character.this.modeRB) {
 						Character.this.modeRB = true;
@@ -918,6 +1188,7 @@ public abstract class Character extends LivingCreature
 							//supports-no reaction
 						}
 					}
+					break;
 
 				default:
 					break;

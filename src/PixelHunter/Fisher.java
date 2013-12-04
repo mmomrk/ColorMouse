@@ -62,7 +62,7 @@ public class Fisher    //todo finished making this class super cool
 	};
 
 	private static final int
-	timeToWaitMillis         = 1250,//how much time  to wait before act
+	timeToWaitMillis         = 1350,//how much time  to wait before act
 	timeToSleepMillis        = 200,//passed to sleep method
 	timeInLoopDelayInAnalyze = 20,
 	timeSkillsReuse          = 1500,    //watch it

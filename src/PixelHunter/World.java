@@ -123,7 +123,11 @@ public class World
 		} else {
 			GroupedVariables.Mediator.BDSWSInDaHouse = false;
 		}
+		if (argumentsList.contains("-m"))
 
+		{
+			characters[0].macroParse(argumentsList.get(argumentsList.indexOf("-m") + 1));
+		}
 
 
 		{
@@ -131,6 +135,10 @@ public class World
 				if (GroupedVariables.Mediator.sleepRegime) {
 					easySleep(400);
 				} else {
+					if (argumentsList.contains("-m")){
+						characters[0].macro();
+						continue;
+					}
 					characters[0].lifeCycle();
 					if (!singleWindowMode) {
 						characters[1].lifeCycle();

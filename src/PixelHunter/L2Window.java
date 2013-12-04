@@ -173,7 +173,7 @@ public class L2Window
 
 		if (abs(diffR) > threshold || abs(diffG) > threshold || abs(diffB) > threshold) {
 			if (abs(diffR) < 2 * threshold && abs(diffG) < 2 * threshold && abs(diffB) < 2 * threshold) {
-				logger.warn("probably two colors are close, but failed comparison. Recommended to increase threshold. " + color1 + " " + color2);
+//				logger.warn("probably two colors are close, but failed comparison. Recommended to increase threshold. " + color1 + " " + color2);
 			}
 			return false;
 		} else {
@@ -255,7 +255,7 @@ public class L2Window
 			logger.warn("got invalid hpConstatns in getCharacterHPMP");
 			return 100;    //discuss.. but with who?
 		}
-		Point currentCoordinate = hpConstants.coordinateRight;
+		Point currentCoordinate = new Point(hpConstants.coordinateRight);
 		while (!characterHPMPColorIsPositive(getRelPixelColor(currentCoordinate), gettingHP)) {
 			currentCoordinate.x--;
 		}

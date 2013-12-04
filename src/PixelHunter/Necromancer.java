@@ -219,45 +219,8 @@ public class Necromancer extends Character
 	}
 
 
-	protected class HPIsHigherCondition extends SkillDealCondition
-	{
-		private int threshold;
-
-		@Override
-		public boolean isSatisfied()
-		{
-			if (Necromancer.this.getHP() > threshold) {
-				logger.debug("HP is higher than" + threshold + " condition is satisfied");
-				return true;
-			}
-			logger.debug("HP is higher than" + threshold + " condition is not satisfied");
-			return false;
-		}
-
-		public HPIsHigherCondition(int threshold)
-		{
-			this.threshold = threshold;
-		}
-	}
 
 
-	protected class TargetIsAliveCondition extends SkillDealCondition
-	{
-		@Override
-		public boolean isSatisfied()
-		{
-			if (!Necromancer.this.target.isDead()) {
-				logger.debug("Target is alive condition is satisfied");
-				return true;
-			}
-			logger.debug("Target is alive condition is not satisfied");
-			return false;
-		}
-	}
 
 
-	protected abstract class SkillDealCondition    //functional programming would suit here best
-	{
-		public abstract boolean isSatisfied();
-	}
 }
