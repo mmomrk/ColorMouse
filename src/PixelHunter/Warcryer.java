@@ -36,7 +36,7 @@ public class Warcryer extends Character
 	}
 
 	@Override
-	protected void setupBuffTimerMap()    //not tested
+	protected void setupBuffTimerMap()
 	{
 		logger.trace(".setupBuffTimerMap");
 		this.buffTimerMap.put(this.buff1, new Timer());

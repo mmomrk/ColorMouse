@@ -156,7 +156,7 @@ public abstract class Character extends LivingCreature
 		this.l2Window.keyClick(KeyEvent.VK_ESCAPE);
 	}
 
-	protected void setPartyMembers()    //not tested
+	protected void setPartyMembers()
 	{
 		logger.trace("setPartyMembers();");
 		PartyMember member = new PartyMember(this.l2Window);
@@ -324,7 +324,7 @@ public abstract class Character extends LivingCreature
 		this.todoOffer(this.actionPvE);
 	}
 
-	public void deactivateModeBuff()                    //not tested
+	public void deactivateModeBuff()
 	{
 		logger.trace(".deactivateModeBuff");
 		this.modeBuff = false;
@@ -471,7 +471,7 @@ public abstract class Character extends LivingCreature
 		logger.info("Finished setChat. Now chatStartingPoint is " + this.chatStartingPoint);
 	}
 
-	public void setHP()    //not tested
+	public void setHP()
 	{
 		logger.trace(".setHP(); for character");
 
@@ -480,12 +480,12 @@ public abstract class Character extends LivingCreature
 		this.l2Window.setCharacterHP(hpConstants, mpConstants);
 	}
 
-	public int getHP()    //not tested
+	public int getHP()
 	{
 		return this.l2Window.getCharacterHPMP(this.hpConstants, true);
 	}
 
-	protected int getMP()//test it
+	protected int getMP()
 	{
 		return this.l2Window.getCharacterHPMP(this.mpConstants, false);
 	}
@@ -545,7 +545,7 @@ public abstract class Character extends LivingCreature
 	protected void selectClickPartyMemberByPartyStackPlace(PartyMember partyMember)
 	{
 		logger.trace(".selectClickPartyMemberByPartyStackPlace(); --partyMember access");
-		this.l2Window.mouseClick_Relative(partyMember.hpConstants.coordinateLeft);//not tested
+		this.l2Window.mouseClick_Relative(partyMember.hpConstants.coordinateLeft);
 	}
 
 
@@ -1383,7 +1383,7 @@ public abstract class Character extends LivingCreature
 	}
 
 
-	private class SetMacroFree extends TimerTask              //not tested
+	private class SetMacroFree extends TimerTask
 	{
 		@Override
 		public void run()

@@ -273,7 +273,7 @@ public class L2Window
 
 	}
 
-	public void setCharacterHP(HpConstants hpConstants, HpConstants mpConstants)    //not tested
+	public void setCharacterHP(HpConstants hpConstants, HpConstants mpConstants)
 	{
 		logger.trace("setting Character HP");
 		WinAPIAPI.showMessage("Setting HP for character. place mouse under fully healed hp bar and press ok");
@@ -423,7 +423,7 @@ public class L2Window
 		}
 	}
 
-	public void mouseClick_Relative(Point relativePoint)//not tested
+	public void mouseClick_Relative(Point relativePoint)
 	{
 		logger.trace(".mouseClick Relative");
 

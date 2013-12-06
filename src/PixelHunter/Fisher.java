@@ -17,7 +17,9 @@ import static java.lang.System.exit;
  * User: mrk
  * Date: 9/6/13; Time: 2:11 AM
  */
-public class Fisher    //todo finished making this class super cool
+
+//implement:nightfish
+public class Fisher
 {
 	private static final Logger logger = LoggerFactory.getLogger(Fisher.class);
 
@@ -207,7 +209,7 @@ public class Fisher    //todo finished making this class super cool
 				if (timeSkillsReuseLeft < timeSkillsReuse) {
 					timerWaitForPumpingSolution.cancel();
 					timerWaitForPumpingSolution = new Timer();
-					analyzeResult = analyze(timeSkillsReuse - timeSkillsReuseLeft);    //watch it. not tested
+					analyzeResult = analyze(timeSkillsReuse - timeSkillsReuseLeft);
 				}
 			}
 			act(analyzeResult);
