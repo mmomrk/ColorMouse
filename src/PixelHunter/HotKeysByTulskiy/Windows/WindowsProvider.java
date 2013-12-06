@@ -81,7 +81,8 @@ public class WindowsProvider extends Provider
 		thread.start();
 	}
 
-	private void register(HotKey hotKey) {
+	private void register(HotKey hotKey)
+	{
 		int id = idSeq++;
 		int code = KeyMap.getCode(hotKey);
 		if (RegisterHotKey(null, id, KeyMap.getModifiers(hotKey.keyStroke), code)) {
@@ -92,19 +93,22 @@ public class WindowsProvider extends Provider
 		}
 	}
 
-	public void register(KeyStroke keyCode, HotKeyListener listener) {
+	public void register(KeyStroke keyCode, HotKeyListener listener)
+	{
 		synchronized (lock) {
 			registerQueue.add(new HotKey(keyCode, listener));
 		}
 	}
 
-	public void register(MediaKey mediaKey, HotKeyListener listener) {
+	public void register(MediaKey mediaKey, HotKeyListener listener)
+	{
 		synchronized (lock) {
 			registerQueue.add(new HotKey(mediaKey, listener));
 		}
 	}
 
-	public void reset() {
+	public void reset()
+	{
 		synchronized (lock) {
 			reset = true;
 			try {
@@ -116,7 +120,8 @@ public class WindowsProvider extends Provider
 	}
 
 	@Override
-	public void stop() {
+	public void stop()
+	{
 		listen = false;
 		if (thread != null) {
 			try {

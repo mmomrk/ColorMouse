@@ -27,9 +27,7 @@ public abstract class Provider
 	 *
 	 * @param useSwingEventQueue whether the provider should be using Swing Event queue or a regular thread
 	 * @return new instance of Provider, or null if platform is not supported
-
 	 * @see WindowsProvider
-
 	 */
 	public static Provider getCurrentProvider(boolean useSwingEventQueue)
 	{

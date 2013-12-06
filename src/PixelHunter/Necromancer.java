@@ -218,9 +218,4 @@ public class Necromancer extends Character
 		}
 	}
 
-
-
-
-
-
 }

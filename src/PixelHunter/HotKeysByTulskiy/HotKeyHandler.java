@@ -62,8 +62,8 @@ public class HotKeyHandler implements HotKeyListener
 
 	private void sleep()
 	{
-		logger.info("Sleep mode is "+GroupedVariables.Mediator.sleepRegime+". Press again to continue program execution");
-		GroupedVariables.Mediator.sleepRegime =	!GroupedVariables.Mediator.sleepRegime;
+		logger.info("Sleep mode is " + GroupedVariables.Mediator.sleepRegime + ". Press again to continue program execution");
+		GroupedVariables.Mediator.sleepRegime = !GroupedVariables.Mediator.sleepRegime;
 	}
 
 	public void onHotKey(HotKey hotKey)
@@ -73,7 +73,7 @@ public class HotKeyHandler implements HotKeyListener
 			logger.info("Received alt+pause. Terminating");
 			provider.stop();
 //			cleanUp();
-			if (World.fishFlag){
+			if (World.fishFlag) {
 				World.fisher.finishFishing();
 			}
 			System.exit(0);
@@ -182,10 +182,10 @@ public class HotKeyHandler implements HotKeyListener
 		logger.trace(".toggleModeFarm");
 		if (lastModeFarm) {
 			World.deactivateFarm();
-			lastModeFarm	=	false;
+			lastModeFarm = false;
 		} else {
 			World.activateFarm();
-			lastModeFarm	=	true;
+			lastModeFarm = true;
 		}
 	}
 
@@ -194,10 +194,10 @@ public class HotKeyHandler implements HotKeyListener
 		logger.trace(".toggleModeBuff");
 		if (lastModeBuff) {
 			World.deactivateBuff();
-			lastModeBuff=false;
+			lastModeBuff = false;
 		} else {
 			World.activateBuff();
-			lastModeBuff=true;
+			lastModeBuff = true;
 		}
 	}
 
@@ -206,10 +206,10 @@ public class HotKeyHandler implements HotKeyListener
 		logger.trace(".toggleModeHomeRun");
 		if (lastModeHomeRun) {
 			World.deactivateHomeRun();
-			lastModeHomeRun=false;
+			lastModeHomeRun = false;
 		} else {
 			World.activateHomeRun();
-			lastModeHomeRun=true;
+			lastModeHomeRun = true;
 		}
 	}
 

@@ -190,7 +190,7 @@ public class ElvenElder extends PixelHunter.Character
 			} else {
 				selectClickPartyMemberByPartyStackPlace(this.partyMember);
 			}
-			logger.debug(".heal wounded: pressed-selected member. now doing 5 or 6:"+buttonNumber);
+			logger.debug(".heal wounded: pressed-selected member. now doing 5 or 6:" + buttonNumber);
 			if (buttonNumber == 5) {    //grHeal
 				ElvenElder.this.iAmHealing = true;
 				int hP = ElvenElder.this.getPartyMemberHP(this.partyMember, this.targetIsPet);

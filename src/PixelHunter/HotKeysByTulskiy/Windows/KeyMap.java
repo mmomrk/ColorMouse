@@ -15,21 +15,24 @@ import static java.awt.event.KeyEvent.*;
  * Author: Denis Tulskiy
  * Date: 6/20/11
  */
-public class KeyMap {
-	private static final Map<Integer, Integer> codeExceptions = new HashMap<Integer, Integer>() {{
-		put(VK_INSERT, 0x2D);
-		put(VK_DELETE, 0x2E);
-		put(VK_ENTER, 0x0D);
-		put(VK_COMMA, 0xBC);
-		put(VK_PERIOD, 0xBE);
-		put(VK_PLUS, 0xBB);
-		put(VK_MINUS, 0xBD);
-		put(VK_SLASH, 0xBF);
-		put(VK_SEMICOLON, 0xBA);
-		put(VK_PRINTSCREEN, 0x2C);
-	}};
+public class KeyMap
+{
+	private static final Map<Integer, Integer> codeExceptions = new HashMap<Integer, Integer>()
+	{{
+			put(VK_INSERT, 0x2D);
+			put(VK_DELETE, 0x2E);
+			put(VK_ENTER, 0x0D);
+			put(VK_COMMA, 0xBC);
+			put(VK_PERIOD, 0xBE);
+			put(VK_PLUS, 0xBB);
+			put(VK_MINUS, 0xBD);
+			put(VK_SLASH, 0xBF);
+			put(VK_SEMICOLON, 0xBA);
+			put(VK_PRINTSCREEN, 0x2C);
+		}};
 
-	public static int getCode(HotKey hotKey) {
+	public static int getCode(HotKey hotKey)
+	{
 		if (hotKey.isMedia()) {
 			int code = 0;
 			switch (hotKey.mediaKey) {
@@ -53,12 +56,14 @@ public class KeyMap {
 			Integer code = codeExceptions.get(keyStroke.getKeyCode());
 			if (code != null) {
 				return code;
-			} else
+			} else {
 				return keyStroke.getKeyCode();
+			}
 		}
 	}
 
-	public static int getModifiers(KeyStroke keyCode) {
+	public static int getModifiers(KeyStroke keyCode)
+	{
 		int modifiers = 0;
 		if (keyCode != null) {
 			if ((keyCode.getModifiers() & InputEvent.SHIFT_DOWN_MASK) != 0) {

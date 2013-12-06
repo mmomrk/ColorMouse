@@ -56,9 +56,9 @@ public class DefaultCharacter extends Character
 	public DefaultCharacter(WinDef.HWND hwnd)
 	{
 		super(GroupedVariables.ProjectConstants.ID_DefaultCharacter, hwnd);
-	    setupBuffTimerMap();
-		this.isHomeRunner	=	true;
-		this.isPhysicAttacker	=	true;
+		setupBuffTimerMap();
+		this.isHomeRunner = true;
+		this.isPhysicAttacker = true;
 
 	}
 }

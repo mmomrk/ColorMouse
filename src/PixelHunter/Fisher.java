@@ -452,22 +452,22 @@ public class Fisher    //todo finished making this class super cool
 
 		this.leftmostBluePixelCoordinate = findBar();
 		this.controlFrameCoordinate = new Point(this.leftmostBluePixelCoordinate.x, this.leftmostBluePixelCoordinate.y + 35);
-		boolean failInFindFrame=true;
+		boolean failInFindFrame = true;
 		for (int i = 0; i < 70; i++) {
-			this.controlFrameCoordinate.y=this.leftmostBluePixelCoordinate.y+35+i;
+			this.controlFrameCoordinate.y = this.leftmostBluePixelCoordinate.y + 35 + i;
 			if (colorsAreClose(getAbsPixelColor(this.controlFrameCoordinate), colorControlFrame1)) {
 				logger.debug("control frame pixel is light");
 				colorControlFrame = colorControlFrame1;
-				failInFindFrame=false;
+				failInFindFrame = false;
 				break;
 			} else if (colorsAreClose(getAbsPixelColor(this.controlFrameCoordinate), colorControlFrame2)) {
 				logger.debug("control frame pixel is dark");
 				colorControlFrame = colorControlFrame2;
-				failInFindFrame=false;
+				failInFindFrame = false;
 				break;
 			}
 		}
-		if (failInFindFrame){
+		if (failInFindFrame) {
 			logger.error("failed to calibrate in find window border. exiting");
 			finishFishing();
 		}

@@ -31,7 +31,7 @@ public class DialogWindow extends JFrame
 				logger.warn("exception in DialogWindow sleep");
 			}
 		}
-		WinAPIAPI.frameExists=false;
+		WinAPIAPI.frameExists = false;
 		this.dispose();
 		return answer;
 
@@ -45,7 +45,7 @@ public class DialogWindow extends JFrame
 		this.setLocationRelativeTo(null);
 //		this.setSize(100,400);
 		Container content = this.getContentPane();
-		content.setLayout(new GridLayout(0,2,10,10));
+		content.setLayout(new GridLayout(0, 2, 10, 10));
 		if (dialogCase == 0 || dialogCase == 1 || dialogCase == 2) {
 
 			content.setBackground(Color.white);
@@ -125,7 +125,7 @@ public class DialogWindow extends JFrame
 				this.charactersID = GroupedVariables.ProjectConstants.ID_Necromancer;
 			} else if (buttonName == "Elvenelder") {
 				this.charactersID = GroupedVariables.ProjectConstants.ID_Elvenelder;
-			}	else {
+			} else {
 				logger.warn("stupid in dialog");
 				this.charactersID = GroupedVariables.ProjectConstants.ID_DefaultCharacter;
 			}

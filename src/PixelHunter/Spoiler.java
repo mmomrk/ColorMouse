@@ -93,7 +93,7 @@ public class Spoiler extends Character
 		}
 
 		if (this.modeFarm) {
-			if (random() < GroupedVariables.ProjectConstants.SS_TO_LOOT_MASS_CONVERSION_SPOILER) {	//watch it
+			if (random() < GroupedVariables.ProjectConstants.SS_TO_LOOT_MASS_CONVERSION_SPOILER) {    //watch it
 				useSkill(pickUp);
 			}
 		}

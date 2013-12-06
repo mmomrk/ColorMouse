@@ -6,20 +6,26 @@ import PixelHunter.HotKeysByTulskiy.Common.Provider;
 
 import javax.swing.*;
 
-public class ProviderTest {
-	public static void main(String[] args) {
+public class ProviderTest
+{
+	public static void main(String[] args)
+	{
 		final Provider provider = Provider.getCurrentProvider(false);
 
-		provider.register(KeyStroke.getKeyStroke("control alt D"), new HotKeyListener() {
-			public void onHotKey(HotKey hotKey) {
+		provider.register(KeyStroke.getKeyStroke("control alt D"), new HotKeyListener()
+		{
+			public void onHotKey(HotKey hotKey)
+			{
 				System.out.println(hotKey);
 				provider.reset();
 				provider.stop();
 			}
 		});
 
-		HotKeyListener listener = new HotKeyListener() {
-			public void onHotKey(HotKey hotKey) {
+		HotKeyListener listener = new HotKeyListener()
+		{
+			public void onHotKey(HotKey hotKey)
+			{
 				System.out.println(hotKey);
 			}
 		};
@@ -46,8 +52,8 @@ public class ProviderTest {
 		provider.register(KeyStroke.getKeyStroke("control alt HOME"), listener);
 		provider.register(KeyStroke.getKeyStroke("control alt PAGE_UP"), listener);
 		provider.register(KeyStroke.getKeyStroke("control alt NUMPAD0"), listener);
-		int i=0;
-		while (true){
+		int i = 0;
+		while (true) {
 //			System.out.println("sleep "+i++);
 			try {
 				Thread.sleep(1000);

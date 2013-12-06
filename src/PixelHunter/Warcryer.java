@@ -20,7 +20,8 @@ public class Warcryer extends Character
 								buff1  = new ActionSelfBuff("20-minute buff", 1, (20 * 60 - 15) * 1000, 20 * 1000);
 
 	@Override
-	protected void message6(int callerID){
+	protected void message6(int callerID)
+	{
 		message5(callerID);
 	}
 
@@ -60,7 +61,7 @@ public class Warcryer extends Character
 		logger.trace("Warcryer constructor");
 		setupBuffTimerMap();
 		this.isHomeRunner = false;
-		this.isPhysicAttacker	=	true;
+		this.isPhysicAttacker = true;
 
 	}
 

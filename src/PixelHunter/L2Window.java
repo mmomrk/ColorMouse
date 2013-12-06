@@ -264,9 +264,9 @@ public class L2Window
 		}
 		Point currentCoordinate = new Point(hpConstants.coordinateRight);
 //		for (; currentCoordinate.x <=) {
-			while (!characterHPMPColorIsPositive(getRelPixelColor(currentCoordinate), gettingHP)) {
-				currentCoordinate.x--;
-			}
+		while (!characterHPMPColorIsPositive(getRelPixelColor(currentCoordinate), gettingHP)) {
+			currentCoordinate.x--;
+		}
 //		}
 
 		return 100 * (currentCoordinate.x - hpConstants.coordinateLeft.x) / overallLength;

@@ -59,10 +59,10 @@ public class World
 					fisher.setSchedule(argumentsList.get(argumentsList.indexOf("--time") + 1));
 				}
 			}
-			if (argumentsList.contains("-p")){
+			if (argumentsList.contains("-p")) {
 				fisher.setPing(Integer.parseInt(argumentsList.get(argumentsList.indexOf("-p") + 1)));
 			}
-			if (argumentsList.contains("-pt")){
+			if (argumentsList.contains("-pt")) {
 				fisher.setTimeToWaitForPumping(Integer.parseInt(argumentsList.get(argumentsList.indexOf("-pt") + 1)));
 			}
 			fisher.infiniteFish();           //uses L2window static methods
@@ -141,7 +141,7 @@ public class World
 				if (GroupedVariables.Mediator.sleepRegime) {
 					easySleep(400);
 				} else {
-					if (argumentsList.contains("-m")){
+					if (argumentsList.contains("-m")) {
 						characters[0].macro();
 						continue;
 					}

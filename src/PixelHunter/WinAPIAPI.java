@@ -134,7 +134,7 @@ public class WinAPIAPI
 
 	public static void setActiveWindow(WinDef.HWND hwnd)
 	{
-		logger.trace("User32.INSTANCE.SetForegroundWindow(hwnd);"+hwnd);
+		logger.trace("User32.INSTANCE.SetForegroundWindow(hwnd);" + hwnd);
 //		User32.INSTANCE.SetFocus(hwnd);
 //		User32.INSTANCE.ShowWindow(hwnd,1);
 //		User32.INSTANCE.BringWindowToTop ();	//invalid
@@ -184,7 +184,7 @@ public class WinAPIAPI
 	}
 
 
-	public static boolean frameExists             = false;
+	public static  boolean frameExists             = false;
 	private static boolean isFirtsRunOfShowMessage = true;
 	private static InfoFrame frame;
 
@@ -198,17 +198,16 @@ public class WinAPIAPI
 			frame.display(s);
 		}
 
-
 	}
 
 	public static void showMessage(String s, int timeSeconds)
 	{
 		if (isFirtsRunOfShowMessage) {
 			frame = new InfoFrame(s);
-			frame.display(s,timeSeconds);
+			frame.display(s, timeSeconds);
 			isFirtsRunOfShowMessage = false;
 		} else {
-			frame.display(s,timeSeconds);
+			frame.display(s, timeSeconds);
 		}
 	}
 

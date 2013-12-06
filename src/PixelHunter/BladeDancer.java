@@ -13,7 +13,7 @@ public class BladeDancer extends SwordSingerBladeDancer
 	{
 		super(GroupedVariables.ProjectConstants.ID_Bladedancer, hwnd);
 		logger.trace("creating BD");
-		for (int i=1;i<=6;i++){
+		for (int i = 1; i <= 6; i++) {
 			this.songDanceSequence.add(new SkillSongDance(i));//i don't care
 		}
 	}

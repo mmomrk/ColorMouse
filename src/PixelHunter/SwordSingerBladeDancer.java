@@ -25,11 +25,12 @@ public abstract class SwordSingerBladeDancer extends Character
 
 	protected int currentSongDance = -1;
 
-	protected boolean iAmSitting=false;
+	protected boolean iAmSitting = false;
 
-	protected void sitStand(){
+	protected void sitStand()
+	{
 		logger.trace(".sitStand();");
-		iAmSitting=!iAmSitting;
+		iAmSitting = !iAmSitting;
 		this.l2Window.keyClick(KeyEvent.VK_NUMPAD8);
 	}
 
@@ -44,8 +45,8 @@ public abstract class SwordSingerBladeDancer extends Character
 	public boolean nextSongDance()    //retval is 'are you finished' answer
 	{
 		logger.trace(".nextSongDance current songdance is " + ++this.currentSongDance);
-		this.iAmSitting=true;//i will be sitting after singing/dancing
-		this.isSummoner=true;//funny but when sitting he is disabled, so attacking only through pet
+		this.iAmSitting = true;//i will be sitting after singing/dancing
+		this.isSummoner = true;//funny but when sitting he is disabled, so attacking only through pet
 		this.l2Window.activate();
 		easySleep(800);
 		if (this.currentSongDance < this.songDanceSequence.size() - 1) {
@@ -72,10 +73,10 @@ public abstract class SwordSingerBladeDancer extends Character
 	public void classSpecificLifeCycle()
 	{
 		logger.trace(".classSpecificLifeCycle");
-		if (this.iAmSitting){
-			if (getMP()>80){
+		if (this.iAmSitting) {
+			if (getMP() > 80) {
 				sitStand();
-				this.isSummoner=false;
+				this.isSummoner = false;
 			} else {
 				logger.debug("i think i am sitting now");
 			}
@@ -108,7 +109,7 @@ public abstract class SwordSingerBladeDancer extends Character
 	{
 		public SkillSongDance(int key)
 		{
-			super(key, 3);	//hardcode is bad. but else it will be too stupid
+			super(key, 3);    //hardcode is bad. but else it will be too stupid
 		}
 	}
 
@@ -129,7 +130,7 @@ public abstract class SwordSingerBladeDancer extends Character
 			{
 				@Override
 				public void run()
-				{	//error is here(todo,implement,remove after!!!
+				{    //error is here(todo,implement,remove after!!!
 					if (SwordSingerBladeDancer.this.isMaster) {
 						todoOffer(new ActionSongDance());
 					} else {

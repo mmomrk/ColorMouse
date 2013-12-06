@@ -8,6 +8,7 @@ import java.util.EventListener;
  * Author: Denis Tulskiy
  * Date: 6/21/11
  */
-public interface HotKeyListener extends EventListener {
+public interface HotKeyListener extends EventListener
+{
 	public void onHotKey(HotKey hotKey);
 }

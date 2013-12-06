@@ -21,8 +21,8 @@ abstract class Action
 	isMessageReact,
 	isSkill,
 	isHomeRun;
-//	protected L2Window l2Window;
-	protected int      priority;    //pve-100;	homerun-200; message-300; buff-350
+	//	protected L2Window l2Window;
+	protected int priority;    //pve-100;	homerun-200; message-300; buff-350
 
 	public abstract void perform();    //returns macro delay
 
@@ -72,7 +72,7 @@ abstract class Action
 	}
 
 
-	protected 	Action()
+	protected Action()
 	{
 		this.iD = currentID++;
 		if (currentID == Integer.MAX_VALUE) {

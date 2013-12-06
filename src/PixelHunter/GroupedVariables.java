@@ -103,7 +103,7 @@ public class GroupedVariables
 			MAJOR_HEAL_FROM = Integer.parseInt(properties.get("MAJOR_HEAL_FROM").toString());
 			MAJOR_HEAL_TO = Integer.parseInt(properties.get("MAJOR_HEAL_TO").toString());
 			CHAMPION_SUSPICION_TIME_SECONDS = Long.parseLong(properties.get("CHAMPION_SUSPICION_TIME_SECONDS").toString());
-			SS_TO_LOOT_MASS_CONVERSION_SPOILER	= Double.parseDouble(properties.get("SS_TO_LOOT_MASS_CONVERSION_SPOILER").toString());
+			SS_TO_LOOT_MASS_CONVERSION_SPOILER = Double.parseDouble(properties.get("SS_TO_LOOT_MASS_CONVERSION_SPOILER").toString());
 
 			ID_PET = Integer.parseInt(properties.get("ID_pet").toString());
 			ID_TARGET = Integer.parseInt(properties.get("ID_target").toString());
@@ -135,8 +135,8 @@ public class GroupedVariables
 			CHAT_TASK_LIST_LENGTH = Integer.parseInt(properties.get("CHAT_TASK_LIST_LENGTH").toString());
 			INITIAL_DEBUG_MODE = Integer.parseInt(properties.get("INITIAL_DEBUG_MODE").toString());//seems obsolete
 			WINDOW_ACTIVATE_DELAY_MILLIS = Integer.parseInt(properties.get("WINDOW_ACTIVATE_DELAY_MILLIS").toString());
-			TIME_SLEEP_KEYPRESS_MILLIS_BEFORE =	Integer.parseInt(properties.get("TIME_SLEEP_KEYPRESS_MILLIS_BEFORE").toString());
-			TIME_SLEEP_KEYPRESS_MILLIS_AFTER	=	Integer.parseInt(properties.get("TIME_SLEEP_KEYPRESS_MILLIS_AFTER").toString());
+			TIME_SLEEP_KEYPRESS_MILLIS_BEFORE = Integer.parseInt(properties.get("TIME_SLEEP_KEYPRESS_MILLIS_BEFORE").toString());
+			TIME_SLEEP_KEYPRESS_MILLIS_AFTER = Integer.parseInt(properties.get("TIME_SLEEP_KEYPRESS_MILLIS_AFTER").toString());
 
 			int red, green, blue;
 			red = Integer.parseInt(properties.get("CharacterHpColor_red").toString());

@@ -40,7 +40,7 @@ public class InfoFrame extends JFrame implements WindowListener
 			{
 				logger.trace(".run schedule timed-out frame");
 				InfoFrame.this.frameExists = false;
-				GroupedVariables.Mediator.sleepRegime=false;
+				GroupedVariables.Mediator.sleepRegime = false;
 				InfoFrame.this.setVisible(false);
 			}
 		}, delaySeconds * 1000);
@@ -132,7 +132,7 @@ public class InfoFrame extends JFrame implements WindowListener
 		{
 //			logger.trace("OK button press performed");
 			InfoFrame.this.frameExists = false;
-			GroupedVariables.Mediator.sleepRegime=false;
+			GroupedVariables.Mediator.sleepRegime = false;
 			InfoFrame.this.setVisible(false);
 //			dispose();
 

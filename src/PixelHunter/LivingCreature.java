@@ -29,6 +29,7 @@ public abstract class LivingCreature
 	{
 		this.id = thisid;
 	}
+
 	static {
 
 //		iDValues.put("prophet", ID_Prophet);

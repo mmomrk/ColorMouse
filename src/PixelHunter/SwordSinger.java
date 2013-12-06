@@ -11,7 +11,7 @@ public class SwordSinger extends SwordSingerBladeDancer
 	{
 		super(GroupedVariables.ProjectConstants.ID_Swordsinger, hwnd);
 		logger.trace("creating SWS");
-		for (int i=1;i<=6;i++){
+		for (int i = 1; i <= 6; i++) {
 			this.songDanceSequence.add(new SkillSongDance(i));//i don't care
 		}
 	}
