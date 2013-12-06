@@ -206,11 +206,18 @@ public class L2Window
 	private boolean characterHPMPColorIsPositive(Color color, boolean checkHP)
 	{
 		if (checkHP) {
+			if (abs(color.getRed() - color.getGreen()) < 15) {    //black or white-numbers
+				return false;
+			}
 			if (color.getRed() < 55) {
 				return false;
 			}
 		} else {
-			if (color.getBlue() < 120) {
+			if (abs(color.getBlue() - color.getGreen()) < 15) { //same
+				return false;
+			}
+
+			if (color.getBlue() < 100) {
 				return false;
 			}
 		}
@@ -249,16 +256,18 @@ public class L2Window
 
 	public int getCharacterHPMP(HpConstants hpConstants, boolean gettingHP)
 	{
-		logger.trace(".getCharacterHPMP with gettingHP flag "+gettingHP);
+		logger.trace(".getCharacterHPMP with gettingHP flag " + gettingHP);
 		int overallLength = hpConstants.coordinateRight.x - hpConstants.coordinateLeft.x;
 		if (overallLength == 0) {
 			logger.warn("got invalid hpConstatns in getCharacterHPMP");
 			return 100;    //discuss.. but with who?
 		}
 		Point currentCoordinate = new Point(hpConstants.coordinateRight);
-		while (!characterHPMPColorIsPositive(getRelPixelColor(currentCoordinate), gettingHP)) {
-			currentCoordinate.x--;
-		}
+//		for (; currentCoordinate.x <=) {
+			while (!characterHPMPColorIsPositive(getRelPixelColor(currentCoordinate), gettingHP)) {
+				currentCoordinate.x--;
+			}
+//		}
 
 		return 100 * (currentCoordinate.x - hpConstants.coordinateLeft.x) / overallLength;
 
@@ -418,7 +427,7 @@ public class L2Window
 	{
 		logger.trace(".mouseClick Relative");
 
-		Point currentMousePosition=new Point(500,500);
+		Point currentMousePosition = new Point(500, 500);
 		if (debugMode == 0) {
 			currentMousePosition = getMousePos();
 		}

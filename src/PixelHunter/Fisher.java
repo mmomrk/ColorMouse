@@ -1,5 +1,4 @@
 package PixelHunter;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +12,6 @@ import java.util.TimerTask;
 
 import static PixelHunter.L2Window.*;
 import static java.lang.System.exit;
-import static java.lang.System.in;
 
 /**
  * User: mrk
@@ -62,7 +60,7 @@ public class Fisher    //todo finished making this class super cool
 	};
 
 	private static final int
-	timeToWaitMillis         = 1350,//how much time  to wait before act
+	//how much time  to wait before act
 	timeToSleepMillis        = 200,//passed to sleep method
 	timeInLoopDelayInAnalyze = 20,
 	timeSkillsReuse          = 1500,    //watch it
@@ -75,6 +73,8 @@ public class Fisher    //todo finished making this class super cool
 	private final int threshold = 10;    //default is 4
 
 	private int
+	ping                = 80,        //can be changed
+	timeToWaitMillis    = 1350,    //can be changed
 	numberOfFAilsInARow = 0,
 	lastKeyPressed      = 0,
 	currentFailLimit    = 0;
@@ -89,7 +89,19 @@ public class Fisher    //todo finished making this class super cool
 
 	PrintWriter fileHandle;
 
-	public void finishFishing(){
+	public void setTimeToWaitForPumping(int newTime)
+	{
+		this.timeToWaitMillis = newTime;
+	}
+
+	public void setPing(int newPing)
+	{
+		this.ping = newPing;
+	}
+
+
+	public void finishFishing()
+	{
 		logger.info("Finishing fishing for some reason");
 		fileHandle.close();
 		exit(0);
@@ -148,12 +160,12 @@ public class Fisher    //todo finished making this class super cool
 	{
 
 		logger.trace(".waitForMana");
-		int count=0;
+		int count = 0;
 		while (!colorsAreClose(manaControlColor, getAbsPixelColor(manaControlPoint))) {
-			if (count>20){
+			if (count > 20) {
 				finishFishing();
 			}
-			WinAPIAPI.showMessage("Waiting for mana regeneration(20 for exit): "+count, 10);
+			WinAPIAPI.showMessage("Waiting for mana regeneration(20 for exit): " + count, 10);
 			count++;
 
 		}
@@ -195,11 +207,11 @@ public class Fisher    //todo finished making this class super cool
 				if (timeSkillsReuseLeft < timeSkillsReuse) {
 					timerWaitForPumpingSolution.cancel();
 					timerWaitForPumpingSolution = new Timer();
-					analyzeResult = analyze(timeSkillsReuse-timeSkillsReuseLeft );	//watch it. not tested
+					analyzeResult = analyze(timeSkillsReuse - timeSkillsReuseLeft);    //watch it. not tested
 				}
 			}
 			act(analyzeResult);
-			fileHandle.print(this.loggerToTheRight+"\r\n"+System.currentTimeMillis() + "\t" + analyzeResult + "\t" + this.workingPoint.x+"\t");
+			fileHandle.print(this.loggerToTheRight + "\r\n" + System.currentTimeMillis() + "\t" + analyzeResult + "\t" + this.workingPoint.x + "\t");
 			timerWaitForPumpingSolution.cancel();
 			timerWaitForPumpingSolution = new Timer();
 		}
@@ -272,7 +284,7 @@ public class Fisher    //todo finished making this class super cool
 			this.lastPumpingTime = System.currentTimeMillis();
 		}
 		logger.info(".act " + reel);
-		World.easySleep(160); //at least double-ping-sleep. or it becomes too fast
+		World.easySleep(this.ping * 2 + 20); //at least double-ping-sleep. or it becomes too fast
 
 	}
 
@@ -296,14 +308,14 @@ public class Fisher    //todo finished making this class super cool
 			colorsAreClose(gotColor, this.colorHpOrange, threshold))
 		{
 			stayingOnPositive = true;
-			this.loggerToTheRight=true;
+			this.loggerToTheRight = true;
 			logger.debug("moving to the right");
 		} else if (colorsAreClose(gotColor, this.colorHpBlueNegative, threshold)
 				   ||
 				   colorsAreClose(gotColor, this.colorHpOrangeNegative, threshold))
 		{
 			stayingOnPositive = false;
-			this.loggerToTheRight=false;
+			this.loggerToTheRight = false;
 			logger.debug("moving to the left");
 		} else {
 			logger.error("Found invalid color in analyze: " + gotColor + " at point " + workingPoint);
@@ -426,7 +438,7 @@ public class Fisher    //todo finished making this class super cool
 	public Fisher()
 	{
 		try {
-			fileHandle = new PrintWriter("resources\\"+String.valueOf(System.currentTimeMillis()), "UTF-8");
+			fileHandle = new PrintWriter("resources\\" + String.valueOf(System.currentTimeMillis()), "UTF-8");
 			fileHandle.println("System time\tAnalyze result\tCoordinate\tMoving to the right");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -439,15 +451,23 @@ public class Fisher    //todo finished making this class super cool
 		this.manaControlColor = L2Window.getAbsPixelColor(this.manaControlPoint);
 
 		this.leftmostBluePixelCoordinate = findBar();
-		this.controlFrameCoordinate = new Point(this.leftmostBluePixelCoordinate.x, this.leftmostBluePixelCoordinate.y + 40);
-		if (colorsAreClose(getAbsPixelColor(this.controlFrameCoordinate), colorControlFrame1)) {
-			logger.debug("control frame pixel is light");
-			colorControlFrame = colorControlFrame1;
-		} else if (colorsAreClose(getAbsPixelColor(this.controlFrameCoordinate), colorControlFrame2)) {
-			logger.debug("control frame pixel is dark");
-			colorControlFrame = colorControlFrame2;
-		} else {
-
+		this.controlFrameCoordinate = new Point(this.leftmostBluePixelCoordinate.x, this.leftmostBluePixelCoordinate.y + 35);
+		boolean failInFindFrame=true;
+		for (int i = 0; i < 70; i++) {
+			this.controlFrameCoordinate.y=this.leftmostBluePixelCoordinate.y+35+i;
+			if (colorsAreClose(getAbsPixelColor(this.controlFrameCoordinate), colorControlFrame1)) {
+				logger.debug("control frame pixel is light");
+				colorControlFrame = colorControlFrame1;
+				failInFindFrame=false;
+				break;
+			} else if (colorsAreClose(getAbsPixelColor(this.controlFrameCoordinate), colorControlFrame2)) {
+				logger.debug("control frame pixel is dark");
+				colorControlFrame = colorControlFrame2;
+				failInFindFrame=false;
+				break;
+			}
+		}
+		if (failInFindFrame){
 			logger.error("failed to calibrate in find window border. exiting");
 			finishFishing();
 		}

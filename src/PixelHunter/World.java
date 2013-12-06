@@ -59,6 +59,12 @@ public class World
 					fisher.setSchedule(argumentsList.get(argumentsList.indexOf("--time") + 1));
 				}
 			}
+			if (argumentsList.contains("-p")){
+				fisher.setPing(Integer.parseInt(argumentsList.get(argumentsList.indexOf("-p") + 1)));
+			}
+			if (argumentsList.contains("-pt")){
+				fisher.setTimeToWaitForPumping(Integer.parseInt(argumentsList.get(argumentsList.indexOf("-pt") + 1)));
+			}
 			fisher.infiniteFish();           //uses L2window static methods
 			return;
 		}
