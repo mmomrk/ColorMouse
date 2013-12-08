@@ -39,7 +39,7 @@ public class L2Window
 	private Point chatStartingPoint;
 	private Point absolutePoint = new Point();
 
-	private Color color;    //for not creating a new one every time
+	private static Color color;    //for not creating a new one every time
 
 	private boolean noChatMode = false;    //++getter
 
@@ -546,7 +546,7 @@ public class L2Window
 	public static Color getAbsPixelColor(Point absolutePoint)
 	{
 
-		Color color; //static color. different variable
+//		Color color; //static color. different variableWinAPIAPI.showMessage(absolutePoint.toString());//remove after
 		color = robot.getPixelColor(absolutePoint.x, absolutePoint.y);
 		switch (debugMode) {
 			case 1:

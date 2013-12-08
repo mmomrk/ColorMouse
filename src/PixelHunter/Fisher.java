@@ -18,26 +18,34 @@ import static java.lang.System.exit;
  * Date: 9/6/13; Time: 2:11 AM
  */
 
-//implement:nightfish
+
 public class Fisher
 {
 	private static final Logger logger = LoggerFactory.getLogger(Fisher.class);
 
 	private L2Window l2Window;
 	private static final Color
-	colorHpBlueNegative   = new Color(53, 33, 26),
-	colorHpOrangeNegative = new Color(36, 14, 12),
-	colorHpBlue           = new Color(4, 103, 159),//(12, 104, 156),
-	colorHpOrange         = new Color(144, 36, 7),
-	colorControlFrame1    = new Color(178, 163, 141),
-	colorControlFrame2    = new Color(97, 77, 59),
-	colorControlOrange    = new Color(195, 55, 20),
-	colorControlBlue      = new Color(0, 175, 246);
-	private static Color colorControlFrame;
+	colorHpBlueNegative         = new Color(53, 33, 26),
+	colorHpOrangeNegative       = new Color(36, 14, 12),
+	colorHpBlue                 = new Color(7, 103, 159),//(12, 104, 156),
+	colorHpOrange               = new Color(144, 36, 7),
+	colorControlFrame1          = new Color(178, 163, 141),
+	colorControlFrame2          = new Color(97, 77, 59),
+	colorControlOrange          = new Color(195, 55, 20),
+	colorControlBlue            = new Color(0, 175, 246),
+	colorFeedbackActionSuccess  = new Color(0, 255, 0),
+	colorFeedbackActionFail     = new Color(123, 125, 66),
+	colorFeedbackActionResist   = new Color(173, 154, 123),
+	colorFeedbackFishingSuccess = new Color(255, 255, 0),
+	colorFeedbackFishingFail    = new Color(255, 0, 123);
+	private final Color colorControlFrame;
 
 	private static boolean nightMode = false;
-	private final Point blinkControlPoint;
-	private       Point workingPoint;
+
+	private Point
+	workingPoint,
+	workingPoint1,
+	feedbackControlPoint;
 
 	private boolean
 	firstFish                         = true,
@@ -75,7 +83,9 @@ public class Fisher
 
 	private final Point
 	leftmostBluePixelCoordinate,
-	controlFrameCoordinate;
+	controlFrameCoordinate,
+	blinkControlPoint,
+	manaControlPoint;
 
 	private final int threshold = 10;    //default is 4
 
@@ -91,10 +101,18 @@ public class Fisher
 	private long
 	lastPumpingTime = System.currentTimeMillis(),
 	lastReelingTime = System.currentTimeMillis();
-	private final Point manaControlPoint;
-	private final Color manaControlColor;
+
+	private final  Color manaControlColor;
+	private static Color workingColor;
 
 	PrintWriter fileHandle;
+
+	public void setFeedbackObtainingPosition()
+	{
+		logger.trace(".setFeedbackObtainingPosition");
+		WinAPIAPI.showMessage("Mouse at feedback control point");
+		this.feedbackControlPoint = WinAPIAPI.getMousePos();
+	}
 
 	public void setTimeToWaitForPumping(int newTime)
 	{
@@ -113,6 +131,44 @@ public class Fisher
 		fileHandle.close();
 		exit(0);
 	}
+
+	private int analyzeFeedback()
+	{
+		logger.trace(".analyzeFeedback()");
+
+		workingPoint1 = new Point(feedbackControlPoint);
+		for (int i = 0; i <= 30; i++) {
+			workingColor = L2Window.getAbsPixelColor(workingPoint1);
+			if (L2Window.colorsAreClose(colorFeedbackActionSuccess, workingColor)) {
+				return 1;        //everything's OK
+			}
+			if (L2Window.colorsAreClose(colorFeedbackActionFail, workingColor)) {
+				return 2;        //wrong button
+			}
+			if (L2Window.colorsAreClose(colorFeedbackActionResist, workingColor)) {
+				workingPoint1.y -= 15;
+				workingPoint1.x = feedbackControlPoint.x;
+				for (int j = 0; j < 30; j++) {
+					workingColor = L2Window.getAbsPixelColor(workingPoint1);
+					if (L2Window.colorsAreClose(colorFeedbackFishingSuccess, workingColor)) {
+						return 4;        //did the job
+					}
+					if (L2Window.colorsAreClose(colorFeedbackFishingFail, workingColor)) {
+						return 5;        //needs improvements
+					}
+					if (L2Window.colorsAreClose(colorFeedbackActionResist, workingColor)) {    //actually it is not really resist
+						return 3;        //resisted attempt or reeling too early
+					}
+					workingPoint1.x++;
+				}
+				return 0;
+			}
+
+			workingPoint1.x++;
+		}
+		return 0;
+	}
+
 
 	private void checkForDisconnect()
 	{
@@ -218,7 +274,12 @@ public class Fisher
 				}
 			}
 			act(analyzeResult);
-			fileHandle.print(this.loggerToTheRight + "\r\n" + System.currentTimeMillis() + "\t" + analyzeResult + "\t" + this.workingPoint.x + "\t");
+			World.easySleep(this.ping * 2 + 20); //at least double-ping-sleep. or it becomes too fast
+			int feedback =this.analyzeFeedback();
+			fileHandle.print(this.loggerToTheRight + "\r\n" + System.currentTimeMillis() + "\t" + analyzeResult + "\t" + this.workingPoint.x + "\t" + feedback + "\t");
+			if (feedback==5||feedback==4){	//watch it. remove after fail
+				keyClickStatic(KeyEvent.VK_NUMPAD2); //next fishing act
+			}
 			timerWaitForPumpingSolution.cancel();
 			timerWaitForPumpingSolution = new Timer();
 		}
@@ -291,7 +352,6 @@ public class Fisher
 			this.lastPumpingTime = System.currentTimeMillis();
 		}
 		logger.info(".act " + reel);
-		World.easySleep(this.ping * 2 + 20); //at least double-ping-sleep. or it becomes too fast
 
 	}
 
@@ -441,53 +501,10 @@ public class Fisher
 
 	}
 
-
-	public Fisher()
-	{
-		try {
-			fileHandle = new PrintWriter("resources\\" + String.valueOf(System.currentTimeMillis()), "UTF-8");
-			fileHandle.println("System time\tAnalyze result\tCoordinate\tMoving to the right");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-		}
-
-		WinAPIAPI.showMessage("Mouse at mana control point");
-		this.manaControlPoint = WinAPIAPI.getMousePos();
-		this.manaControlColor = L2Window.getAbsPixelColor(this.manaControlPoint);
-
-		this.leftmostBluePixelCoordinate = findBar();
-		this.controlFrameCoordinate = new Point(this.leftmostBluePixelCoordinate.x, this.leftmostBluePixelCoordinate.y + 35);
-		boolean failInFindFrame = true;
-		for (int i = 0; i < 70; i++) {
-			this.controlFrameCoordinate.y = this.leftmostBluePixelCoordinate.y + 35 + i;
-			if (colorsAreClose(getAbsPixelColor(this.controlFrameCoordinate), colorControlFrame1)) {
-				logger.debug("control frame pixel is light");
-				colorControlFrame = colorControlFrame1;
-				failInFindFrame = false;
-				break;
-			} else if (colorsAreClose(getAbsPixelColor(this.controlFrameCoordinate), colorControlFrame2)) {
-				logger.debug("control frame pixel is dark");
-				colorControlFrame = colorControlFrame2;
-				failInFindFrame = false;
-				break;
-			}
-		}
-		if (failInFindFrame) {
-			logger.error("failed to calibrate in find window border. exiting");
-			finishFishing();
-		}
-		this.blinkControlPoint = new Point(this.leftmostBluePixelCoordinate.x + 1, this.leftmostBluePixelCoordinate.y + 3);
-
-	}
-
 	public void setSchedule(String currentIngameTime)
 	{
 
 		logger.trace(".setSchedule(); with " + currentIngameTime);
-
-
 
 		long ingameCurrentTimeFromDayStartMilliseconds = Integer.parseInt(currentIngameTime.substring(0, 2)) * 10 * 60 * 1000 + Integer.parseInt(currentIngameTime.substring(2, 4)) * 10 * 1000;
 		logger.debug("got ingame time " + Integer.parseInt(currentIngameTime.substring(0, 2)) + " " + Integer.parseInt(currentIngameTime.substring(2, 4)));
@@ -498,7 +515,6 @@ public class Fisher
 		{
 			taskTryNighMode.run();
 			logger.debug("set nightmode to now");
-
 		}
 
 		long nextNoghtModeSwitchMilliseconds = (ingameTime24HoursLengthMilliseconds - ingameCurrentTimeFromDayStartMilliseconds + ingameTimeFishingStartsMilliseconds) % ingameTime24HoursLengthMilliseconds; //not lol. this should work just perfectly
@@ -506,4 +522,52 @@ public class Fisher
 		logger.debug("next nightmode switch expected in " + String.valueOf(nextNoghtModeSwitchMilliseconds / 1000 / 60 / 60) + " hours " + String.valueOf((nextNoghtModeSwitchMilliseconds / 1000 / 60) % 60) + " minutes");
 
 	}
+
+
+	public Fisher()
+	{
+		try {
+			fileHandle = new PrintWriter("resources\\" + String.valueOf(System.currentTimeMillis()), "UTF-8");
+			fileHandle.println("System time\tAnalyze result\tCoordinate\tFeedback code\tMoving to the right");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		}
+
+		WinAPIAPI.showMessage("Mouse at mana control point");
+		this.manaControlPoint = WinAPIAPI.getMousePos();
+		this.manaControlColor = L2Window.getAbsPixelColor(this.manaControlPoint);
+
+		this.setFeedbackObtainingPosition();
+
+		this.leftmostBluePixelCoordinate = findBar();
+		this.controlFrameCoordinate = new Point(this.leftmostBluePixelCoordinate.x, this.leftmostBluePixelCoordinate.y + 35);
+
+		Color colorAssumedFrame = Color.BLACK;
+		boolean failInFindFrame = true;
+
+		for (int i = 0; i < 70; i++) {
+			this.controlFrameCoordinate.y = this.leftmostBluePixelCoordinate.y + 35 + i;
+			if (colorsAreClose(getAbsPixelColor(this.controlFrameCoordinate), colorControlFrame1)) {
+				logger.debug("control frame pixel is light");
+				colorAssumedFrame = colorControlFrame1;
+				failInFindFrame = false;
+				break;
+			} else if (colorsAreClose(getAbsPixelColor(this.controlFrameCoordinate), colorControlFrame2)) {
+				logger.debug("control frame pixel is dark");
+				colorAssumedFrame = colorControlFrame2;
+				failInFindFrame = false;
+				break;
+			}
+		}
+		colorControlFrame = colorAssumedFrame;
+		if (failInFindFrame) {
+			logger.error("failed to calibrate in find window border. exiting");
+			finishFishing();
+		}
+		this.blinkControlPoint = new Point(this.leftmostBluePixelCoordinate.x + 1, this.leftmostBluePixelCoordinate.y + 3);
+
+	}
+
 }
