@@ -156,22 +156,9 @@ public class WinAPIAPI
 		return returnRectangle;
 	}
 
-	public static void bringToFront(WinDef.HWND hwnd)    //todo delete it. is obsolete
-	{    //todo. needs to todo
-		return;
-	}
-
 
 	public static int dialogWindow(int useCase)
-	{//todo: very much todo
-//		System.out.println(s);
-//		int answer;
-//		try {
-//			answer = System.in.read();
-//		} catch (IOException e) {
-//			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-//			answer = -1;
-//		}
+	{
 		DialogWindow dialog = new DialogWindow(useCase);
 
 

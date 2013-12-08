@@ -68,6 +68,11 @@ public class Fisher
 	timeSkillsReuse          = 1500,    //watch it
 	deltaX                   = 3;
 
+	private static final long
+	ingameTimeFishingStartsMilliseconds = (6 * 10) * 1000,
+	ingameTimeFishingEndsMilliseconds   = (6 * 10 * 60 - 6 * 10) * 1000,
+	ingameTime24HoursLengthMilliseconds = (4 * 60 * 60) * 1000;
+
 	private final Point
 	leftmostBluePixelCoordinate,
 	controlFrameCoordinate;
@@ -148,7 +153,7 @@ public class Fisher
 					nightMode = false;
 
 				} else {
-					Fisher.logger.info("trying to switch to nightmode");
+					Fisher.logger.info("switching to nightmode");
 					L2Window.keyClickStatic(KeyEvent.VK_NUMPAD8);    //night lure
 					nightMode = true;
 				}
@@ -475,13 +480,30 @@ public class Fisher
 		}
 		this.blinkControlPoint = new Point(this.leftmostBluePixelCoordinate.x + 1, this.leftmostBluePixelCoordinate.y + 3);
 
-
-		timerNightReminder.schedule(taskTryNighMode, 1 * 60 * 1000, 10 * 60 * 1000);//once every ten minutes, first try in one minute after start
 	}
 
-	public void setSchedule(String time)
+	public void setSchedule(String currentIngameTime)
 	{
-//		sdfc
+
+		logger.trace(".setSchedule(); with " + currentIngameTime);
+
+
+
+		long ingameCurrentTimeFromDayStartMilliseconds = Integer.parseInt(currentIngameTime.substring(0, 2)) * 10 * 60 * 1000 + Integer.parseInt(currentIngameTime.substring(2, 4)) * 10 * 1000;
+		logger.debug("got ingame time " + Integer.parseInt(currentIngameTime.substring(0, 2)) + " " + Integer.parseInt(currentIngameTime.substring(2, 4)));
+
+		if (ingameCurrentTimeFromDayStartMilliseconds > ingameTimeFishingStartsMilliseconds
+			&&
+			ingameCurrentTimeFromDayStartMilliseconds < ingameTimeFishingEndsMilliseconds)
+		{
+			taskTryNighMode.run();
+			logger.debug("set nightmode to now");
+
+		}
+
+		long nextNoghtModeSwitchMilliseconds = (ingameTime24HoursLengthMilliseconds - ingameCurrentTimeFromDayStartMilliseconds + ingameTimeFishingStartsMilliseconds) % ingameTime24HoursLengthMilliseconds; //not lol. this should work just perfectly
+		timerNightReminder.schedule(taskTryNighMode, nextNoghtModeSwitchMilliseconds, ingameTime24HoursLengthMilliseconds);
+		logger.debug("next nightmode switch expected in " + String.valueOf(nextNoghtModeSwitchMilliseconds / 1000 / 60 / 60) + " hours " + String.valueOf((nextNoghtModeSwitchMilliseconds / 1000 / 60) % 60) + " minutes");
 
 	}
 }

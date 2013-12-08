@@ -341,7 +341,7 @@ public abstract class Character extends LivingCreature
 		forceRebuff();
 	}
 
-	public void deactivateModeHomeRun()    //todo on all deactiates: cancel all timers
+	public void deactivateModeHomeRun()
 	{
 		logger.trace(".deactivateModeHomeRun");
 		this.modeHomeRun = false;

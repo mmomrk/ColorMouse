@@ -37,6 +37,6 @@ public class CharacterFactory
 
 
 		logger.warn("DefaultCharacter has been created");
-		return new DefaultCharacter(hwnd);    //remove this after things are better
+		return new DefaultCharacter(hwnd);
 	}
 }
