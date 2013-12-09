@@ -53,12 +53,13 @@ public class World
 			L2Window initializingL2Window = new L2Window();
 			fisher = new Fisher();
 			if (argumentsList.contains("-t")) {
-
 				fisher.setSchedule(argumentsList.get(argumentsList.indexOf("-t") + 1));
 			} else if (argumentsList.contains("--time")) {
 				fisher.setSchedule(argumentsList.get(argumentsList.indexOf("--time") + 1));
 			}
-
+			if (argumentsList.contains("-cm")) {    //check mana mode
+				fisher.setCheckManaMode();
+			}
 			if (argumentsList.contains("-p")) {
 				fisher.setPing(Integer.parseInt(argumentsList.get(argumentsList.indexOf("-p") + 1)));
 			}

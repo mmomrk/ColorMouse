@@ -52,7 +52,9 @@ public class Fisher
 	firstAnalysis                     = true,
 	finishedWaitingForPumpingDecision = false,
 	needToChangeLure                  = false,
-	loggerToTheRight                  = false;
+	loggerToTheRight                  = false,
+	checkManaMode                     = false,
+	fileLog                           = false;
 
 	private Timer timerWaitForPumpingSolution = new Timer();
 
@@ -107,6 +109,19 @@ public class Fisher
 
 	PrintWriter fileHandle;
 
+	public void setFileLogMode()
+	{
+		logger.trace(".		setFileLogMode();");
+		this.fileLog = true;
+
+	}
+
+	public void setCheckManaMode()
+	{
+		logger.trace(".setCheckManaMode();");
+		this.checkManaMode = true;
+	}
+
 	public void setFeedbackObtainingPosition()
 	{
 		logger.trace(".setFeedbackObtainingPosition");
@@ -128,7 +143,9 @@ public class Fisher
 	public void finishFishing()
 	{
 		logger.info("Finishing fishing for some reason");
-		fileHandle.close();
+		if (this.fileLog) {
+			fileHandle.close();
+		}
 		exit(0);
 	}
 
@@ -200,7 +217,9 @@ public class Fisher
 		while (true) {
 			fish();
 			checkForDisconnect();
-			waitForMana();
+			if (checkManaMode) {
+				waitForMana();
+			}
 			if (needToChangeLure) {
 				needToChangeLure = false;
 				if (nightMode) {
@@ -273,12 +292,16 @@ public class Fisher
 					analyzeResult = analyze(timeSkillsReuse - timeSkillsReuseLeft);
 				}
 			}
+
 			act(analyzeResult);
 			World.easySleep(this.ping * 2 + 20); //at least double-ping-sleep. or it becomes too fast
-			int feedback =this.analyzeFeedback();
-			fileHandle.print(this.loggerToTheRight + "\r\n" + System.currentTimeMillis() + "\t" + analyzeResult + "\t" + this.workingPoint.x + "\t" + feedback + "\t");
-			if (feedback==5||feedback==4){	//watch it. remove after fail
-				keyClickStatic(KeyEvent.VK_NUMPAD2); //next fishing act
+			int feedback = this.analyzeFeedback();
+			if (this.fileLog) {
+				fileHandle.print(this.loggerToTheRight + "\r\n" + System.currentTimeMillis() + "\t" + analyzeResult + "\t" + this.workingPoint.x + "\t" + feedback + "\t");
+			}
+			if (feedback == 5 || feedback == 4) {
+				keyClickStatic(KeyEvent.VK_NUMPAD2);
+				return;
 			}
 			timerWaitForPumpingSolution.cancel();
 			timerWaitForPumpingSolution = new Timer();
@@ -426,6 +449,8 @@ public class Fisher
 						waitForBlink();
 						if (!(colorsAreClose(blinkControlColor, this.colorControlBlue, threshold) || colorsAreClose(blinkControlColor, this.colorControlOrange, threshold))) {//bar is empty, fish needs last shot
 							return false;//pump it and it's yours
+						} else {
+							return true; //watch it test it .probably should soulve a dozen of problems
 						}
 					} else {
 						return false;    //and go away again//watch it. probably a source of bad behav
@@ -466,6 +491,18 @@ public class Fisher
 			{
 				return true;    //do the reeling
 			}
+			workingPoint.x -= deltaX;
+			if (colorsAreClose(getAbsPixelColor(workingPoint), this.colorHpBlue, threshold)
+				||
+				colorsAreClose(getAbsPixelColor(workingPoint), this.colorHpOrange, threshold))
+			{
+				workingPoint.x += deltaX;
+			} else {
+				if (isFishingFrameExist()) {
+					return analyze();
+				}
+			}
+
 //			timePassed += timeInLoopDelayInAnalyze;
 //			logger.debug("checking for pumping decision");
 //			World.easySleep(timeInLoopDelayInAnalyze);
@@ -524,17 +561,18 @@ public class Fisher
 	}
 
 
-	public Fisher()
+	public Fisher(boolean loggingToFile)
 	{
-		try {
-			fileHandle = new PrintWriter("resources\\" + String.valueOf(System.currentTimeMillis()), "UTF-8");
-			fileHandle.println("System time\tAnalyze result\tCoordinate\tFeedback code\tMoving to the right");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		if (loggingToFile) {
+			try {
+				fileHandle = new PrintWriter("resources\\" + String.valueOf(System.currentTimeMillis()), "UTF-8");
+				fileHandle.println("System time\tAnalyze result\tCoordinate\tFeedback code\tMoving to the right");
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+			}
 		}
-
 		WinAPIAPI.showMessage("Mouse at mana control point");
 		this.manaControlPoint = WinAPIAPI.getMousePos();
 		this.manaControlColor = L2Window.getAbsPixelColor(this.manaControlPoint);
