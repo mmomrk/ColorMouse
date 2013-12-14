@@ -38,8 +38,11 @@ public class World
 
 		GroupedVariables.ProjectConstants initializingConstants = new GroupedVariables.ProjectConstants();
 		HotKeyHandler hotKeyHandler = new HotKeyHandler();
-		processIdentifier = new ProcessIdentifier();
-		hwnds = ProcessIdentifier.getL2HwndArray();
+		boolean interludeCompatibilityMode = (argumentsList.contains("--interlude") || argumentsList.contains("-i")) ? true : false;
+		if (!interludeCompatibilityMode) {
+			processIdentifier = new ProcessIdentifier();
+			hwnds = ProcessIdentifier.getL2HwndArray();
+		}
 
 		if (argumentsList.contains("-f")
 			||
@@ -51,15 +54,18 @@ public class World
 		{    //fishing
 			fishFlag = true;
 			L2Window initializingL2Window = new L2Window();
-			fisher = new Fisher();
+			fisher = new Fisher(argumentsList.contains("-fl") ? true : false,
+								argumentsList.contains("-cm") ? true : false,
+								interludeCompatibilityMode,
+								(argumentsList.contains("-ch")||argumentsList.contains("-chp")) ? true : false);
 			if (argumentsList.contains("-t")) {
 				fisher.setSchedule(argumentsList.get(argumentsList.indexOf("-t") + 1));
 			} else if (argumentsList.contains("--time")) {
 				fisher.setSchedule(argumentsList.get(argumentsList.indexOf("--time") + 1));
 			}
-			if (argumentsList.contains("-cm")) {    //check mana mode
-				fisher.setCheckManaMode();
-			}
+//			if (argumentsList.contains("-cm")) {    //check mana mode
+//				fisher.setCheckManaMode();
+//			}
 			if (argumentsList.contains("-p")) {
 				fisher.setPing(Integer.parseInt(argumentsList.get(argumentsList.indexOf("-p") + 1)));
 			}

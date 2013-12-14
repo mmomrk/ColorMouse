@@ -545,13 +545,12 @@ public class L2Window
 
 	public static Color getAbsPixelColor(Point absolutePoint)
 	{
-
-//		Color color; //static color. different variableWinAPIAPI.showMessage(absolutePoint.toString());//remove after
 		color = robot.getPixelColor(absolutePoint.x, absolutePoint.y);
 		switch (debugMode) {
 			case 1:
 //				WinAPIAPI.toolTip(color.toString(), absolutePoint.x, absolutePoint.y);
 				robot.mouseMove(absolutePoint.x, absolutePoint.y);
+//				World.easySleep(50);//remove immedately after you see it
 				break;
 			case 2:
 				robot.mouseMove(absolutePoint.x, absolutePoint.y);

@@ -113,13 +113,101 @@ public abstract class SwordSingerBladeDancer extends Character
 		}
 	}
 
-
+//	protected class ActionSelfBuff extends PixelHunter.Character.ActionAbstractBuff
+//	{
+//		public final int    buttonNumber;
+//		public final int    macroDelayMillis;
+//		public final String buffName;
+//		public final int    buffDelay;
+//
+//		@Override
+//		public void perform()
+//		{
+//			if (buffName == null) {
+//				Action.logger.warn("cancelled buff execution.. maybe this means something");
+//				return;
+//			}
+//			Action.logger.trace("ActionAbstractBuff.perform" + this.toString());
+//			Character.this.l2Window.keyClick(KeyEvent.VK_NUMPAD0 + this.buttonNumber); //96 is num pad 0. increments lineary
+//			macroLocksActions(this.macroDelayMillis);    //locks any action because macro is executed
+//			if (Character.this.modeBuff) {
+//				Action.logger.debug(".perform: making a hard task of adding new buff. watch it. watch it!");
+//				Character.this.buffTimerMap.get(this).schedule(new SelfBuffTask(this), this.buffDelay);
+//			}
+//		}
+//
+//		@Override
+//		public String toString()
+//		{
+//			return ("Buff action " + this.buffName + ". ID " + this.getID() + ", priority " + this.priority + ", button Num_" + this.buttonNumber + ", delayTime " + this.buffDelay + ", macro delay " + this.macroDelayMillis);
+//		}
+//
+//		@Override
+//		public boolean equals(Object o)
+//		{
+//			if (this == o) {
+//				return true;
+//			}
+//			if (o == null || getClass() != o.getClass()) {
+//				return false;
+//			}
+//
+//			ActionSelfBuff that = (ActionSelfBuff) o;
+//
+//			if (buttonNumber != that.buttonNumber) {
+//				return false;
+//			}
+//			if (!buffName.equals(that.buffName)) {
+//				return false;
+//			}
+//
+//			return true;
+//		}
+//
+//		@Override
+//		public int hashCode()
+//		{
+//			int result = buttonNumber;
+//			result = 31 * result + buffName.hashCode();
+//			return result;
+//		}
+//
+//		public ActionSelfBuff(String buffName, int buttonNumber, int buffDelayMillis, int macroDelayMillis)//btns from numpad
+//		{
+//			super();    //auto setting ID
+//
+//			this.buffName = buffName;
+//			this.isBuff = true;
+//			this.priority = 350;
+//			this.buttonNumber = buttonNumber;
+//			this.buffDelay = buffDelayMillis;
+//			this.macroDelayMillis = macroDelayMillis;
+//
+//			Action.logger.trace("Created ActionAbstractBuff. ID " + this.getID() + ", button Num_" + this.buttonNumber + ", macro delay " + this.macroDelayMillis);
+//		}
+//
+//		public ActionSelfBuff(ActionSelfBuff buffExample)
+//		{
+//			super();
+//			this.buffName = buffExample.buffName;
+//			this.isBuff = true;
+//			this.priority = buffExample.getPriority();
+//			this.buttonNumber = buffExample.buttonNumber;
+//			this.buffDelay = buffExample.buffDelay;
+//			this.macroDelayMillis = buffExample.macroDelayMillis;
+//
+//			Action.logger.trace("Created ActionAbstractBuff. ID " + this.getID() + ", button Num_" + this.buttonNumber + ", macro delay " + this.macroDelayMillis);
+//		}
+//
+//	}
 	protected class ActionSongDance extends ActionAbstractBuff
 	{
+		private boolean equalityField=false;	//used only to generate equals
+
 		@Override
 		public Action getNewCopy()
 		{
-			return new ActionSongDance();
+			return this;
 		}
 
 		@Override
@@ -142,9 +230,37 @@ public abstract class SwordSingerBladeDancer extends Character
 
 		}
 
+
+		@Override
+		public boolean equals(Object o)
+		{
+			if (this == o) {
+				return true;
+			}
+			if (o == null || getClass() != o.getClass()) {
+				return false;
+			}
+
+			ActionSongDance that = (ActionSongDance) o;
+
+			if (equalityField != that.equalityField) {
+				return false;
+			}
+
+			return true;
+		}
+
+		@Override
+		public int hashCode()
+		{
+			return (equalityField ? 1 : 0);
+		}
+
 		public ActionSongDance()
 		{
 			super();
+
+			this.equalityField=true;
 			this.priority = 350;
 		}
 	}

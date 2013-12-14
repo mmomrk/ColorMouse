@@ -24,23 +24,31 @@ public class Fisher
 	private static final Logger logger = LoggerFactory.getLogger(Fisher.class);
 
 	private L2Window l2Window;
+
+	private static Color
+	colorHpBlueNegative = new Color(53, 33, 26),
+	colorHpBlue         = new Color(7, 103, 159),//(12, 104, 156),
+	colorControlBlue    = new Color(0, 175, 246),
+	colorControlFrame1  = new Color(178, 163, 141);
+
 	private static final Color
-	colorHpBlueNegative         = new Color(53, 33, 26),
-	colorHpOrangeNegative       = new Color(36, 14, 12),
-	colorHpBlue                 = new Color(7, 103, 159),//(12, 104, 156),
-	colorHpOrange               = new Color(144, 36, 7),
-	colorControlFrame1          = new Color(178, 163, 141),
-	colorControlFrame2          = new Color(97, 77, 59),
-	colorControlOrange          = new Color(195, 55, 20),
-	colorControlBlue            = new Color(0, 175, 246),
+	colorHpOrangeNegative = new Color(36, 14, 12),
+	colorHpOrange         = new Color(144, 36, 7),
+	colorControlFrame2    = new Color(97, 77, 59),
+	colorControlOrange    = new Color(195, 55, 20),
+
 	colorFeedbackActionSuccess  = new Color(0, 255, 0),
 	colorFeedbackActionFail     = new Color(123, 125, 66),
 	colorFeedbackActionResist   = new Color(173, 154, 123),
 	colorFeedbackFishingSuccess = new Color(255, 255, 0),
 	colorFeedbackFishingFail    = new Color(255, 0, 123);
+
+
 	private final Color colorControlFrame;
 
-	private static boolean nightMode = false;
+
+	private static boolean nightMode = false,
+	interludeCompatibilityMode       = false;
 
 	private Point
 	workingPoint,
@@ -54,6 +62,7 @@ public class Fisher
 	needToChangeLure                  = false,
 	loggerToTheRight                  = false,
 	checkManaMode                     = false,
+	checkHealthMode                   = false,
 	fileLog                           = false;
 
 	private Timer timerWaitForPumpingSolution = new Timer();
@@ -84,10 +93,11 @@ public class Fisher
 	ingameTime24HoursLengthMilliseconds = (4 * 60 * 60) * 1000;
 
 	private final Point
-	leftmostBluePixelCoordinate,
-	controlFrameCoordinate,
-	blinkControlPoint,
-	manaControlPoint;
+						leftmostBluePixelCoordinate;
+	private final Point controlFrameCoordinate;
+	private final Point blinkControlPoint;
+	private final Point manaControlPoint;
+	private final Point healthControlPoint;
 
 	private final int threshold = 10;    //default is 4
 
@@ -98,28 +108,32 @@ public class Fisher
 	lastKeyPressed      = 0,
 	currentFailLimit    = 0;
 
-	private int[] numberOfFailsAllowed = new int[] {3, 20};
+	private int[] numberOfFailsAllowed = new int[] {10, 30};
 
 	private long
 	lastPumpingTime = System.currentTimeMillis(),
 	lastReelingTime = System.currentTimeMillis();
 
-	private final  Color manaControlColor;
+	private final Color
+	manaControlColor,
+	healthControlColor;
 	private static Color workingColor;
 
 	PrintWriter fileHandle;
 
-	public void setFileLogMode()
-	{
-		logger.trace(".		setFileLogMode();");
-		this.fileLog = true;
 
-	}
-
-	public void setCheckManaMode()
+	private void checkHealthAndAct()		//keys for interlude. not for aster
 	{
-		logger.trace(".setCheckManaMode();");
-		this.checkManaMode = true;
+		logger.trace(".checkHealth part");
+		if (!colorsAreClose(healthControlColor, getAbsPixelColor(healthControlPoint))) {
+			logger.info("I guess I cought a monster. Acting accordingly");
+			L2Window.keyClickStatic(KeyEvent.VK_9);
+			World.easySleep(15000);
+			L2Window.keyClickStatic(KeyEvent.VK_0);
+			World.easySleep(15000);
+			return;
+		}
+
 	}
 
 	public void setFeedbackObtainingPosition()
@@ -195,7 +209,7 @@ public class Fisher
 			currentFailLimit = numberOfFailsAllowed[1];
 		}
 
-		if (this.lastKeyPressed == KeyEvent.VK_NUMPAD2) {
+		if (this.lastKeyPressed == KeyEvent.VK_NUMPAD2 || this.lastKeyPressed == KeyEvent.VK_2) {
 			numberOfFAilsInARow++;
 		} else {
 			numberOfFAilsInARow = 0;
@@ -215,7 +229,7 @@ public class Fisher
 	public void infiniteFish()
 	{
 		while (true) {
-			fish();
+			fish();        //includes check for mob appear with -chp flag
 			checkForDisconnect();
 			if (checkManaMode) {
 				waitForMana();
@@ -234,6 +248,11 @@ public class Fisher
 				}
 				World.easySleep(600);
 			}
+			if (checkHealthMode){
+				checkHealthAndAct();
+			}
+
+
 		}
 
 	}
@@ -244,7 +263,7 @@ public class Fisher
 		logger.trace(".waitForMana");
 		int count = 0;
 		while (!colorsAreClose(manaControlColor, getAbsPixelColor(manaControlPoint))) {
-			if (count > 20) {
+			if (count > 35) {
 				finishFishing();
 			}
 			WinAPIAPI.showMessage("Waiting for mana regeneration(20 for exit): " + count, 10);
@@ -259,8 +278,13 @@ public class Fisher
 		logger.trace(".fish");
 
 		if (!isFishingFrameExist()) {    //we killed the frame. correcting the mistake
-			keyClickStatic(KeyEvent.VK_NUMPAD2);
-			this.lastKeyPressed = KeyEvent.VK_NUMPAD2;
+			if (!interludeCompatibilityMode) {
+				keyClickStatic(KeyEvent.VK_NUMPAD2);
+				this.lastKeyPressed = KeyEvent.VK_NUMPAD2;
+			} else {
+				keyClickStatic(KeyEvent.VK_2);
+				this.lastKeyPressed = KeyEvent.VK_2;
+			}
 			logger.info("Throwing a bait");
 			World.easySleep(500);    //or he may cancel it immediately
 		}
@@ -274,7 +298,6 @@ public class Fisher
 		boolean analyzeResult;
 		long timeSkillsReuseLeft;
 		while (isFishingFrameExist()) {
-//			logger.trace("frame exists. next analyze after wait for blink");
 			waitForBlink();
 			analyzeResult = analyze();
 
@@ -295,11 +318,17 @@ public class Fisher
 
 			act(analyzeResult);
 			World.easySleep(this.ping * 2 + 20); //at least double-ping-sleep. or it becomes too fast
-			int feedback = this.analyzeFeedback();
+			if (interludeCompatibilityMode){
+				L2Window.keyClickStatic(KeyEvent.VK_8);
+			}
+			int feedback = interludeCompatibilityMode ? 0 : this.analyzeFeedback();
 			if (this.fileLog) {
 				fileHandle.print(this.loggerToTheRight + "\r\n" + System.currentTimeMillis() + "\t" + analyzeResult + "\t" + this.workingPoint.x + "\t" + feedback + "\t");
 			}
-			if (feedback == 5 || feedback == 4) {
+			if ((feedback == 5 || feedback == 4)
+				&&
+				!this.needToChangeLure)
+			{
 				keyClickStatic(KeyEvent.VK_NUMPAD2);
 				return;
 			}
@@ -366,12 +395,22 @@ public class Fisher
 	private void act(boolean reel)
 	{
 		if (reel) {
-			keyClickStatic(KeyEvent.VK_NUMPAD4);
-			lastKeyPressed = KeyEvent.VK_NUMPAD4;
+			if (!interludeCompatibilityMode) {
+				keyClickStatic(KeyEvent.VK_NUMPAD4);
+				lastKeyPressed = KeyEvent.VK_NUMPAD4;
+			} else {
+				keyClickStatic(KeyEvent.VK_4);
+				lastKeyPressed = KeyEvent.VK_4;
+			}
 			this.lastReelingTime = System.currentTimeMillis();
 		} else {
-			keyClickStatic(KeyEvent.VK_NUMPAD3);
-			lastKeyPressed = KeyEvent.VK_NUMPAD3;
+			if (!interludeCompatibilityMode) {
+				keyClickStatic(KeyEvent.VK_NUMPAD3);
+				lastKeyPressed = KeyEvent.VK_NUMPAD3;
+			} else {
+				keyClickStatic(KeyEvent.VK_3);
+				lastKeyPressed = KeyEvent.VK_3;
+			}
 			this.lastPumpingTime = System.currentTimeMillis();
 		}
 		logger.info(".act " + reel);
@@ -499,6 +538,7 @@ public class Fisher
 				workingPoint.x += deltaX;
 			} else {
 				if (isFishingFrameExist()) {
+					workingPoint.x += deltaX;
 					return analyze();
 				}
 			}
@@ -561,8 +601,25 @@ public class Fisher
 	}
 
 
-	public Fisher(boolean loggingToFile)
+	public Fisher(boolean loggingToFile, boolean checkingMana, boolean interludeCompatibleMode, boolean checkingHP)
 	{
+		if (interludeCompatibleMode) {
+			this.interludeCompatibilityMode = true;
+
+			colorHpBlueNegative = new Color(90, 23, 35);       //ch
+
+			colorHpBlue = new Color(57, 190, 253);//(12, 104, 156),	//ch
+
+			colorControlBlue = new Color(8, 113, 198);    //ch
+
+			colorControlFrame1 = new Color(0, 0, 0);    //ch
+
+		} else {
+			this.setFeedbackObtainingPosition();
+		}
+		this.fileLog = loggingToFile;
+		this.checkManaMode = checkingMana;
+		this.checkHealthMode = checkingHP;	//interlude only
 		if (loggingToFile) {
 			try {
 				fileHandle = new PrintWriter("resources\\" + String.valueOf(System.currentTimeMillis()), "UTF-8");
@@ -573,11 +630,23 @@ public class Fisher
 				e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 			}
 		}
-		WinAPIAPI.showMessage("Mouse at mana control point");
-		this.manaControlPoint = WinAPIAPI.getMousePos();
-		this.manaControlColor = L2Window.getAbsPixelColor(this.manaControlPoint);
+		if (checkManaMode) {
+			WinAPIAPI.showMessage("Mouse at mana control point");
+			this.manaControlPoint = WinAPIAPI.getMousePos();
+			this.manaControlColor = L2Window.getAbsPixelColor(this.manaControlPoint);
+		} else {
+			this.manaControlPoint = new Point(-1, -1);
+			this.manaControlColor = Color.BLACK;
+		}
+		if (checkHealthMode) {
+			WinAPIAPI.showMessage("Mouse at HP control point");
+			this.healthControlPoint = WinAPIAPI.getMousePos();
+			this.healthControlColor = L2Window.getAbsPixelColor(this.healthControlPoint);
+		} else {
+			this.healthControlPoint = new Point(-1, -1);
+			this.healthControlColor = Color.BLACK;
+		}
 
-		this.setFeedbackObtainingPosition();
 
 		this.leftmostBluePixelCoordinate = findBar();
 		this.controlFrameCoordinate = new Point(this.leftmostBluePixelCoordinate.x, this.leftmostBluePixelCoordinate.y + 35);
@@ -586,7 +655,7 @@ public class Fisher
 		boolean failInFindFrame = true;
 
 		for (int i = 0; i < 70; i++) {
-			this.controlFrameCoordinate.y = this.leftmostBluePixelCoordinate.y + 35 + i;
+			this.controlFrameCoordinate.y = this.leftmostBluePixelCoordinate.y + 25 + i;
 			if (colorsAreClose(getAbsPixelColor(this.controlFrameCoordinate), colorControlFrame1)) {
 				logger.debug("control frame pixel is light");
 				colorAssumedFrame = colorControlFrame1;

@@ -129,7 +129,7 @@ public abstract class Character extends LivingCreature
 
 	protected boolean iThinkIAmFacingAChampion()
 	{
-		logger.trace(".iThinkIAmFacingAChampion()");
+		logger.trace(".iThinkIAmFacingAChampion()?");
 		if (this.modeFarm && System.currentTimeMillis() - this.iStartedToKillTargetAt > ProjectConstants.CHAMPION_SUSPICION_TIME_SECONDS * 1000) {
 			if (this.targetWasAlive) {
 				return true;
@@ -213,7 +213,7 @@ public abstract class Character extends LivingCreature
 					} else {
 						logger.warn("for some reason support has non-zero hp target.maybe it's ok");
 					}
-					if (iThinkIAmFacingAChampion()) {
+					if (iThinkIAmFacingAChampion() && !this.isFightingChampion) {
 						onChampion();
 					}
 				}
@@ -257,7 +257,7 @@ public abstract class Character extends LivingCreature
 
 	}
 
-	/*checks for allowness of tod o*/
+	/*checks for allowness of tod_o*/
 	private void doTheToDo()
 	{
 
