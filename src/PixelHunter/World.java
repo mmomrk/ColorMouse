@@ -44,6 +44,12 @@ public class World
 			hwnds = ProcessIdentifier.getL2HwndArray();
 		}
 
+		if (argumentsList.contains("-LIG")) {
+
+			LittleInGameHelper littleInGameHelper=new LittleInGameHelper(argumentsList.contains("-cp")?true:false);
+			littleInGameHelper.doTheJob();
+		}
+
 		if (argumentsList.contains("-f")
 			||
 			argumentsList.contains("--fishing")
@@ -51,13 +57,14 @@ public class World
 			argumentsList.contains("--fish")
 			||
 			argumentsList.contains("--fisher"))
+
 		{    //fishing
 			fishFlag = true;
 			L2Window initializingL2Window = new L2Window();
 			fisher = new Fisher(argumentsList.contains("-fl") ? true : false,
 								argumentsList.contains("-cm") ? true : false,
 								interludeCompatibilityMode,
-								(argumentsList.contains("-ch")||argumentsList.contains("-chp")) ? true : false);
+								(argumentsList.contains("-ch") || argumentsList.contains("-chp")) ? true : false);
 			if (argumentsList.contains("-t")) {
 				fisher.setSchedule(argumentsList.get(argumentsList.indexOf("-t") + 1));
 			} else if (argumentsList.contains("--time")) {
@@ -105,13 +112,17 @@ public class World
 
 
 		int id = 0;
-		if (singleWindowMode) {
+		if (singleWindowMode)
+
+		{
 			L2Window.initiateSize(0, hwnds.get(0));    //yes, static method access, not the class representative
 			//0=fully on the screen
 			WinAPIAPI.setActiveWindow(hwnds.get(0));
 			id = WinAPIAPI.dialogWindow(0);
 			characters[0] = CharacterFactory.getCharacter(id, hwnds.get(0));
-		} else {    //todo change hwnds order: first is left. if one can do
+		} else
+
+		{    //todo change hwnds order: first is left. if one can do
 
 			WinAPIAPI.setActiveWindow(hwnds.get(0));        //not implemented yet
 			L2Window.initiateSize(1, hwnds.get(0));    //1=left on the screen
@@ -131,11 +142,15 @@ public class World
 								  (characters[1].id == GroupedVariables.ProjectConstants.ID_Swordsinger
 								   ||
 								   characters[1].id == GroupedVariables.ProjectConstants.ID_Bladedancer)))
+
 		{
 			GroupedVariables.Mediator.BDSWSInDaHouse = true;
-		} else {
+		} else
+
+		{
 			GroupedVariables.Mediator.BDSWSInDaHouse = false;
 		}
+
 		if (argumentsList.contains("-m"))
 
 		{

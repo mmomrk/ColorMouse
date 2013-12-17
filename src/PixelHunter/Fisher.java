@@ -125,10 +125,11 @@ public class Fisher
 	private void checkHealthAndAct()		//keys for interlude. not for aster
 	{
 		logger.trace(".checkHealth part");
+		int timeBetweenMacros=2*60*1000;
 		if (!colorsAreClose(healthControlColor, getAbsPixelColor(healthControlPoint))) {
 			logger.info("I guess I cought a monster. Acting accordingly");
 			L2Window.keyClickStatic(KeyEvent.VK_9);
-			World.easySleep(15000);
+			World.easySleep(timeBetweenMacros);
 			L2Window.keyClickStatic(KeyEvent.VK_0);
 			World.easySleep(15000);
 			return;
@@ -249,6 +250,8 @@ public class Fisher
 				World.easySleep(600);
 			}
 			if (checkHealthMode){
+				checkHealthAndAct();
+				World.easySleep(2500);
 				checkHealthAndAct();
 			}
 
