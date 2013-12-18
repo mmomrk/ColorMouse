@@ -50,6 +50,17 @@ public class L2Window
 		World.easySleep(activateDelay);
 	}
 
+	public static void keyPressReleaseStatic(int key, boolean press)
+	{
+		logger.trace(".keyPressStatic();");
+		World.easySleep(GroupedVariables.ProjectConstants.TIME_SLEEP_KEYPRESS_MILLIS_BEFORE);
+		if (press) {
+			robot.keyPress(key);
+		} else {
+			robot.keyRelease(key);
+		}
+	}
+
 	public void keyClick(int key)
 	{
 		logger.trace(".keyClick, non-static " + key);
@@ -192,7 +203,7 @@ public class L2Window
 
 		if (abs(diffR) > threshold || abs(diffG) > threshold || abs(diffB) > threshold) {
 			if (abs(diffR) < 2 * threshold && abs(diffG) < 2 * threshold && abs(diffB) < 2 * threshold) {
-				logger.warn("probably two colors are close, but failed comparison. Recommended to increase threshold. " + color1 + " " + color2);
+//				logger.warn("probably two colors are close, but failed comparison. Recommended to increase threshold. " + color1 + " " + color2);
 
 			}
 			return false;
@@ -417,7 +428,9 @@ public class L2Window
 		Point currentMousePosition = getMousePos();
 		robot.mouseMove(absolutePoint.x, absolutePoint.y);
 		robot.mousePress(InputEvent.BUTTON1_MASK);
+		World.easySleep(30);
 		robot.mouseRelease(InputEvent.BUTTON1_MASK);
+		World.easySleep(50);
 		if (debugMode == 0) {
 			robot.mouseMove(currentMousePosition.x, currentMousePosition.y);
 		}
@@ -427,7 +440,7 @@ public class L2Window
 	{
 		logger.trace(".mouseClick Relative");
 
-		Point currentMousePosition = new Point(500, 500);
+		Point currentMousePosition = new Point(500, 500); //have to do this way
 		if (debugMode == 0) {
 			currentMousePosition = getMousePos();
 		}
@@ -435,6 +448,7 @@ public class L2Window
 		robot.mousePress(InputEvent.BUTTON1_MASK);
 		World.easySleep(30);
 		robot.mouseRelease(InputEvent.BUTTON1_MASK);
+		World.easySleep(50);
 		if (debugMode == 0) {
 			robot.mouseMove(currentMousePosition.x, currentMousePosition.y);
 		}

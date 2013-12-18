@@ -46,7 +46,7 @@ public class World
 
 		if (argumentsList.contains("-LIG")) {
 
-			LittleInGameHelper littleInGameHelper=new LittleInGameHelper(argumentsList.contains("-cp")?true:false);
+			LittleInGameHelper littleInGameHelper = new LittleInGameHelper(argumentsList.contains("-cp") ? true : false);
 			littleInGameHelper.doTheJob();
 		}
 
@@ -64,15 +64,14 @@ public class World
 			fisher = new Fisher(argumentsList.contains("-fl") ? true : false,
 								argumentsList.contains("-cm") ? true : false,
 								interludeCompatibilityMode,
-								(argumentsList.contains("-ch") || argumentsList.contains("-chp")) ? true : false);
+								(argumentsList.contains("-ch") || argumentsList.contains("-chp")) ? true : false,
+								argumentsList.contains("-br"));
 			if (argumentsList.contains("-t")) {
 				fisher.setSchedule(argumentsList.get(argumentsList.indexOf("-t") + 1));
 			} else if (argumentsList.contains("--time")) {
 				fisher.setSchedule(argumentsList.get(argumentsList.indexOf("--time") + 1));
 			}
-//			if (argumentsList.contains("-cm")) {    //check mana mode
-//				fisher.setCheckManaMode();
-//			}
+
 			if (argumentsList.contains("-p")) {
 				fisher.setPing(Integer.parseInt(argumentsList.get(argumentsList.indexOf("-p") + 1)));
 			}

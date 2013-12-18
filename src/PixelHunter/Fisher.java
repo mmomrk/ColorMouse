@@ -63,7 +63,8 @@ public class Fisher
 	loggerToTheRight                  = false,
 	checkManaMode                     = false,
 	checkHealthMode                   = false,
-	fileLog                           = false;
+	fileLog                           = false,
+	brewMode                          = false;
 
 	private Timer timerWaitForPumpingSolution = new Timer();
 
@@ -96,7 +97,10 @@ public class Fisher
 						leftmostBluePixelCoordinate;
 	private final Point controlFrameCoordinate;
 	private final Point blinkControlPoint;
-	private final Point manaControlPoint;
+	private       Point
+						manaControlPoint,
+	manaBrewControlPoint,
+	manaBrewButtonPoint;
 	private final Point healthControlPoint;
 
 	private final int threshold = 10;    //default is 4
@@ -114,18 +118,52 @@ public class Fisher
 	lastPumpingTime = System.currentTimeMillis(),
 	lastReelingTime = System.currentTimeMillis();
 
-	private final Color
+	private Color
 	manaControlColor,
+	manaBrewControlColor,
 	healthControlColor;
 	private static Color workingColor;
 
 	PrintWriter fileHandle;
 
+	private void brew()
+	{
 
-	private void checkHealthAndAct()		//keys for interlude. not for aster
+		if (L2Window.colorsAreClose(this.manaBrewControlColor, L2Window.getAbsPixelColor(this.manaBrewControlPoint))) {
+			logger.trace(".brew();");
+			L2Window.keyPressReleaseStatic(KeyEvent.VK_SHIFT, true);
+			L2Window.mouseClick_Absolute(this.manaBrewButtonPoint);
+//			World.easySleep(300);
+//			L2Window.mouseClick_Absolute(this.manaBrewButtonPoint);
+			L2Window.keyPressReleaseStatic(KeyEvent.VK_SHIFT, false);
+		}
+	}
+
+	public void setBrewMode()
+	{
+		logger.trace(".setBrewMode();");
+		this.brewMode = true;
+		WinAPIAPI.showMessage("Mouse at BREW mana control point");
+		this.manaBrewControlPoint = WinAPIAPI.getMousePos();
+		this.manaBrewControlColor = L2Window.getAbsPixelColor(this.manaBrewControlPoint);
+		WinAPIAPI.showMessage("Mouse at brew button");
+		this.manaBrewButtonPoint = WinAPIAPI.getMousePos();
+
+	}
+
+	public void setCheckManaMode()
+	{
+		logger.trace(".setCheckManaMode();");
+		this.checkManaMode = true;
+		WinAPIAPI.showMessage("Mouse at mana control point");
+		this.manaControlPoint = WinAPIAPI.getMousePos();
+		this.manaControlColor = L2Window.getAbsPixelColor(this.manaControlPoint);
+	}
+
+	private void checkHealthAndAct()        //keys for interlude. not for aster
 	{
 		logger.trace(".checkHealth part");
-		int timeBetweenMacros=2*60*1000;
+		int timeBetweenMacros = 2 * 60 * 1000;
 		if (!colorsAreClose(healthControlColor, getAbsPixelColor(healthControlPoint))) {
 			logger.info("I guess I cought a monster. Acting accordingly");
 			L2Window.keyClickStatic(KeyEvent.VK_9);
@@ -212,6 +250,7 @@ public class Fisher
 
 		if (this.lastKeyPressed == KeyEvent.VK_NUMPAD2 || this.lastKeyPressed == KeyEvent.VK_2) {
 			numberOfFAilsInARow++;
+			World.easySleep(1000);
 		} else {
 			numberOfFAilsInARow = 0;
 		}
@@ -232,9 +271,7 @@ public class Fisher
 		while (true) {
 			fish();        //includes check for mob appear with -chp flag
 			checkForDisconnect();
-			if (checkManaMode) {
-				waitForMana();
-			}
+
 			if (needToChangeLure) {
 				needToChangeLure = false;
 				if (nightMode) {
@@ -249,12 +286,17 @@ public class Fisher
 				}
 				World.easySleep(600);
 			}
-			if (checkHealthMode){
+			if (checkManaMode) {
+				waitForMana();
+			}
+			if (checkHealthMode) {
 				checkHealthAndAct();
 				World.easySleep(2500);
 				checkHealthAndAct();
 			}
-
+			if (brewMode) {
+				brew();
+			}
 
 		}
 
@@ -321,18 +363,18 @@ public class Fisher
 
 			act(analyzeResult);
 			World.easySleep(this.ping * 2 + 20); //at least double-ping-sleep. or it becomes too fast
-			if (interludeCompatibilityMode){
+			if (interludeCompatibilityMode) {
 				L2Window.keyClickStatic(KeyEvent.VK_8);
 			}
 			int feedback = interludeCompatibilityMode ? 0 : this.analyzeFeedback();
 			if (this.fileLog) {
 				fileHandle.print(this.loggerToTheRight + "\r\n" + System.currentTimeMillis() + "\t" + analyzeResult + "\t" + this.workingPoint.x + "\t" + feedback + "\t");
 			}
-			if ((feedback == 5 || feedback == 4)
-				&&
-				!this.needToChangeLure)
+			if ((feedback == 5 || feedback == 4))
 			{
-				keyClickStatic(KeyEvent.VK_NUMPAD2);
+				if (!this.brewMode && !this.needToChangeLure) {
+					keyClickStatic(KeyEvent.VK_NUMPAD2);
+				}
 				return;
 			}
 			timerWaitForPumpingSolution.cancel();
@@ -604,7 +646,7 @@ public class Fisher
 	}
 
 
-	public Fisher(boolean loggingToFile, boolean checkingMana, boolean interludeCompatibleMode, boolean checkingHP)
+	public Fisher(boolean loggingToFile, boolean checkingMana, boolean interludeCompatibleMode, boolean checkingHP, boolean brewing)
 	{
 		if (interludeCompatibleMode) {
 			this.interludeCompatibilityMode = true;
@@ -622,7 +664,8 @@ public class Fisher
 		}
 		this.fileLog = loggingToFile;
 		this.checkManaMode = checkingMana;
-		this.checkHealthMode = checkingHP;	//interlude only
+		this.checkHealthMode = checkingHP;    //interlude only
+		this.brewMode = brewing;
 		if (loggingToFile) {
 			try {
 				fileHandle = new PrintWriter("resources\\" + String.valueOf(System.currentTimeMillis()), "UTF-8");
@@ -633,13 +676,8 @@ public class Fisher
 				e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 			}
 		}
-		if (checkManaMode) {
-			WinAPIAPI.showMessage("Mouse at mana control point");
-			this.manaControlPoint = WinAPIAPI.getMousePos();
-			this.manaControlColor = L2Window.getAbsPixelColor(this.manaControlPoint);
-		} else {
-			this.manaControlPoint = new Point(-1, -1);
-			this.manaControlColor = Color.BLACK;
+		if (checkingMana) {
+			setCheckManaMode();
 		}
 		if (checkHealthMode) {
 			WinAPIAPI.showMessage("Mouse at HP control point");
@@ -649,7 +687,9 @@ public class Fisher
 			this.healthControlPoint = new Point(-1, -1);
 			this.healthControlColor = Color.BLACK;
 		}
-
+		if (brewing) {
+			setBrewMode();
+		}
 
 		this.leftmostBluePixelCoordinate = findBar();
 		this.controlFrameCoordinate = new Point(this.leftmostBluePixelCoordinate.x, this.leftmostBluePixelCoordinate.y + 35);
