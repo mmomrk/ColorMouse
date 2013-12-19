@@ -24,7 +24,7 @@ public class InfoFrame extends JFrame implements WindowListener
 	private static final Logger logger = LoggerFactory.getLogger(InfoFrame.class);
 
 	private JLabel  label;
-	private JButton okButton;
+	private JButton okButton, okButtonNoSleep;
 
 	private boolean frameExists = false;
 
@@ -115,8 +115,11 @@ public class InfoFrame extends JFrame implements WindowListener
 		label = new JLabel(text);
 		okButton = new JButton("OK");
 		okButton.addActionListener(new ActionOKButton());
+		okButtonNoSleep = new JButton("OK. No sleep manipulations");
+		okButtonNoSleep.addActionListener(new ActionOKNoSleepButton());
 		add(label, BorderLayout.NORTH);
-		add(okButton, BorderLayout.SOUTH);
+		add(okButton, BorderLayout.CENTER);
+		add(okButtonNoSleep, BorderLayout.SOUTH);
 
 		this.setLocationRelativeTo(null);
 
@@ -132,7 +135,22 @@ public class InfoFrame extends JFrame implements WindowListener
 		{
 //			logger.trace("OK button press performed");
 			InfoFrame.this.frameExists = false;
-			GroupedVariables.Mediator.sleepRegime = false;
+			GroupedVariables.Mediator.sleepRegime = !GroupedVariables.Mediator.sleepRegime;
+			InfoFrame.this.setVisible(false);
+//			dispose();
+
+		}
+	}
+
+
+	class ActionOKNoSleepButton implements ActionListener
+	{
+
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+//			logger.trace("OK button press performed");
+			InfoFrame.this.frameExists = false;
 			InfoFrame.this.setVisible(false);
 //			dispose();
 

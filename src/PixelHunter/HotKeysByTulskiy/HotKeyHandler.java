@@ -1,11 +1,8 @@
 package PixelHunter.HotKeysByTulskiy;
-import PixelHunter.GroupedVariables;
+import PixelHunter.*;
 import PixelHunter.HotKeysByTulskiy.Common.HotKey;
 import PixelHunter.HotKeysByTulskiy.Common.HotKeyListener;
 import PixelHunter.HotKeysByTulskiy.Common.Provider;
-import PixelHunter.L2Window;
-import PixelHunter.WinAPIAPI;
-import PixelHunter.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,13 +20,16 @@ public class HotKeyHandler implements HotKeyListener
 
 	final Provider provider = Provider.getCurrentProvider(false);
 
-	private static final int PAUSE        = 299;        //forgive me..
-	private static final int ALT_PAUSE    = 300;    //in the name of sparta
-	private static final int SHIFT_PAUSE  = 301;
-	private static final int ALT_CTRL_F   = 302;
-	private static final int ALT_CTRL_R   = 303;
-	private static final int ALT_CTRL_B   = 304;
-	private static final int CTRL_SHIFT_B = 305;
+	private static final int
+	PAUSE        = 299,        //forgive me..
+	ALT_PAUSE    = 300,    //in the name of sparta
+	SHIFT_PAUSE  = 301,
+	ALT_CTRL_F   = 302,
+	ALT_CTRL_R   = 303,
+	ALT_CTRL_B   = 304,
+	CTRL_SHIFT_B = 305,
+	CTRL_1       = 306,
+	CTRL_2       = 307;
 
 
 //	private final JPanel      bottomPanel = new JPanel();
@@ -80,7 +80,6 @@ public class HotKeyHandler implements HotKeyListener
 		} else if (hotKey.keyStroke == KeyStroke.getKeyStroke("PAUSE")) {
 			logger.debug("Got hotKey PAUSE. Executing");
 			World.pauseWorld();
-//			sleep();
 		} else if (hotKey.keyStroke == KeyStroke.getKeyStroke("shift PAUSE")) {
 			logger.debug("Got hotKey shift PAUSE. Executing");
 			debugModeShift();
@@ -94,9 +93,16 @@ public class HotKeyHandler implements HotKeyListener
 			logger.debug("Got hotKey alt control B. Executing");
 			toggleModeBuff();
 		} else if (hotKey.keyStroke == KeyStroke.getKeyStroke("control shift B")) {
-			logger.debug("Got hotKey shift B. Executing");
+			logger.debug("Got hotKey control shift B. Executing");
 			forceRebuff();
+		} else if (hotKey.keyStroke == KeyStroke.getKeyStroke("control 1")) {
+			logger.debug("Got hotKey control 1 Executing");
+			setFisherTo();
+		} else if (hotKey.keyStroke == KeyStroke.getKeyStroke("control 2")) {
+			logger.debug("Got hotKey control 2 Executing");
+			fisherMove();
 		}
+
 
 
 //		switch (hotKey.keyStroke) {
@@ -147,6 +153,8 @@ public class HotKeyHandler implements HotKeyListener
 		WinAPIAPI.User32DLL.unregisterHotKey(null, ALT_CTRL_R);
 		WinAPIAPI.User32DLL.unregisterHotKey(null, ALT_CTRL_B);
 		WinAPIAPI.User32DLL.unregisterHotKey(null, CTRL_SHIFT_B);
+		WinAPIAPI.User32DLL.unregisterHotKey(null, CTRL_1);
+		WinAPIAPI.User32DLL.unregisterHotKey(null, CTRL_2);
 
 	}
 
@@ -161,7 +169,8 @@ public class HotKeyHandler implements HotKeyListener
 		provider.register(KeyStroke.getKeyStroke("alt control R"), this);
 		provider.register(KeyStroke.getKeyStroke("alt control B"), this);
 		provider.register(KeyStroke.getKeyStroke("control shift B"), this);
-
+		provider.register(KeyStroke.getKeyStroke("control 1"), this);
+		provider.register(KeyStroke.getKeyStroke("control 2"), this);
 //		WinAPIAPI.User32DLL.registerHotKey(null, PAUSE, 0, KeyEvent.VK_PAUSE);
 //		WinAPIAPI.User32DLL.registerHotKey(null, ALT_PAUSE, WinAPIAPI.User32DLL.MOD_ALT, KeyEvent.VK_PAUSE);
 //		WinAPIAPI.User32DLL.registerHotKey(null, SHIFT_PAUSE, WinAPIAPI.User32DLL.MOD_SHIFT, KeyEvent.VK_PAUSE);
@@ -169,6 +178,18 @@ public class HotKeyHandler implements HotKeyListener
 //		WinAPIAPI.User32DLL.registerHotKey(null, ALT_CTRL_R, WinAPIAPI.User32DLL.MOD_ALT + WinAPIAPI.User32DLL.MOD_CONTROL, KeyEvent.VK_R);
 //		WinAPIAPI.User32DLL.registerHotKey(null, ALT_CTRL_B, WinAPIAPI.User32DLL.MOD_ALT + WinAPIAPI.User32DLL.MOD_CONTROL, KeyEvent.VK_B);
 //		WinAPIAPI.User32DLL.registerHotKey(null, SHIFT_B, WinAPIAPI.User32DLL.MOD_SHIFT, KeyEvent.VK_B);
+	}
+
+	private void fisherMove()
+	{
+		logger.trace(".fisherMove();");
+		Fisher.moveFishLIG();
+	}
+
+	private void setFisherTo()
+	{
+		logger.trace(".setFisherTo();");
+		Fisher.setMoveFromTo();
 	}
 
 	private void forceRebuff()

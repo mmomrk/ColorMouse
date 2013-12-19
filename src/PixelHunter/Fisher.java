@@ -93,6 +93,11 @@ public class Fisher
 	ingameTimeFishingEndsMilliseconds   = (6 * 10 * 60 - 6 * 10) * 1000,
 	ingameTime24HoursLengthMilliseconds = (4 * 60 * 60) * 1000;
 
+
+	private static Point
+	moveInventoryItemsFromCoordinate,
+	moveInventoryItemsToCoordinate;
+
 	private final Point
 						leftmostBluePixelCoordinate;
 	private final Point controlFrameCoordinate;
@@ -125,6 +130,29 @@ public class Fisher
 	private static Color workingColor;
 
 	PrintWriter fileHandle;
+
+	public static void moveFishLIG()
+	{
+		logger.trace(".moveFishLIG();");
+		moveInventoryItemsFromCoordinate = WinAPIAPI.getMousePos();
+		L2Window.keyPressReleaseStatic(KeyEvent.VK_ALT, true);
+		World.easySleep(30);
+		L2Window.mousePressReleaseStatic(true);
+		World.easySleep(30);
+		L2Window.mouseMove(moveInventoryItemsToCoordinate);
+		L2Window.mousePressReleaseStatic(false);
+		L2Window.keyPressReleaseStatic(KeyEvent.VK_ALT, false);
+		World.easySleep(30);
+		L2Window.mouseMove(moveInventoryItemsFromCoordinate);
+
+	}
+
+	public static void setMoveFromTo()
+	{
+		logger.trace(".setMoveFromTo();");
+		WinAPIAPI.showMessage("Mouse at \'TO\' point");
+		moveInventoryItemsToCoordinate = WinAPIAPI.getMousePos();
+	}
 
 	private void brew()
 	{
@@ -286,6 +314,9 @@ public class Fisher
 				}
 				World.easySleep(600);
 			}
+			while (GroupedVariables.Mediator.sleepRegime) {
+				World.easySleep(100);
+			}
 			if (checkManaMode) {
 				waitForMana();
 			}
@@ -370,8 +401,7 @@ public class Fisher
 			if (this.fileLog) {
 				fileHandle.print(this.loggerToTheRight + "\r\n" + System.currentTimeMillis() + "\t" + analyzeResult + "\t" + this.workingPoint.x + "\t" + feedback + "\t");
 			}
-			if ((feedback == 5 || feedback == 4))
-			{
+			if ((feedback == 5 || feedback == 4)) {
 				if (!this.brewMode && !this.needToChangeLure) {
 					keyClickStatic(KeyEvent.VK_NUMPAD2);
 				}

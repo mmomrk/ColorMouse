@@ -175,6 +175,18 @@ public class WinAPIAPI
 	private static boolean isFirtsRunOfShowMessage = true;
 	private static InfoFrame frame;
 
+	public static void showMessageNoPause(String s)
+	{
+		if (isFirtsRunOfShowMessage) {
+			frame = new InfoFrame(s);
+			frame.display(s);
+			isFirtsRunOfShowMessage = false;
+		} else {
+			frame.display(s);
+		}
+
+	}
+
 	public static void showMessage(String s)
 	{
 		if (isFirtsRunOfShowMessage) {

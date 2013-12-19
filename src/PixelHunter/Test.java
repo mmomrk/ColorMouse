@@ -10,7 +10,6 @@ public class Test
 		HotKeyHandler hotKeyHandler = new HotKeyHandler();
 		L2Window l2Window = new L2Window();
 
-
 	}
 
 }

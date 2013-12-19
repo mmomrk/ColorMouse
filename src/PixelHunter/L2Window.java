@@ -9,6 +9,7 @@ import java.awt.*;
 import java.awt.event.InputEvent;
 
 import static PixelHunter.WinAPIAPI.getMousePos;
+import static PixelHunter.WinAPIAPI.toolTip;
 import static java.lang.Math.abs;
 
 /**
@@ -42,6 +43,12 @@ public class L2Window
 	private static Color color;    //for not creating a new one every time
 
 	private boolean noChatMode = false;    //++getter
+
+	public static void mouseMove(Point whereTo)
+	{
+		logger.trace(".mouseMove();");
+		robot.mouseMove(whereTo.x, whereTo.y);
+	}
 
 	public void activate()
 	{
@@ -419,6 +426,16 @@ public class L2Window
 		logger.info("successfully found HP");
 
 		return;
+	}
+
+	public static void mousePressReleaseStatic(boolean press)
+	{
+		logger.trace("mousePressReleaseStatic();");
+		if (press) {
+			robot.mousePress(InputEvent.BUTTON1_MASK);
+		} else {
+			robot.mouseRelease(InputEvent.BUTTON1_MASK);
+		}
 	}
 
 	public static void mouseClick_Absolute(Point absolutePoint)

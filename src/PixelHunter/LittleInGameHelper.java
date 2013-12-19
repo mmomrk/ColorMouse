@@ -15,17 +15,18 @@ public class LittleInGameHelper
 
 	private Color cpCheckColor;
 
-	private void prepareCPCheckMode(){
+	private void prepareCPCheckMode()
+	{
 		WinAPIAPI.showMessage("Mouse at CP control point");
 		this.cpCheckPoint = WinAPIAPI.getMousePos();
 		this.cpCheckColor = L2Window.getAbsPixelColor(this.cpCheckPoint);
 	}
 
-	public  void doTheJob()
+	public void doTheJob()
 	{
-		while (true){
-			if (this.cpCheckMode){
-				while (!L2Window.colorsAreClose(this.cpCheckColor,L2Window.getAbsPixelColor(this.cpCheckPoint))){
+		while (true) {
+			if (this.cpCheckMode) {
+				while (!L2Window.colorsAreClose(this.cpCheckColor, L2Window.getAbsPixelColor(this.cpCheckPoint))) {
 					L2Window.keyClickStatic(KeyEvent.VK_F11);
 					World.easySleep(500);
 				}
@@ -36,8 +37,8 @@ public class LittleInGameHelper
 
 	public LittleInGameHelper(boolean cpCheck)
 	{
-		this.cpCheckMode =cpCheck;
-		if (this.cpCheckMode){
+		this.cpCheckMode = cpCheck;
+		if (this.cpCheckMode) {
 			prepareCPCheckMode();
 		}
 	}

@@ -113,7 +113,8 @@ public abstract class SwordSingerBladeDancer extends Character
 		}
 	}
 
-//	protected class ActionSelfBuff extends PixelHunter.Character.ActionAbstractBuff
+
+	//	protected class ActionSelfBuff extends PixelHunter.Character.ActionAbstractBuff
 //	{
 //		public final int    buttonNumber;
 //		public final int    macroDelayMillis;
@@ -202,7 +203,7 @@ public abstract class SwordSingerBladeDancer extends Character
 //	}
 	protected class ActionSongDance extends ActionAbstractBuff
 	{
-		private boolean equalityField=false;	//used only to generate equals
+		private boolean equalityField = false;    //used only to generate equals
 
 		@Override
 		public Action getNewCopy()
@@ -260,7 +261,7 @@ public abstract class SwordSingerBladeDancer extends Character
 		{
 			super();
 
-			this.equalityField=true;
+			this.equalityField = true;
 			this.priority = 350;
 		}
 	}
